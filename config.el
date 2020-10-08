@@ -96,7 +96,7 @@
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (on-platform-do
- ((windows cygwin) (setq org-directory "C:/Users/elken/AppData/Roaming/Microsoft/Windows/Network Shortcuts/org"))
+ ((windows cygwin) (setq org-directory "z:/"))
  (linux (setq org-directory "~/org/")))
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
