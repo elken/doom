@@ -62,13 +62,6 @@
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
-
-(dolist (mode '(org-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
 (setq user-full-name "Ellis Kenyo"
@@ -86,8 +79,14 @@
 ;; font string. You generally only need these two:
 ;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
 ;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
-(setq doom-font (font-spec :family "Hasklug NF" :size 12 :weight 'semi-light)
-      doom-variable-pitch-font (font-spec :family "Montserrat" :size 13))
+(on-platform-do
+ ((windows cygwin)
+  (setq doom-font (font-spec :family "Hasklug NF" :size 12)
+        doom-variable-pitch-font (font-spec :family "Montserrat" :size 13)))
+ ((linux)
+  (setq doom-font (font-spec :family "Hasklug Nerd Font" :size 12)
+        doom-variable-pitch-font (font-spec :family "Montserrat" :size 13))))
+
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -97,12 +96,18 @@
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (on-platform-do
- ((windows cygwin) (setq org-directory "C:\Users\elken\AppData\Roaming\Microsoft\Windows\Network Shortcuts\org"))
+ ((windows cygwin) (setq org-directory "C:/Users/elken/AppData/Roaming/Microsoft/Windows/Network Shortcuts/org"))
  (linux (setq org-directory "~/org/")))
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type 'relative)
+
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 
 ;; Here are some additional functions/macros that could help you configure Doom:
@@ -123,15 +128,15 @@
 ;; they are implemented.
 
 (use-package! rainbow-mode
-	:hook
-	(prog-mode . rainbow-mode)
-	(text-mode . rainbow-mode))
+  :hook
+  (prog-mode . rainbow-mode)
+  (text-mode . rainbow-mode))
 
 (use-package! org
   :hook (org-mode . elken/org-mode-setup)
   :config
   (setq org-ellipsis " ▾"
-	org-hide-emphasis-markers t)
+        org-hide-emphasis-markers t)
   (elken/org-font-setup))
 
 (use-package! org-bullets
