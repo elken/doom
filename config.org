@@ -58,12 +58,6 @@ Enable =visual-fill-column-mode= to center an org document for nicer editing.
   (visual-fill-column-mode 1))
 #+END_SRC
 
-When a task is marked done, insert a completed time.
-
-#+BEGIN_SRC emacs-lisp
-(setq org-log-done 'time)
-#+END_SRC
-
 Enables archiving of tasks. Replaces the in-built version which only works for single tasks.
 
 #+BEGIN_SRC emacs-lisp
@@ -140,7 +134,7 @@ Configure the fonts across all used platforms (slightly different names).
 Load my current flavour-of-the-month colour scheme.
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-dracula)
 #+END_SRC
 
 *** Line Numbers
@@ -181,16 +175,23 @@ Configuration for any packages included above
     #+END_SRC
 **** Org
 
-    This is where the various org hooks are applied along with a few other settings
+This is where the various org hooks are applied along with a few other settings
 
-        #+BEGIN_SRC emacs-lisp
-        (use-package! org
-        :hook (org-mode . elken/org-mode-setup)
-        :config
-        (setq org-ellipsis " ▾"
-                org-hide-emphasis-markers t)
-        (elken/org-font-setup))
-        #+END_SRC
+#+BEGIN_SRC emacs-lisp
+    (use-package! org
+    :hook (org-mode . elken/org-mode-setup)
+    :config
+    (setq org-ellipsis " ▾"                                 ;; Change the dropdown icon
+          org-todo-keywords
+          '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STRT(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
+            (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")) ;; Keywords
+          org-agenda-start-with-log-mode t                  ;; Use log-mode for agenda
+          org-archive-location "Archive.org::"              ;; Change archive location
+          org-log-done 'time                                ;; Add timestamp to DONE items
+          org-log-into-drawer t                             ;; Log items into drawer
+          org-hide-emphasis-markers t)                      ;; Only show the last marker
+    (elken/org-font-setup))
+#+END_SRC
 **** Org-bullets
     Pretty format the org heading markers
     #+BEGIN_SRC emacs-lisp
