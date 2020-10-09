@@ -236,6 +236,8 @@ Center the org mode documents
 #+END_SRC
 
 *** Org-make-toc
+Used to create the table of contents
+
 #+BEGIN_SRC emacs-lisp
 (use-package! org-make-toc
   :after org)
