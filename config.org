@@ -1,0 +1,204 @@
+* Config
+Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original, snippets from stackoverflow and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
+
+** Helper functions
+Useful macro to handle configuration across multiple platforms. I could probably tidy this up a bit but it works and programmers are lazy.
+
+#+BEGIN_SRC emacs-lisp
+(defun platform-keyword-to-string (platform-keyword)
+  (cond
+   ((eq platform-keyword 'windows) "windows-nt")
+   ((eq platform-keyword 'cygwin) "cygwin")
+   ((eq platform-keyword 'osx) "darwin")
+   ((eq platform-keyword 'linux) "gnu/linux")))
+
+;; Define a macro that runs an elisp expression only on a particular platform
+(defmacro on-platform-do (&rest platform-expressions)
+  `(cond
+    ,@(mapcar
+       (lambda (platform-expr)
+     (let ((keyword (nth 0 platform-expr))
+           (expr (nth 1 platform-expr)))
+       `(,(if (listp keyword)
+         `(or
+           ,@(mapcar
+              (lambda (kw) `(string-equal system-type ,(platform-keyword-to-string kw)))
+              keyword))
+          `(string-equal system-type ,(platform-keyword-to-string keyword)))
+          ,expr)))
+       platform-expressions)))
+#+END_SRC
+
+** Org Mode
+*** General setup
+
+Set the default org directories across all platforms.
+
+#+BEGIN_SRC emacs-lisp
+(on-platform-do
+ ((windows cygwin) (setq org-directory "z:/"))
+ (linux (setq org-directory "~/org/")))
+#+END_SRC
+
+Enable =org-indent-mode= by default to properly indent everything automagically, =variable-pitch-mode= to enable the more readable fonts where it makes sense and =visual-line-mode= to add a "current line" selection.
+
+#+BEGIN_SRC emacs-lisp
+(defun elken/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (visual-line-mode 1))
+
+#+END_SRC
+
+Enable =visual-fill-column-mode= to center an org document for nicer editing.
+
+#+BEGIN_SRC emacs-lisp
+(defun elken/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+#+END_SRC
+
+When a task is marked done, insert a completed time.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-log-done 'time)
+#+END_SRC
+
+Enables archiving of tasks. (This might already exist within doom but I'm still tinkering)
+
+#+BEGIN_SRC emacs-lisp
+(defun elken/org-mode-archive-done-tasks ()
+  (interactive)
+  (org-map-entries 'org-archive-subtree "/DONE" 'file))
+#+END_SRC
+
+*** Font setup
+Font setup to prettify the fonts. Uses Montserrat in most places except where it makes sense to use the defined fixed width font.
+
+#+BEGIN_SRC emacs-lisp
+(defun elken/org-font-setup ()
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Montserrat" :weight 'regular :height (cdr face)))
+
+
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+#+END_SRC
+
+** User setup
+
+Use my name and emails for things like GPG, snippets, mail, magit, etc.
+
+#+BEGIN_SRC emacs-lisp
+(setq user-full-name "Ellis Kenyo"
+      user-mail-address "me@elken.dev")
+#+END_SRC
+
+** Graphical setup
+*** Fonts
+Configure the fonts across all used platforms (slightly different names).
+
+#+BEGIN_SRC emacs-lisp
+(on-platform-do
+ ((windows cygwin)
+  (setq doom-font (font-spec :family "Hasklug NF" :size 12)
+        doom-variable-pitch-font (font-spec :family "Montserrat" :size 13)))
+ ((linux)
+  (setq doom-font (font-spec :family "Hasklug Nerd Font" :size 12)
+        doom-variable-pitch-font (font-spec :family "Montserrat" :size 13))))
+#+END_SRC
+
+*** Theme
+
+Load my current flavour-of-the-month colour scheme.
+
+#+BEGIN_SRC emacs-lisp
+(setq doom-theme 'doom-one)
+#+END_SRC
+
+*** Line Numbers
+Set the default line number format to be relative and disable line numbers for specific modes
+#+BEGIN_SRC emacs-lisp
+(setq display-line-numbers-type 'relative)
+
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+END_SRC
+
+** Packages
+
+Tangle this into the packages.el file. Removes the need for it.
+
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! rainbow-mode)
+(package! org-bullets)
+(package! visual-fill-column)
+#+END_SRC
+
+*** Setup
+
+Configuration for any packages included above
+
+**** Rainbow Mode
+
+    Colouring paranetheses so I don't get confused by the scary lisp dialects.
+
+    #+BEGIN_SRC emacs-lisp
+    (use-package! rainbow-mode
+      :hook
+      (prog-mode . rainbow-mode)
+      (text-mode . rainbow-mode))
+    #+END_SRC
+**** Org
+
+    This is where the various org hooks are applied along with a few other settings
+
+        #+BEGIN_SRC emacs-lisp
+        (use-package! org
+        :hook (org-mode . elken/org-mode-setup)
+        :config
+        (setq org-ellipsis " ▾"
+                org-hide-emphasis-markers t)
+        (elken/org-font-setup))
+        #+END_SRC
+**** Org-bullets
+    Pretty format the org heading markers
+    #+BEGIN_SRC emacs-lisp
+    (use-package! org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+    #+END_SRC
+
+**** Visual Fill Column
+    Center the org mode documents
+
+    #+BEGIN_SRC emacs-lisp
+    (use-package! visual-fill-column
+    :hook (org-mode . elken/org-mode-visual-fill))
+    #+END_SRC
