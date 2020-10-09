@@ -1,7 +1,30 @@
-* Config
 Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original, snippets from stackoverflow and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
 
-** Helper functions
+* Table of Contents
+:PROPERTIES:
+:TOC:      :include all
+:END:
+:CONTENTS:
+- [[#table-of-contents][Table of Contents]]
+- [[#helper-functions][Helper functions]]
+- [[#org-mode][Org Mode]]
+  - [[#general-setup][General setup]]
+  - [[#font-setup][Font setup]]
+- [[#user-setup][User setup]]
+- [[#graphical-setup][Graphical setup]]
+  - [[#fonts][Fonts]]
+  - [[#theme][Theme]]
+  - [[#line-numbers][Line Numbers]]
+- [[#packages][Packages]]
+  - [[#setup][Setup]]
+    - [[#rainbow-mode][Rainbow Mode]]
+    - [[#org][Org]]
+    - [[#org-bullets][Org-bullets]]
+    - [[#visual-fill-column][Visual Fill Column]]
+    - [[#org-make-toc][Org-make-toc]]
+:END:
+
+* Helper functions
 Useful macro to handle configuration across multiple platforms. I could probably tidy this up a bit but it works and programmers are lazy.
 
 #+BEGIN_SRC emacs-lisp
@@ -29,8 +52,8 @@ Useful macro to handle configuration across multiple platforms. I could probably
        platform-expressions)))
 #+END_SRC
 
-** Org Mode
-*** General setup
+* Org Mode
+** General setup
 
 Set the default org directories across all platforms.
 
@@ -73,7 +96,7 @@ Enables archiving of tasks. Replaces the in-built version which only works for s
 (map! :map org-mode-map "C-c $" #'elken/org-archive-done-tasks)
 #+END_SRC
 
-*** Font setup
+** Font setup
 Font setup to prettify the fonts. Uses Montserrat in most places except where it makes sense to use the defined fixed width font.
 
 #+BEGIN_SRC emacs-lisp
@@ -106,7 +129,7 @@ Font setup to prettify the fonts. Uses Montserrat in most places except where it
 
 #+END_SRC
 
-** User setup
+* User setup
 
 Use my name and emails for things like GPG, snippets, mail, magit, etc.
 
@@ -115,8 +138,8 @@ Use my name and emails for things like GPG, snippets, mail, magit, etc.
       user-mail-address "me@elken.dev")
 #+END_SRC
 
-** Graphical setup
-*** Fonts
+* Graphical setup
+** Fonts
 Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
@@ -129,7 +152,7 @@ Configure the fonts across all used platforms (slightly different names).
         doom-variable-pitch-font (font-spec :family "Montserrat" :size 13))))
 #+END_SRC
 
-*** Theme
+** Theme
 
 Load my current flavour-of-the-month colour scheme.
 
@@ -137,7 +160,7 @@ Load my current flavour-of-the-month colour scheme.
 (setq doom-theme 'doom-dracula)
 #+END_SRC
 
-*** Line Numbers
+** Line Numbers
 Set the default line number format to be relative and disable line numbers for specific modes
 #+BEGIN_SRC emacs-lisp
 (setq display-line-numbers-type 'relative)
@@ -149,7 +172,7 @@ Set the default line number format to be relative and disable line numbers for s
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
-** Packages
+* Packages
 
 Tangle this into the packages.el file. Removes the need for it.
 
@@ -157,23 +180,24 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! rainbow-mode)
 (package! org-bullets)
 (package! visual-fill-column)
+(package! org-make-toc)
 #+END_SRC
 
-*** Setup
+** Setup
 
 Configuration for any packages included above
 
-**** Rainbow Mode
+*** Rainbow Mode
 
-    Colouring paranetheses so I don't get confused by the scary lisp dialects.
+Colouring paranetheses so I don't get confused by the scary lisp dialects.
 
-    #+BEGIN_SRC emacs-lisp
-    (use-package! rainbow-mode
-      :hook
-      (prog-mode . rainbow-mode)
-      (text-mode . rainbow-mode))
-    #+END_SRC
-**** Org
+#+BEGIN_SRC emacs-lisp
+(use-package! rainbow-mode
+    :hook
+    (prog-mode . rainbow-mode)
+    (text-mode . rainbow-mode))
+#+END_SRC
+*** Org
 
 This is where the various org hooks are applied along with a few other settings
 
@@ -192,20 +216,27 @@ This is where the various org hooks are applied along with a few other settings
           org-hide-emphasis-markers t)                      ;; Only show the last marker
     (elken/org-font-setup))
 #+END_SRC
-**** Org-bullets
-    Pretty format the org heading markers
-    #+BEGIN_SRC emacs-lisp
-    (use-package! org-bullets
-    :after org
-    :hook (org-mode . org-bullets-mode)
-    :custom
-    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-    #+END_SRC
+*** Org-bullets
+Pretty format the org heading markers
 
-**** Visual Fill Column
-    Center the org mode documents
+#+BEGIN_SRC emacs-lisp
+(use-package! org-bullets
+:after org
+:hook (org-mode . org-bullets-mode)
+:custom
+(org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+END_SRC
 
-    #+BEGIN_SRC emacs-lisp
-    (use-package! visual-fill-column
-    :hook (org-mode . elken/org-mode-visual-fill))
-    #+END_SRC
+*** Visual Fill Column
+Center the org mode documents
+
+#+BEGIN_SRC emacs-lisp
+(use-package! visual-fill-column
+:hook (org-mode . elken/org-mode-visual-fill))
+#+END_SRC
+
+*** Org-make-toc
+#+BEGIN_SRC emacs-lisp
+(use-package! org-make-toc
+  :after org)
+#+END_SRC
