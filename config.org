@@ -47,7 +47,6 @@ Enable =org-indent-mode= by default to properly indent everything automagically,
   (org-indent-mode)
   (variable-pitch-mode 1)
   (visual-line-mode 1))
-
 #+END_SRC
 
 Enable =visual-fill-column-mode= to center an org document for nicer editing.
@@ -65,12 +64,19 @@ When a task is marked done, insert a completed time.
 (setq org-log-done 'time)
 #+END_SRC
 
-Enables archiving of tasks. (This might already exist within doom but I'm still tinkering)
+Enables archiving of tasks. Replaces the in-built version which only works for single tasks.
 
 #+BEGIN_SRC emacs-lisp
-(defun elken/org-mode-archive-done-tasks ()
+(defun elken/org-archive-done-tasks ()
+  "Attempt to archive all done tasks in file"
   (interactive)
-  (org-map-entries 'org-archive-subtree "/DONE" 'file))
+  (org-map-entries
+   (lambda ()
+     (org-archive-subtree)
+     (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
+   "/DONE" 'file))
+
+(map! :map org-mode-map "C-c $" #'elken/org-archive-done-tasks)
 #+END_SRC
 
 *** Font setup
