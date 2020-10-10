@@ -1,3 +1,6 @@
+[[file:banner.png]]
+(icon courtesy of https://github.com/eccentric-j/doom-icon)
+
 Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original, snippets from stackoverflow and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
 
 * Table of Contents
@@ -160,6 +163,10 @@ Load my current flavour-of-the-month colour scheme.
 (setq doom-theme 'doom-dracula)
 #+END_SRC
 
+Change the default banner
+#+BEGIN_SRC emacs-lisp
+(setq +doom-dashboard-banner-file (expand-file-name "banner.png" doom-private-dir))
+#+END_SRC
 ** Line Numbers
 Set the default line number format to be relative and disable line numbers for specific modes
 #+BEGIN_SRC emacs-lisp
