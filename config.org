@@ -1,4 +1,5 @@
 [[file:banner.png]]
+
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
 
 Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original, snippets from stackoverflow and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
