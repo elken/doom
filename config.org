@@ -180,6 +180,12 @@ Set the default line number format to be relative and disable line numbers for s
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
+** GUI/Frame
+Maximise emacs on startup
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+#+END_SRC
 * Packages
 
 Tangle this into the packages.el file. Removes the need for it.
