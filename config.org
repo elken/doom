@@ -1,3 +1,6 @@
+#+TITLE: Config
+
+#+CAPTION: Banner
 [[file:banner.png]]
 
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
@@ -98,6 +101,12 @@ Enables archiving of tasks. Replaces the in-built version which only works for s
    "/DONE" 'file))
 
 (map! :map org-mode-map "C-c $" #'elken/org-archive-done-tasks)
+#+END_SRC
+
+Show images inline by default
+
+#+BEGIN_SRC emacs-lisp
+(setq org-startup-with-inline-images t)
 #+END_SRC
 
 ** Font setup
@@ -211,6 +220,7 @@ Colouring paranetheses so I don't get confused by the scary lisp dialects.
     (prog-mode . rainbow-mode)
     (text-mode . rainbow-mode))
 #+END_SRC
+
 *** Org
 
 This is where the various org hooks are applied along with a few other settings
@@ -230,6 +240,7 @@ This is where the various org hooks are applied along with a few other settings
           org-hide-emphasis-markers t)                      ;; Only show the last marker
     (elken/org-font-setup))
 #+END_SRC
+
 *** Org-bullets
 Pretty format the org heading markers
 
