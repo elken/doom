@@ -109,6 +109,17 @@ Show images inline by default
 (setq org-startup-with-inline-images t)
 #+END_SRC
 
+Auto reload config on save (just this file)
+
+#+begin_src emacs-lisp
+(defun elken/doom-reload-on-save ()
+  (when (string-equal (buffer-file-name)
+                      (expand-file-name "config.org" doom-private-dir))
+    (doom/reload)))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'elken/doom-reload-on-save)))
+#+end_src
+
 ** Font setup
 Font setup to prettify the fonts. Uses Montserrat in most places except where it makes sense to use the defined fixed width font.
 
@@ -267,3 +278,15 @@ Used to create the table of contents
 (use-package! org-make-toc
   :after org)
 #+END_SRC
+
+*** Org-tempo
+Better snippets for org-mode src blocks
+
+#+BEGIN_SRC emacs-lisp
+(use-package! org-tempo
+  :after org
+  :init
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+#+END_SRC
+
