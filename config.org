@@ -22,6 +22,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#fonts][Fonts]]
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
+  - [[#guiframe][GUI/Frame]]
 - [[#packages][Packages]]
   - [[#setup][Setup]]
     - [[#rainbow-mode][Rainbow Mode]]
@@ -29,6 +30,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#org-bullets][Org-bullets]]
     - [[#visual-fill-column][Visual Fill Column]]
     - [[#org-make-toc][Org-make-toc]]
+    - [[#org-tempo][Org-tempo]]
 :END:
 
 * Helper functions
@@ -74,6 +76,7 @@ Enable =org-indent-mode= by default to properly indent everything automagically,
 
 #+BEGIN_SRC emacs-lisp
 (defun elken/org-mode-setup ()
+  (org-make-toc-mode)
   (org-indent-mode)
   (variable-pitch-mode 1)
   (visual-line-mode 1))
@@ -245,7 +248,7 @@ This is where the various org hooks are applied along with a few other settings
           '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STRT(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
             (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")) ;; Keywords
           org-agenda-start-with-log-mode t                  ;; Use log-mode for agenda
-          org-archive-location "Archive.org::"              ;; Change archive location
+          org-archive-location "Archive_%s.org::"           ;; Change archive location
           org-log-done 'time                                ;; Add timestamp to DONE items
           org-log-into-drawer t                             ;; Log items into drawer
           org-hide-emphasis-markers t)                      ;; Only show the last marker
@@ -280,7 +283,7 @@ Used to create the table of contents
 #+END_SRC
 
 *** Org-tempo
-Better snippets for org-mode src blocks
+Better snippets for org-mode =src= blocks
 
 #+BEGIN_SRC emacs-lisp
 (use-package! org-tempo
