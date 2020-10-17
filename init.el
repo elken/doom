@@ -17,6 +17,9 @@
 ;; Loading before emacs
 (setq treemacs-git-mode 'deferred)
 
+;; Make line endings work
+(setq evil-respect-visual-line-mode t)
+
 (doom! :input
        ;;chinese
        ;;japanese
