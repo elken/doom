@@ -207,7 +207,7 @@ Set the default line number format to be relative and disable line numbers for s
 Maximise emacs on startup
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+END_SRC
 * Packages
 
