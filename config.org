@@ -248,7 +248,7 @@ This is where the various org hooks are applied along with a few other settings
           '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STRT(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
             (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")) ;; Keywords
           org-agenda-start-with-log-mode t                  ;; Use log-mode for agenda
-          org-archive-location "Archive_%s::"           ;; Change archive location
+          org-archive-location "archive/Archive_%s::"           ;; Change archive location
           org-log-done 'time                                ;; Add timestamp to DONE items
           org-log-into-drawer t                             ;; Log items into drawer
           org-hide-emphasis-markers t)                      ;; Only show the last marker
