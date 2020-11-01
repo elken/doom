@@ -31,6 +31,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#visual-fill-column][Visual Fill Column]]
     - [[#org-make-toc][Org-make-toc]]
     - [[#org-tempo][Org-tempo]]
+    - [[#edit-server][Edit Server]]
 :END:
 
 * Helper functions
@@ -218,6 +219,7 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! org-bullets)
 (package! visual-fill-column)
 (package! org-make-toc)
+(package! edit-server)
 #+END_SRC
 
 ** Setup
@@ -293,3 +295,23 @@ Better snippets for org-mode =src= blocks
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+END_SRC
 
+*** Edit Server
+Used for editing things from Firefox
+
+#+begin_src emacs-lisp
+(use-package! edit-server
+  :commands edit-server-start
+  :init (if after-init-time
+              (edit-server-start)
+            (add-hook 'after-init-hook
+                      #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t)
+                  (window-system . x))))
+#+end_src
