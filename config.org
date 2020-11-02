@@ -13,6 +13,8 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 :END:
 :CONTENTS:
 - [[#table-of-contents][Table of Contents]]
+- [[#global-settings][Global settings]]
+  - [[#auth-info][Auth info]]
 - [[#helper-functions][Helper functions]]
 - [[#org-mode][Org Mode]]
   - [[#general-setup][General setup]]
@@ -32,6 +34,14 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#org-make-toc][Org-make-toc]]
     - [[#org-tempo][Org-tempo]]
 :END:
+
+* Global settings
+** Auth info
+Add plaintext authinfo file to the list of sources
+
+#+begin_src emacs-lisp
+(add-to-list 'auth-sources "~/.authinfo")
+#+end_src
 
 * Helper functions
 Useful macro to handle configuration across multiple platforms. I could probably tidy this up a bit but it works and programmers are lazy.
@@ -209,6 +219,7 @@ Maximise emacs on startup
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+END_SRC
+
 * Packages
 
 Tangle this into the packages.el file. Removes the need for it.
