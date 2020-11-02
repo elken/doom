@@ -33,6 +33,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#visual-fill-column][Visual Fill Column]]
     - [[#org-make-toc][Org-make-toc]]
     - [[#org-tempo][Org-tempo]]
+    - [[#edit-server][Edit Server]]
 :END:
 
 * Global settings
@@ -217,7 +218,7 @@ Set the default line number format to be relative and disable line numbers for s
 Maximise emacs on startup
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+END_SRC
 
 * Packages
@@ -229,6 +230,7 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! org-bullets)
 (package! visual-fill-column)
 (package! org-make-toc)
+(package! edit-server)
 #+END_SRC
 
 ** Setup
@@ -259,7 +261,7 @@ This is where the various org hooks are applied along with a few other settings
           '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STRT(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
             (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")) ;; Keywords
           org-agenda-start-with-log-mode t                  ;; Use log-mode for agenda
-          org-archive-location "Archive_%s::"           ;; Change archive location
+          org-archive-location "archive/Archive_%s::"           ;; Change archive location
           org-log-done 'time                                ;; Add timestamp to DONE items
           org-log-into-drawer t                             ;; Log items into drawer
           org-hide-emphasis-markers t)                      ;; Only show the last marker
@@ -304,3 +306,23 @@ Better snippets for org-mode =src= blocks
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+END_SRC
 
+*** Edit Server
+Used for editing things from Firefox
+
+#+begin_src emacs-lisp
+(use-package! edit-server
+  :commands edit-server-start
+  :init (if after-init-time
+              (edit-server-start)
+            (add-hook 'after-init-hook
+                      #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t)
+                  (window-system . x))))
+#+end_src
