@@ -78,9 +78,8 @@ Useful macro to handle configuration across multiple platforms. I could probably
 Set the default org directories across all platforms.
 
 #+BEGIN_SRC emacs-lisp
-(on-platform-do
- ((windows cygwin) (setq org-directory "z:/"))
- (linux (setq org-directory "~/org/")))
+(setq org-directory "~/org/")
+
 #+END_SRC
 
 Enable =org-indent-mode= by default to properly indent everything automagically, =variable-pitch-mode= to enable the more readable fonts where it makes sense and =visual-line-mode= to add a "current line" selection.
@@ -313,10 +312,13 @@ Used for editing things from Firefox
 (use-package! edit-server
   :commands edit-server-start
   :init (if after-init-time
-              (edit-server-start)
-            (add-hook 'after-init-hook
-                      #'(lambda() (edit-server-start))))
-  :config (setq edit-server-new-frame-alist
+            (when (and (require 'edit-server nil t) (daemonp))
+                (edit-server-start))
+                (add-hook 'after-init-hook
+                    #'(lambda() (when (and (require 'edit-server nil t) (daemonp))
+                (edit-server-start)))))
+  :config (on-platform-do
+            ((windows cygwin) (setq edit-server-new-frame-alist
                 '((name . "Edit with Emacs FRAME")
                   (top . 200)
                   (left . 200)
@@ -324,5 +326,14 @@ Used for editing things from Firefox
                   (height . 25)
                   (minibuffer . t)
                   (menu-bar-lines . t)
-                  (window-system . x))))
+                  (window-system . w32))))
+            (linux) (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t)
+                  (window-system . x)))))
 #+end_src
