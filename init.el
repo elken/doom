@@ -20,6 +20,8 @@
 ;; Make line endings work
 (setq evil-respect-visual-line-mode t)
 
+(setq +mu4e-mu4e-mail-path "~/mail")
+
 (doom! :input
        ;;chinese
        ;;japanese
@@ -50,7 +52,7 @@
        ;;neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
-       tabs              ; a tab bar for Emacs
+       ;;tabs              ; a tab bar for Emacs
        treemacs          ; a project drawer, like neotree but cooler
        unicode           ; extended unicode support for various languages
        vc-gutter         ; vcs diff in the fringe
@@ -180,7 +182,7 @@
        ;;yaml              ; JSON, but readable
 
        :email
-       ;;(mu4e +gmail)
+       mu4e
        ;;notmuch
        ;;(wanderlust +gmail)
 
