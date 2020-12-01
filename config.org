@@ -34,6 +34,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#org-make-toc][Org-make-toc]]
     - [[#org-tempo][Org-tempo]]
     - [[#edit-server][Edit Server]]
+    - [[#graphql-mode][Graphql-mode]]
 :END:
 
 * Global settings
@@ -230,6 +231,7 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! visual-fill-column)
 (package! org-make-toc)
 (package! edit-server)
+(package! graphql-mode)
 #+END_SRC
 
 ** Setup
@@ -336,4 +338,11 @@ Used for editing things from Firefox
                   (minibuffer . t)
                   (menu-bar-lines . t)
                   (window-system . x)))))
+#+end_src
+
+*** Graphql-mode
+Used for displaying graphql queries nicely & sending.
+
+#+begin_src emacs-lisp
+(use-package! graphql-mode)
 #+end_src
