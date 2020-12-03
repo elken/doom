@@ -1,5 +1,4 @@
 #+TITLE: Config
-
 #+CAPTION: Banner
 [[file:banner.png]]
 
@@ -168,7 +167,6 @@ Font setup to prettify the fonts. Uses Montserrat in most places except where it
 #+END_SRC
 
 * User setup
-
 Use my name and emails for things like GPG, snippets, mail, magit, etc.
 
 #+BEGIN_SRC emacs-lisp
@@ -176,6 +174,19 @@ Use my name and emails for things like GPG, snippets, mail, magit, etc.
       user-mail-address "me@elken.dev")
 #+END_SRC
 
+Email folders and setup. This might move to a new section if I start to use email seriously.
+
+#+begin_src emacs-lisp
+(set-email-account! "mail.elken.dev"
+                    '((mu4e-sent-folder       . "/mailbox/Sent Mail")
+                      (mu4e-drafts-folder     . "/mailbox/Drafts")
+                      (mu4e-trash-folder      . "/mailbox/Trash")
+                      (mu4e-refile-folder     . "/mailbox/All Mail")
+                      (smtpmail-smtp-user     . "me@elken.dev")
+                      (user-mail-address      . "me@elken.dev")    ;; only needed for mu < 1.4
+                      (mu4e-compose-signature . "---\nelken"))
+                    t)
+#+end_src
 * Graphical setup
 ** Fonts
 Configure the fonts across all used platforms (slightly different names).
@@ -314,11 +325,9 @@ Used for editing things from Firefox
 (use-package! edit-server
   :commands edit-server-start
   :init (if after-init-time
-            (when (and (require 'edit-server nil t) (daemonp))
-                (edit-server-start))
+                (edit-server-start)
                 (add-hook 'after-init-hook
-                    #'(lambda() (when (and (require 'edit-server nil t) (daemonp))
-                (edit-server-start)))))
+                    #'(lambda() (edit-server-start))))
   :config (on-platform-do
             ((windows cygwin) (setq edit-server-new-frame-alist
                 '((name . "Edit with Emacs FRAME")
