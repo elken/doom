@@ -17,3 +17,5 @@ packages.el
 README.org
 
 .env*
+
+eshell/aliases
