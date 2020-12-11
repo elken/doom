@@ -20,6 +20,8 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#general-setup][General setup]]
   - [[#font-setup][Font setup]]
 - [[#user-setup][User setup]]
+- [[#languages][Languages]]
+  - [[#rust][Rust]]
 - [[#graphical-setup][Graphical setup]]
   - [[#fonts][Fonts]]
   - [[#theme][Theme]]
@@ -34,7 +36,6 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#org-make-toc][Org-make-toc]]
     - [[#org-tempo][Org-tempo]]
     - [[#edit-server][Edit Server]]
-    - [[#nano][Nano]]
 :END:
 
 * Global settings
@@ -188,6 +189,17 @@ Email folders and setup. This might move to a new section if I start to use emai
                       (mu4e-compose-signature . "---\nelken"))
                     t)
 #+end_src
+* Languages
+Configuration for various programming languages.
+
+** Rust
+Make =rls= the default
+
+#+begin_src emacs-lisp
+(after! rustic
+  (setq rustic-lsp-server 'rls))
+#+end_src
+
 * Graphical setup
 ** Fonts
 Configure the fonts across all used platforms (slightly different names).
@@ -243,8 +255,6 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! visual-fill-column)
 (package! org-make-toc)
 (package! edit-server)
-(package! nano-emacs
-  :recipe (:host github :repo "rougier/nano-emacs"))
 #+END_SRC
 
 ** Setup
@@ -351,13 +361,3 @@ Used for editing things from Firefox
                   (window-system . x)))))
 #+end_src
 
-*** Nano
-Extra ricing customisations. Need to merge in my own configurations...
-
-#+begin_src emacs-lisp
-(require 'disp-table)
-(require 'nano-theme-dark)
-(require 'nano-help)
-(require 'nano-modeline)
-(require 'nano-layout)
-#+end_src

@@ -1,0 +1,321 @@
+alias 1 cd +1
+alias 2 cd +2
+alias 3 cd +3
+alias 4 cd +4
+alias 5 cd +5
+alias 6 cd +6
+alias 7 cd +7
+alias 8 cd +8
+alias 9 cd +9
+alias _ sudo
+alias a fasd -a
+alias ack nocorrect ack
+alias b ${(z)BROWSER}
+alias bower noglob bower
+alias c clear
+alias ccm64 sudo ccm64
+alias cd nocorrect cd
+alias cmake cm cmake
+alias cp nocorrect cp -i -i
+alias cpi nocorrect cp -i -i
+alias d fasd -d
+alias df df -kh
+alias diff /usr/bin/diff -rupN
+alias diffu diff --unified
+alias du du -kh
+alias e ${(z)EDITOR}
+alias ebuild nocorrect ebuild
+alias f fasd -f
+alias fc noglob fc
+alias ff fzf
+alias find noglob find
+alias ftp noglob ftp
+alias g git
+alias gCO gCo $(gCl)
+alias gCT gCt $(gCl)
+alias gCa git add $(gCl)
+alias gCe git mergetool $(gCl)
+alias gCl git --no-pager diff --name-only --diff-filter=U
+alias gCo git checkout --ours --
+alias gCt git checkout --theirs --
+alias gFb git flow bugfix
+alias gFbc git flow bugfix checkout
+alias gFbd git flow bugfix diff
+alias gFbf git flow bugfix finish
+alias gFbl git flow bugfix list
+alias gFbm git flow bugfix pull
+alias gFbp git flow bugfix publish
+alias gFbr git flow bugfix rebase
+alias gFbs git flow bugfix start
+alias gFbt git flow bugfix track
+alias gFbx git flow bugfix delete
+alias gFf git flow feature
+alias gFfc git flow feature checkout
+alias gFfd git flow feature diff
+alias gFff git flow feature finish
+alias gFfl git flow feature list
+alias gFfm git flow feature pull
+alias gFfp git flow feature publish
+alias gFfr git flow feature rebase
+alias gFfs git flow feature start
+alias gFft git flow feature track
+alias gFfx git flow feature delete
+alias gFh git flow hotfix
+alias gFhc git flow hotfix checkout
+alias gFhd git flow hotfix diff
+alias gFhf git flow hotfix finish
+alias gFhl git flow hotfix list
+alias gFhm git flow hotfix pull
+alias gFhp git flow hotfix publish
+alias gFhr git flow hotfix rebase
+alias gFhs git flow hotfix start
+alias gFht git flow hotfix track
+alias gFhx git flow hotfix delete
+alias gFi git flow init
+alias gFl git flow release
+alias gFlc git flow release checkout
+alias gFld git flow release diff
+alias gFlf git flow release finish
+alias gFll git flow release list
+alias gFlm git flow release pull
+alias gFlp git flow release publish
+alias gFlr git flow release rebase
+alias gFls git flow release start
+alias gFlt git flow release track
+alias gFlx git flow release delete
+alias gFs git flow support
+alias gFsc git flow support checkout
+alias gFsd git flow support diff
+alias gFsf git flow support finish
+alias gFsl git flow support list
+alias gFsm git flow support pull
+alias gFsp git flow support publish
+alias gFsr git flow support rebase
+alias gFss git flow support start
+alias gFst git flow support track
+alias gFsx git flow support delete
+alias gR git remote
+alias gRa git remote add
+alias gRb git-hub-browse
+alias gRl git remote --verbose
+alias gRm git remote rename
+alias gRp git remote prune
+alias gRs git remote show
+alias gRu git remote update
+alias gRx git remote rm
+alias gS git submodule
+alias gSI git submodule update --init --recursive
+alias gSa git submodule add
+alias gSf git submodule foreach
+alias gSi git submodule init
+alias gSl git submodule status
+alias gSm git-submodule-move
+alias gSs git submodule sync
+alias gSu git submodule foreach git pull origin master
+alias gSx git-submodule-remove
+alias gb git branch
+alias gbD git branch --delete --force
+alias gbL git branch --all --verbose
+alias gbM git branch --move --force
+alias gbR git branch --move --force
+alias gbS git show-branch --all
+alias gbV git branch --verbose --verbose
+alias gbX git branch --delete --force
+alias gba git branch --all --verbose
+alias gbc git checkout -b
+alias gbd git branch --delete
+alias gbl git branch --verbose
+alias gbm git branch --move
+alias gbr git branch --move
+alias gbs git show-branch
+alias gbv git branch --verbose
+alias gbx git branch --delete
+alias gc git commit --verbose
+alias gcF git commit --verbose --amend
+alias gcO git checkout --patch
+alias gcP git cherry-pick --no-commit
+alias gcR git reset "HEAD^"
+alias gcS git commit -S --verbose
+alias gcSF git commit -S --verbose --amend
+alias gcSa git commit -S --verbose --all
+alias gcSf git commit -S --amend --reuse-message HEAD
+alias gcSm git commit -S --message
+alias gcY git cherry -v
+alias gca git commit --verbose --all
+alias gcam git commit --all --message
+alias gcc nocorrect /usr/lib/colorgcc/bin/gcc
+alias gcf git commit --amend --reuse-message HEAD
+alias gcl git-commit-lost
+alias gcm git commit --message
+alias gco git checkout
+alias gcp git cherry-pick --ff
+alias gcr git revert
+alias gcs git show
+alias gcsS git show --pretty=short --show-signature
+alias gcy git cherry -v --abbrev
+alias gd git ls-files
+alias gdc git ls-files --cached
+alias gdi git status --porcelain --short --ignored | sed -n "s/^!! //p"
+alias gdk git ls-files --killed
+alias gdm git ls-files --modified
+alias gdu git ls-files --other --exclude-standard
+alias gdx git ls-files --deleted
+alias get curl --continue-at - --location --progress-bar --remote-name --remote-time
+alias gf git fetch
+alias gfa git fetch --all
+alias gfc git clone
+alias gfcr git clone --recurse-submodules
+alias gfm git pull
+alias gfr git pull --rebase
+alias gg git grep
+alias ggL git grep --files-without-matches
+alias ggi git grep --ignore-case
+alias ggl git grep --files-with-matches
+alias ggv git grep --invert-match
+alias ggw git grep --word-regexp
+alias giA git add --patch
+alias giD git diff --no-ext-diff --cached --word-diff
+alias giI git update-index --no-assume-unchanged
+alias giR git reset --patch
+alias giX git rm -rf --cached
+alias gia git add
+alias gid git diff --no-ext-diff --cached
+alias gii git update-index --assume-unchanged
+alias gir git reset
+alias gist nocorrect gist
+alias git hub
+alias giu git add --update
+alias gix git rm -r --cached
+alias gl git log --topo-order --pretty=format:"${_git_log_medium_format}"
+alias glS git log --show-signature
+alias glb git log --topo-order --pretty=format:"${_git_log_brief_format}"
+alias glc git shortlog --summary --numbered
+alias gld git log --topo-order --stat --patch --full-diff --pretty=format:"${_git_log_medium_format}"
+alias glg git log --topo-order --all --graph --pretty=format:"${_git_log_oneline_format}"
+alias glo git log --topo-order --pretty=format:"${_git_log_oneline_format}"
+alias globurl noglob urlglobber 
+alias gls git log --topo-order --stat --pretty=format:"${_git_log_medium_format}"
+alias gm git merge
+alias gmC git merge --no-commit
+alias gmF git merge --no-ff
+alias gma git merge --abort
+alias gmt git mergetool
+alias gp git push
+alias gpA git push --all && git push --tags
+alias gpF git push --force
+alias gpa git push --all
+alias gpc git push --set-upstream origin "$(git-branch-current 2> /dev/null)"
+alias gpf git push --force-with-lease
+alias gpp git pull origin "$(git-branch-current 2> /dev/null)" && git push origin "$(git-branch-current 2> /dev/null)"
+alias gpt git push --tags
+alias gr git rebase
+alias gra git rebase --abort
+alias grc git rebase --continue
+alias grep nocorrect grep --color=auto
+alias gri git rebase --interactive
+alias grs git rebase --skip
+alias gs git stash
+alias gsL git-stash-dropped
+alias gsS git stash save --patch --no-keep-index
+alias gsX git-stash-clear-interactive
+alias gsa git stash apply
+alias gsd git stash show --patch --stat
+alias gsl git stash list
+alias gsp git stash pop
+alias gsr git-stash-recover
+alias gss git stash save --include-untracked
+alias gsw git stash save --include-untracked --keep-index
+alias gsx git stash drop
+alias gt git tag
+alias gtl git tag -l
+alias gts git tag -s
+alias gtv git verify-tag
+alias gwC git clean -f
+alias gwD git diff --no-ext-diff --word-diff
+alias gwR git reset --hard
+alias gwS git status --ignore-submodules=${_git_status_ignore_submodules}
+alias gwX git rm -rf
+alias gwc git clean -n
+alias gwd git diff --no-ext-diff
+alias gwr git reset --soft
+alias gws git status --ignore-submodules=${_git_status_ignore_submodules} --short
+alias gwx git rm -r
+alias heroku nocorrect heroku
+alias hibernate sudo systemctl hibernate
+alias history noglob history
+alias history-stat history 0 | awk ''{print $2}'' | sort | uniq -c | sort -n -r | head
+alias http-serve python3 -m http.server
+alias l ls -1A
+alias la ll -A
+alias lc lt -c
+alias lk ll -Sr
+alias ll ls -lh
+alias lm la | "$PAGER"
+alias ln nocorrect ln -i -i
+alias lni nocorrect ln -i -i
+alias locate noglob locate
+alias lr ll -R
+alias ls ls --color=auto
+alias lt ll -tr
+alias lu lt -u
+alias lx ll -XB
+alias make make -j`expr $(nproc) + 1` -l$(nproc)
+alias man nocorrect man
+alias mkdir nocorrect mkdir -p
+alias mv nocorrect mv -i
+alias mvi nocorrect mv -i
+alias mysql nocorrect mysql
+alias ninja cm ninja
+alias o xdg-open
+alias p ${(z)PAGER}
+alias pac yay
+alias pacI yay --upgrade
+alias pacQ yay --query --info
+alias pacS yay --query --search
+alias pacU yay --sync --refresh --sysupgrade
+alias pacX yay --remove --nosave --recursive
+alias paci yay --sync
+alias pacman yay
+alias pacman-list-orphans yay --query --deps --unrequired
+alias pacman-remove-orphans yay --remove --recursive $(yay --quiet --query --deps --unrequired)
+alias pacq yay --sync --info
+alias pacs yay --sync --search
+alias pacu yay --sync --refresh && sudo asp update
+alias pacx yay --remove
+alias pbc pbcopy
+alias pbcopy xsel --clipboard --input
+alias pbp pbpaste
+alias pbpaste xsel --clipboard --output
+alias po popd
+alias pu pushd
+alias q exit
+alias rake noglob rake
+alias reboot sudo systemctl reboot
+alias rm nocorrect rm -i
+alias rmi nocorrect rm -i
+alias rsync noglob rsync
+alias run-help man
+alias s fasd -si
+alias sa alias | grep -i
+alias scp noglob scp
+alias sd fasd -sid
+alias sf fasd -sif
+alias sftp noglob sftp
+alias shutdown sudo systemctl poweroff
+alias sl ls
+alias so source
+alias sprUp curl -F ''sprunge=<-'' http://sprunge.us
+alias topc top -o %CPU
+alias topm top -o %MEM
+alias type type -a
+alias v ${(z)VISUAL}
+alias vf vim $(fzf)
+alias vim nvim
+alias vimserv NVIM_LISTEN_ADDRESS=/tmp/nvimsocket nvim
+alias which-command whence
+alias wine32 WINEARCH=win32 WINEPREFIX=~/.wine32 wine
+alias winetricks32 WINEARCH=win32 WINEPREFIX=~/.wine32 winetricks
+alias workdone git log --graph --pretty=format:''%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'' --abbrev-commit --author=elken
+alias workflow g add .;gca;gp
+alias z fasd_cd -d
+alias zz fasd_cd -d -i
