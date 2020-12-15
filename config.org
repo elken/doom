@@ -4,7 +4,7 @@
 
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
 
-Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original, snippets from stackoverflow and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
+Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original; snippets from stackoverflow, modernemacs and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
 
 * Table of Contents
 :PROPERTIES:
@@ -21,6 +21,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#user-setup][User setup]]
 - [[#languages][Languages]]
   - [[#rust][Rust]]
+- [[#eshell][EShell]]
 - [[#graphical-setup][Graphical setup]]
   - [[#fonts][Fonts]]
   - [[#theme][Theme]]
@@ -198,6 +199,98 @@ Make =rls= the default
 #+begin_src emacs-lisp
 (after! rustic
   (setq rustic-lsp-server 'rls))
+#+end_src
+
+* EShell
+Eshell is a beautiful thing but ootb experience is a tad dated. Seems there is an issue with the magit section. I would also like to extend to add other sections later..
+
+#+begin_src emacs-lisp
+(require 'dash)
+(require 's)
+
+(defmacro with-face (STR &rest PROPS)
+  "Return STR propertized with PROPS."
+  `(propertize ,STR 'face (list ,@PROPS)))
+
+(defmacro esh-section (NAME ICON FORM &rest PROPS)
+  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
+  `(setq ,NAME
+         (lambda () (when ,FORM
+                      (-> ,ICON
+                          (concat esh-section-delim ,FORM)
+                          (with-face ,@PROPS))))))
+
+(defun esh-acc (acc x)
+  "Accumulator for evaluating and concatenating esh-sections."
+  (--if-let (funcall x)
+      (if (s-blank? acc)
+          it
+        (concat acc esh-sep it))
+    acc))
+
+(defun esh-prompt-func ()
+  "Build `eshell-prompt-function'"
+  (concat esh-header
+          (-reduce-from 'esh-acc "" eshell-funcs)
+          "\n"
+          eshell-prompt-string))
+#+end_src
+
+Define the sections using the macros above
+
+#+begin_src emacs-lisp
+
+;; Separator between esh-sections
+(setq esh-sep " | ")  ; or " | "
+
+;; Separator between an esh-section icon and form
+(setq esh-section-delim " ")
+
+;; Eshell prompt header
+(setq esh-header "\n┌─")  ; or "\n┌─"
+
+;; Eshell prompt regexp and string. Unless you are varying the prompt by eg.
+;; your login, these can be the same.
+(setq eshell-prompt-regexp "└─> ")   ; or "└─> "
+(setq eshell-prompt-string "└─> ")   ; or "└─> "
+
+#+end_src
+
+Finally define the actual setup
+
+#+begin_src emacs-lisp
+(esh-section esh-dir
+             ""  ;  (faicon folder)
+             (abbreviate-file-name (eshell/pwd))
+             '(:foreground "gold" :bold ultra-bold :underline t))
+
+(esh-section esh-git
+             ""  ;  (git icon)
+             (or (magit-get-current-branch) "")
+             '(:foreground "pink"))
+
+(esh-section esh-clock
+             "\xf017"  ;  (clock icon)
+             (format-time-string "%H:%M" (current-time))
+             '(:foreground "forest green"))
+
+;; Below I implement a "prompt number" section
+(setq esh-prompt-num 0)
+(add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
+(advice-add 'eshell-send-input :before
+            (lambda (&rest args) (setq esh-prompt-num (incf esh-prompt-num))))
+
+(esh-section esh-num
+             ""  ;  (list icon)
+             (number-to-string esh-prompt-num)
+             '(:foreground "brown"))
+
+;; Choose which eshell-funcs to enable
+(setq eshell-funcs (list esh-dir esh-git esh-clock esh-num))
+
+;; Enable the new eshell prompt
+(after! eshell
+  (setq eshell-prompt-function 'esh-prompt-func))
 #+end_src
 
 * Graphical setup
