@@ -119,6 +119,20 @@ Enables archiving of tasks. Replaces the in-built version which only works for s
 (map! :map org-mode-map "C-c $" #'elken/org-archive-done-tasks)
 #+END_SRC
 
+Enables removal of killed tasks. I'm not /yet/ interested in tracking this long-term.
+
+#+BEGIN_SRC emacs-lisp
+(defun elken/org-remove-kill-tasks ()
+  (interactive)
+  (org-map-entries
+   (lambda ()
+     (org-cut-subtree)
+     (pop kill-ring)
+     (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
+   "/KILL" 'file))
+
+#+END_SRC
+
 Show images inline by default
 
 #+BEGIN_SRC emacs-lisp
@@ -236,26 +250,6 @@ Eshell is a beautiful thing but ootb experience is a tad dated. Seems there is a
           eshell-prompt-string))
 #+end_src
 
-Define the sections using the macros above
-
-#+begin_src emacs-lisp
-
-;; Separator between esh-sections
-(setq esh-sep " | ")  ; or " | "
-
-;; Separator between an esh-section icon and form
-(setq esh-section-delim " ")
-
-;; Eshell prompt header
-(setq esh-header "\n┌─")  ; or "\n┌─"
-
-;; Eshell prompt regexp and string. Unless you are varying the prompt by eg.
-;; your login, these can be the same.
-(setq eshell-prompt-regexp "└─> ")   ; or "└─> "
-(setq eshell-prompt-string "└─> ")   ; or "└─> "
-
-#+end_src
-
 Finally define the actual setup
 
 #+begin_src emacs-lisp
@@ -266,7 +260,7 @@ Finally define the actual setup
 
 (esh-section esh-git
              ""  ;  (git icon)
-             (or (magit-get-current-branch) "")
+             (ignore-errors (magit-get-current-branch))
              '(:foreground "pink"))
 
 (esh-section esh-clock
@@ -275,7 +269,6 @@ Finally define the actual setup
              '(:foreground "forest green"))
 
 ;; Below I implement a "prompt number" section
-(setq esh-prompt-num 0)
 (add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
 (advice-add 'eshell-send-input :before
             (lambda (&rest args) (setq esh-prompt-num (incf esh-prompt-num))))
@@ -290,7 +283,13 @@ Finally define the actual setup
 
 ;; Enable the new eshell prompt
 (after! eshell
-  (setq eshell-prompt-function 'esh-prompt-func))
+  (setq eshell-prompt-function 'esh-prompt-func
+        esh-sep " | "
+        esh-section-delim " "
+        esh-header "\n┌─"
+        eshell-prompt-regexp "└─> "
+        eshell-prompt-string "└─> "
+        esh-prompt-num 0))
 #+end_src
 
 * Graphical setup
