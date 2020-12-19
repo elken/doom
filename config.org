@@ -117,7 +117,8 @@ Enables archiving of tasks. Replaces the in-built version which only works for s
      (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
    "/DONE" 'file))
 
-(map! :map org-mode-map "C-c $" #'elken/org-archive-done-tasks)
+(after! org-mode
+    (map! :map org-mode-map "C-c $" #'elken/org-archive-done-tasks))
 #+END_SRC
 
 Enables removal of killed tasks. I'm not /yet/ interested in tracking this long-term.
