@@ -18,6 +18,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#org-mode][Org Mode]]
   - [[#general-setup][General setup]]
   - [[#font-setup][Font setup]]
+  - [[#firn-setup][Firn setup]]
 - [[#user-setup][User setup]]
 - [[#languages][Languages]]
   - [[#rust][Rust]]
@@ -180,9 +181,15 @@ Font setup to prettify the fonts. Uses Montserrat in most places except where it
   (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
-
 #+END_SRC
 
+** Firn setup
+Useful settings and functions for [[github:theiceshell/firn][firn]]
+
+#+begin_src emacs-lisp
+(setq enable-dir-local-variables t)
+(add-hook! 'before-save-hook 'time-stamp)
+#+end_src
 * User setup
 Use my name and emails for things like GPG, snippets, mail, magit, etc.
 
