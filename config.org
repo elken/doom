@@ -165,6 +165,16 @@ Auto reload config on save (both =config.org= and =init.el=)
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'elken/doom-reload-on-save)))
 #+end_src
 
+Make tangled shell files executable (I trust myself, ish...)
+
+#+begin_src emacs-lisp
+(defun elken/make-tangled-shell-executable ()
+  "Ensure that tangled shell files are executable"
+  (set-file-modes (buffer-file-name) #o755))
+
+(add-hook 'org-babel-post-tangle-hook 'elken/make-tangled-shell-executable)
+#+end_src
+
 ** Font setup
 Font setup to prettify the fonts. Uses Montserrat in most places except where it makes sense to use the defined fixed width font.
 
@@ -358,6 +368,13 @@ Maximise emacs on startup
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+END_SRC
 
+Add some transparency
+
+#+begin_src emacs-lisp
+(set-frame-parameter (selected-frame) 'alpha 90)
+(add-to-list 'default-frame-alist '(alpha . 90))
+#+end_src
+
 * Packages
 
 Tangle this into the packages.el file. Removes the need for it.
@@ -370,6 +387,7 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! org-make-toc)
 (package! edit-server)
 (package! graphql-mode)
+(package! desktop-environment)
 #+END_SRC
 
 ** Setup
