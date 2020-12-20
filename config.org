@@ -141,13 +141,19 @@ Show images inline by default
 (setq org-startup-with-inline-images t)
 #+END_SRC
 
-Auto reload config on save (just this file)
+Auto reload config on save (both =config.org= and =init.el=)
 
 #+begin_src emacs-lisp
+(defvar doom-reload-files '("config.org" "init.el"))
+
 (defun elken/doom-reload-on-save ()
-  (when (string-equal (buffer-file-name)
-                      (expand-file-name "config.org" doom-private-dir))
-    (doom/reload)))
+  (when
+        (cl-some (lambda (s)
+            (string-equal
+                (buffer-file-name)
+                (expand-file-name s doom-private-dir)))
+        doom-reload-files))
+  (doom/reload))
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'elken/doom-reload-on-save)))
 #+end_src
