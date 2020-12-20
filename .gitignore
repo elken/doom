@@ -10,8 +10,9 @@
 # Undo-tree save-files
 *.~undo-tree
 
+# Ignore tangled files
 config.el
-
+desktop.el
 packages.el
 
 README.org

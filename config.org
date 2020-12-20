@@ -144,16 +144,23 @@ Show images inline by default
 Auto reload config on save (both =config.org= and =init.el=)
 
 #+begin_src emacs-lisp
-(defvar doom-reload-files '("config.org" "init.el"))
+(require 'cl-extra)
+(defvar elken/reload-files '("config.org" "init.el"))
+(defvar elken/extra-org-files '("desktop.org"))
 
 (defun elken/doom-reload-on-save ()
-  (when
-        (cl-some (lambda (s)
-            (string-equal
+  (cond
+   ((cl-some (lambda (s)
+               (string-equal
                 (buffer-file-name)
                 (expand-file-name s doom-private-dir)))
-        doom-reload-files))
-  (doom/reload))
+             elken/reload-files) (doom/reload))
+   ((cl-some (lambda (s)
+               (string-equal
+                (buffer-file-name)
+                (expand-file-name s doom-private-dir)))
+             elken/extra-org-files) (let ((org-confirm-babel-evaluate nil))
+             (org-babel-tangle)))))
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'elken/doom-reload-on-save)))
 #+end_src
@@ -356,6 +363,7 @@ Maximise emacs on startup
 Tangle this into the packages.el file. Removes the need for it.
 
 #+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! exwm)
 (package! rainbow-mode)
 (package! org-bullets)
 (package! visual-fill-column)

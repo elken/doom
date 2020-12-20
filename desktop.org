@@ -1,0 +1,90 @@
+#+TITLE: EXWM Configuration
+
+* Window Management
+Configuration related to managing windows in Emacs.
+
+** EXWM
+This is what all the cool kids are doing these days. Look ma, no DE!
+
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun elken/exwm-update-class ()
+  "Update the buffer to be the name of the window"
+  (exwm-workspace-rename-buffer exwm-class-name))
+
+(use-package! exwm
+  :config
+  ;; Set a sane number of default workspaces
+  (setq exwm-worksapce-number 5)
+
+  ;; Set the buffer to the name of the window class
+  (add-hook 'exwm-update-class-hook #'elken/exwm-update-class)
+
+  ;; /Always/ pass these to emacs
+  (setq exwm-input-prefix-keys
+        '(?\C-x
+          ?\C-u
+          ?\C-h
+          ?\M-x
+          ?\M-`
+          ?\M-&
+          ?\M-:
+          ?\C-\M-j
+          ?\C-\ ))
+
+  ;; Shortcut to passthrough next keys
+  (map! :map exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+
+  ;; Setup screen layout
+  (require 'exwm-randr)
+  (exwm-randr-enable)
+  (start-process-shell-command "xrandr" nil "sh ~/.screenlayouts/default.sh")
+
+  ;; Setup tray
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
+
+  (setq exwm-input-global-keys
+        '(
+          ([?\s-r] . exwm-reset)
+          ([s-left] . windmove-left)
+          ([s-right] . windmove-right)
+          ([s-up] . windmove-up)
+          ([s-down] . windmove-down)
+
+          ([?\s-&] . (lambda (command) (interactive (list (read-shell-command "> ")))
+                       (start-process-shell-command command nil command)))
+
+          ([?\s-w] . exwm-workspace-switch)
+
+          ([?\s-`] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 0)))
+          ([?\s-1] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 1)))
+          ([?\s-2] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 2)))
+          ([?\s-3] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 3)))
+          ([?\s-4] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 4)))
+          ([?\s-5] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 5)))
+          ([?\s-6] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 6)))
+          ([?\s-7] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 7)))
+          ([?\s-8] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 8)))
+          ([?\s-9] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 9)))))
+  (exwm-enable))
+#+end_src
