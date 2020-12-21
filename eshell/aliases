@@ -1,0 +1,40 @@
+alias _ sudo $*
+alias c recenter 0
+alias df df -kh $*
+alias diff /usr/bin/diff -rupN $*
+alias du du -kh $*
+alias e for i in ${eshell-flatten-list $*} {find-file $i}
+alias g /usr/bin/git $*
+alias hibernate sudo systemctl hibernate
+alias l ls -1A $*
+alias ll ls -lh $*
+alias lt ll -tr $*
+alias la ll -A $*
+alias lc lt -c $*
+alias lk ll -Sr $*
+alias lm la $* | "$PAGER"
+alias lr ll -R $*
+alias lu lt -u $*
+alias lx ll -XB $*
+alias make make -j`expr $(nproc) + 1` -l$(nproc) $*
+alias o xdg-open
+alias pac yay
+alias pacI yay --upgrade $*
+alias pacQ yay --query --info $*
+alias pacS yay --query --search $*
+alias pacU yay --sync --refresh --sysupgrade $*
+alias pacX yay --remove --nosave --recursive $*
+alias paci yay --sync $*
+alias pacman-list-orphans yay --query --deps --unrequired $*
+alias pacman-remove-orphans yay --remove --recursive $(yay --quiet --query --deps --unrequired) $*
+alias pacq yay --sync --info $*
+alias pacs yay --sync --search $*
+alias pacu yay --sync --refresh && sudo asp update
+alias pacx yay --remove $*
+alias po popd
+alias pu pushd
+alias q exit
+alias reboot sudo systemctl reboot
+alias shutdown sudo systemctl poweroff
+alias wine32 WINEARCH=win32 WINEPREFIX=~/.wine32 wine
+alias winetricks32 WINEARCH=win32 WINEPREFIX=~/.wine32 winetricks

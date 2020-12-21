@@ -8,6 +8,7 @@ Configuration related to managing windows in Emacs. I need to comment this bette
 This is what all the cool kids are doing these days. Look ma, no DE!
 
 #+begin_src emacs-lisp :tangle ./desktop.el
+
 ;; Make the launcher only show app names
 (use-package! counsel
   :custom
@@ -16,6 +17,21 @@ This is what all the cool kids are doing these days. Look ma, no DE!
 (defun elken/exwm-update-class ()
   "Update the buffer to be the name of the window"
   (exwm-workspace-rename-buffer exwm-class-name))
+
+(defun elken/exwm-update-title ()
+  "Update the window title when needed"
+  (pcase exwm-class-name
+    ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
+    ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))))
+
+(defun elken/configure-window-by-class()
+  "Configuration for windows (grouped by WM_CLASS)"
+  (interactive)
+  (pcase exwm-class-name
+    ("mpv" (exwm-floating-toggle-floating)
+     (exwm-layout-toggle-mode-line))
+    ("firefox" (exwm-workspace-move-window 2))
+    ("Firefox" (exwm-workspace-move-window 2))))
 
 (defun elken/run-in-background (command)
   "Run the specified command as a daemon"
@@ -35,6 +51,7 @@ This is what all the cool kids are doing these days. Look ma, no DE!
 
   ;; Daemon applications
   (elken/run-in-background "pasystray")
+  (elken/run-in-background "megasync")
   (elken/run-in-background "nm-applet"))
 
 (use-package! desktop-environment
@@ -43,11 +60,25 @@ This is what all the cool kids are doing these days. Look ma, no DE!
 
 (use-package! exwm
   :config
+  ;; Show all buffers for switching
+  (setq exwm-workspace-show-all-buffers t)
+
   ;; Set a sane number of default workspaces
-  (setq exwm-worksapce-number 5)
+  (setq exwm-workspace-number 5)
+
+  (setq exwm-randr-workspace-monitor-plist '(2 "DP-0" 3 "DP-0"))
 
   ;; Set the buffer to the name of the window class
   (add-hook 'exwm-update-class-hook #'elken/exwm-update-class)
+
+  ;; Init hook
+  (add-hook 'exwm-init-hook #'elken/exwm-init-hook)
+
+  ;; Update window title
+  (add-hook 'exwm-update-title-hook #'elken/exwm-update-title)
+
+  ;; Configure windows as created
+  (add-hook 'exwm-manage-finish-hook #'elken/configure-window-by-class)
 
   ;; /Always/ pass these to emacs
   (setq exwm-input-prefix-keys
@@ -77,8 +108,6 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   (setq exwm-systemtray-height 16)
   (exwm-systemtray-enable)
 
-  ;; Init hook
-  (add-hook 'exwm-init-hook #'elken/exwm-init-hook)
 
   (setq exwm-input-global-keys
         '(
