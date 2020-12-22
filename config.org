@@ -39,6 +39,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#org-tempo][Org-tempo]]
     - [[#edit-server][Edit Server]]
     - [[#graphql-mode][Graphql-mode]]
+    - [[#spotify][Spotify]]
 :END:
 
 * Global settings
@@ -325,6 +326,7 @@ Finally define the actual setup
 #+end_src
 
 * EXWM
+
 Some config has to go here (so it's reloaded properly)
 #+begin_src emacs-lisp
 ;; Make posframes work in exwm
@@ -420,6 +422,12 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! edit-server)
 (package! graphql-mode)
 (package! desktop-environment)
+;; (package! oauth2)
+;; (package! simple-httpd)
+;; (package! dotenv.el
+;;   :recipe (:host github :repo "pkulev/dotenv.el"))
+;; (package! spotify.el
+;;   :recipe (:host github :repo "danielfm/spotify.el"))
 #+END_SRC
 
 ** Setup
@@ -428,7 +436,7 @@ Configuration for any packages included above
 
 *** Rainbow Mode
 
-Colouring paranetheses so I don't get confused by the scary lisp dialects.
+Colouring parentheses so I don't get confused by the scary lisp dialects.
 
 #+BEGIN_SRC emacs-lisp
 (use-package! rainbow-mode
@@ -531,4 +539,20 @@ Used for displaying graphql queries nicely & sending.
 
 #+begin_src emacs-lisp
 (use-package! graphql-mode)
+#+end_src
+
+*** Spotify
+/Possible/ configuration for spotify, however seems to be a few bugs floating so not usable yet.
+
+#+begin_src emacs-lisp
+;;(use-package! dotenv)
+;;(use-package! spotify
+;;  :config
+;;  (let ((id (dotenv-get "CLIENT_ID" ".env"))
+;;        (secret (dotenv-get "CLIENT_SECRET" ".env")))
+;;    (setq spotify-oauth2-client-id id
+;;          spotify-oauth2-client-secret secret
+;;          spotify-transport 'connect
+;;          spotify-status-location 'modeline))
+;;  (global-spotify-remote-mode))
 #+end_src

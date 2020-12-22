@@ -21,7 +21,6 @@ This is what all the cool kids are doing these days. Look ma, no DE!
 (defun elken/exwm-update-title ()
   "Update the window title when needed"
   (pcase exwm-class-name
-    ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
     ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))))
 
 (defun elken/configure-window-by-class()
@@ -30,8 +29,13 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   (pcase exwm-class-name
     ("mpv" (exwm-floating-toggle-floating)
      (exwm-layout-toggle-mode-line))
-    ("firefox" (exwm-workspace-move-window 2))
-    ("Firefox" (exwm-workspace-move-window 2))))
+    ("discord" (exwm-workspace-move-window 3))
+    ("Spotify" (exwm-workspace-move-window 4))
+    ("firefox" (exwm-workspace-move-window 2))))
+
+(defun elken/run-application (command)
+  "Run the specified command as a daemon"
+  (call-process "gtk-launch" nil 0 nil command))
 
 (defun elken/run-in-background (command)
   "Run the specified command as a daemon"
@@ -52,11 +56,17 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   ;; Daemon applications
   (elken/run-in-background "pasystray")
   (elken/run-in-background "megasync")
-  (elken/run-in-background "nm-applet"))
+  (elken/run-in-background "nm-applet")
+
+  ;; Startup applications
+  (elken/run-application "firefox")
+  (elken/run-application "discord")
+  (elken/run-application "spotify"))
 
 (use-package! desktop-environment
   :after exwm
-  :config (desktop-environment-mode))
+  :config
+  (desktop-environment-mode))
 
 (use-package! exwm
   :config
@@ -64,9 +74,17 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   (setq exwm-workspace-show-all-buffers t)
 
   ;; Set a sane number of default workspaces
-  (setq exwm-workspace-number 5)
+  (setq exwm-workspace-number 10)
 
+  ;; Define workspace setup for monitors
   (setq exwm-randr-workspace-monitor-plist '(2 "DP-0" 3 "DP-0"))
+
+  ;; Mouse follow me
+  (setq exwm-workspace-warp-cursor t)
+
+  ;; Focus follow mouse
+  (setq mouse-autoselect-window t
+        focus-follows-mouse t)
 
   ;; Set the buffer to the name of the window class
   (add-hook 'exwm-update-class-hook #'elken/exwm-update-class)
@@ -108,7 +126,6 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   (setq exwm-systemtray-height 16)
   (exwm-systemtray-enable)
 
-
   (setq exwm-input-global-keys
         '(
           ([?\s- ] . counsel-linux-app)
@@ -123,6 +140,7 @@ This is what all the cool kids are doing these days. Look ma, no DE!
 
           ([?\s-w] . exwm-workspace-switch)
 
+          ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
           ([?\s-`] . (lambda ()
                        (interactive)
                        (exwm-workspace-switch-create 0)))
@@ -156,7 +174,6 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   (exwm-enable))
 #+end_src
 
-
 *** Other config files
 **** Startup
 Main script used to run exwm
@@ -167,11 +184,12 @@ Main script used to run exwm
 exec >~/.logs/xsession 2>&1
 export LANG="en_GB.UTF-8"
 export LANGUAGE="en_GB.UTF-8"
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
 xset -dpms
 xset s off
 xss-lock -- slock &
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-exec dbus-launch --exit-with-session emacs -mm -l ~/.doom.d/desktop.el
+emacs -mm -l ~/.doom.d/desktop.el
 #+end_src
 
 **** Debug
@@ -183,9 +201,11 @@ Script used to debug any startup changes that ~will~ may occur.
 exec >~/.logs/xsession 2>&1
 export LANG="en_GB.UTF-8"
 export LANGUAGE="en_GB.UTF-8"
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
 xset -dpms
 xset s off
-exec dbus-launch --exit-with-session emacs -mm --debug-init -l ~/.doom.d/desktop.el
+picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
+emacs -mm --debug-init -l ~/.doom.d/desktop.el
 #+end_src
 
 **** Picom config
@@ -328,12 +348,11 @@ use-damage = true;
 
 wintypes:
 {
-	tooltip = { fade = true; shadow = false; focus = false;	};
+	tooltip = { fade = true; shadow = true; focus = false;	};
 	normal = { shadow = false; };
-	dock = { shadow = false; };
 	dnd = { shadow = false; };
 	popup_menu = { shadow = true; focus = false; opacity = 0.90; };
-	dropdown_menu = { shadow = false; focus = false; };
+	dropdown_menu = { shadow = true; focus = false; };
 	above = { shadow = true; };
 	splash = { shadow = false; };
 	utility = { focus = false; shadow = false; };
@@ -343,3 +362,4 @@ wintypes:
 	dialog = { shadow = true; };
 };
 #+end_src
+
