@@ -50,6 +50,13 @@ Add plaintext authinfo file to the list of sources
 (add-to-list 'auth-sources "~/.authinfo")
 #+end_src
 
+** Variables
+Global things and stuff
+#+begin_src emacs-lisp
+(setq elken/exwm-enabledp (and (eq window-system 'x)
+                           (seq-contains command-line-args "--use-exwm")))
+#+end_src
+
 * Helper functions
 Useful macro to handle configuration across multiple platforms. I could probably tidy this up a bit but it works and programmers are lazy.
 
@@ -333,6 +340,7 @@ Some config has to go here (so it's reloaded properly)
 ;; https://github.com/ch11ng/exwm/issues/550
 (after! ivy-posframe
   :config
+  (when elken/exwm-enabledp
   (defun +ivy-posframe-display-exwm (str)
     (ivy-posframe--display str
                            (lambda (info)
@@ -355,7 +363,7 @@ Some config has to go here (so it's reloaded properly)
         '((t . +ivy-posframe-display-exwm))
 
         ivy-posframe-parameters '((parent-frame nil)
-                                  (z-group . above))))
+                                  (z-group . above)))))
 #+end_src
 * Graphical setup
 ** Fonts
@@ -405,8 +413,9 @@ Maximise emacs on startup
 Add some transparency
 
 #+begin_src emacs-lisp
+(when elken/exwm-enabledp
 (set-frame-parameter (selected-frame) 'alpha 90)
-(add-to-list 'default-frame-alist '(alpha . 90))
+(add-to-list 'default-frame-alist '(alpha . 90)))
 #+end_src
 
 * Packages

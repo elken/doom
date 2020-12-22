@@ -189,7 +189,7 @@ xset -dpms
 xset s off
 xss-lock -- slock &
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-emacs -mm -l ~/.doom.d/desktop.el
+emacs -mm -l ~/.doom.d/desktop.el --use-exwm
 #+end_src
 
 **** Debug
@@ -205,7 +205,7 @@ export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
 xset -dpms
 xset s off
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-emacs -mm --debug-init -l ~/.doom.d/desktop.el
+emacs -mm --debug-init -l ~/.doom.d/desktop.el --use-exwm
 #+end_src
 
 **** Picom config
