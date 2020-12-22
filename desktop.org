@@ -171,7 +171,7 @@ xset -dpms
 xset s off
 xss-lock -- slock &
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-exec dbus-launch --exit-with-session emacs -mm -l ~/.doom.d/desktop.el
+exec dbus-launch --exit-with-session emacs -mm --use-exwm -l ~/.doom.d/desktop.el
 #+end_src
 
 **** Debug
@@ -185,7 +185,7 @@ export LANG="en_GB.UTF-8"
 export LANGUAGE="en_GB.UTF-8"
 xset -dpms
 xset s off
-exec dbus-launch --exit-with-session emacs -mm --debug-init -l ~/.doom.d/desktop.el
+exec dbus-launch --exit-with-session emacs -mm --debug-init --use-exwm -l ~/.doom.d/desktop.el
 #+end_src
 
 **** Picom config
