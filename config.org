@@ -33,7 +33,6 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#setup][Setup]]
     - [[#rainbow-mode][Rainbow Mode]]
     - [[#org][Org]]
-    - [[#org-bullets][Org-bullets]]
     - [[#visual-fill-column][Visual Fill Column]]
     - [[#org-make-toc][Org-make-toc]]
     - [[#org-tempo][Org-tempo]]
@@ -85,7 +84,6 @@ Set the default org directories across all platforms.
 
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/org/")
-
 #+END_SRC
 
 Enable =org-indent-mode= by default to properly indent everything automagically, =variable-pitch-mode= to enable the more readable fonts where it makes sense and =visual-line-mode= to add a "current line" selection.
@@ -134,7 +132,6 @@ Enables removal of killed tasks. I'm not /yet/ interested in tracking this long-
      (pop kill-ring)
      (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
    "/KILL" 'file))
-
 #+END_SRC
 
 Show images inline by default
@@ -182,11 +179,6 @@ Font setup to prettify the fonts. Uses Montserrat in most places except where it
 
 #+BEGIN_SRC emacs-lisp
 (defun elken/org-font-setup ()
-  ;; Replace list hyphen with dot
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-
   ;; Set faces for heading levels
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
@@ -417,7 +409,6 @@ Tangle this into the packages.el file. Removes the need for it.
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! exwm)
 (package! rainbow-mode)
-(package! org-bullets)
 (package! visual-fill-column)
 (package! org-make-toc)
 (package! edit-server)
@@ -464,17 +455,6 @@ This is where the various org hooks are applied along with a few other settings
           org-log-into-drawer t                             ;; Log items into drawer
           org-hide-emphasis-markers t)                      ;; Only show the last marker
     (elken/org-font-setup))
-#+END_SRC
-
-*** Org-bullets
-Pretty format the org heading markers
-
-#+BEGIN_SRC emacs-lisp
-(use-package! org-bullets
-:after org
-:hook (org-mode . org-bullets-mode)
-:custom
-(org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 #+END_SRC
 
 *** Visual Fill Column
