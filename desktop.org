@@ -34,13 +34,29 @@ This is what all the cool kids are doing these days. Look ma, no DE!
     ("firefox" (exwm-workspace-move-window 2))))
 
 (defun elken/run-application (command)
-  "Run the specified command as a daemon"
+  "Run the specified command as an application"
   (call-process "gtk-launch" nil 0 nil command))
 
-(defun elken/run-in-background (command)
+(defvar elken/process-alist '())
+
+(defun elken/kill-process--action (process)
+  "Do the actual process killing"
+  (when process
+    (ignore-errors
+      (kill-process (cdr process))))
+  (setq elken/process-alist (remove process elken/process-alist)))
+
+(defun elken/kill-process ()
+  "Kill a background process"
+  (interactive)
+  (ivy-read "Kill process: " elken/process-alist
+            :action #'elken/kill-process--action
+            :caller 'elken/kill-process))
+
+(defun elken/run-in-background (command &optional args)
   "Run the specified command as a daemon"
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+  (elken/kill-process--action (assoc command elken/process-alist))
+  (setq elken/process-alist (cons `(,command . ,(start-process-shell-command command nil (format "%s %s" command (or args "")))) elken/process-alist)))
 
 (defun elken/set-wallpaper (file)
   "Set the DE wallpaper to be $FILE"
@@ -51,7 +67,6 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   "Various init processes for exwm"
   ;; Default emacs behaviours
   (exwm-workspace-switch-create 1)
-  (eshell)
 
   ;; Daemon applications
   (elken/run-in-background "pasystray")
@@ -66,6 +81,7 @@ This is what all the cool kids are doing these days. Look ma, no DE!
 (use-package! desktop-environment
   :after exwm
   :config
+  (setq desktop-environment-screenlock-command "gnome-screensaver-command -l")
   (desktop-environment-mode))
 
 (use-package! exwm
@@ -86,6 +102,8 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   (setq mouse-autoselect-window t
         focus-follows-mouse t)
 
+  (setq exwm-workspace-index-map
+        (lambda (index) (number-to-string (1+ index))))
   ;; Set the buffer to the name of the window class
   (add-hook 'exwm-update-class-hook #'elken/exwm-update-class)
 
@@ -144,6 +162,7 @@ This is what all the cool kids are doing these days. Look ma, no DE!
           ([?\s-`] . (lambda ()
                        (interactive)
                        (exwm-workspace-switch-create 0)))
+
           ([?\s-1] . (lambda ()
                        (interactive)
                        (exwm-workspace-switch-create 1)))
@@ -174,6 +193,9 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   (exwm-enable))
 #+end_src
 
+#+RESULTS:
+: t
+
 *** Other config files
 **** Startup
 Main script used to run exwm
@@ -185,11 +207,14 @@ exec >~/.logs/xsession 2>&1
 export LANG="en_GB.UTF-8"
 export LANGUAGE="en_GB.UTF-8"
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+export _JAVA_AWT_WM_NONREPARENTING=1
+wmname LG3D
 xset -dpms
 xset s off
-xss-lock -- slock &
+xss-lock -- gnome-screensaver-command -l &
+xhost +SI:localuser:$USER
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-emacs -mm -l ~/.doom.d/desktop.el --use-exwm
+emacs -mm -l ~/.doom.d/desktop.el
 #+end_src
 
 **** Debug
@@ -204,8 +229,9 @@ export LANGUAGE="en_GB.UTF-8"
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
 xset -dpms
 xset s off
+xhost +SI:localuser:$USER
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-emacs -mm --debug-init -l ~/.doom.d/desktop.el --use-exwm
+emacs -mm --debug-init -l ~/.doom.d/desktop.el
 #+end_src
 
 **** Picom config
