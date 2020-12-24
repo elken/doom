@@ -14,7 +14,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#table-of-contents][Table of Contents]]
 - [[#global-settings][Global settings]]
   - [[#auth-info][Auth info]]
-- [[#helper-functions][Helper functions]]
+- [[#keybindings][Keybindings]]
 - [[#org-mode][Org Mode]]
   - [[#general-setup][General setup]]
   - [[#font-setup][Font setup]]
@@ -49,38 +49,25 @@ Add plaintext authinfo file to the list of sources
 (add-to-list 'auth-sources "~/.authinfo")
 #+end_src
 
-* Helper functions
-Useful macro to handle configuration across multiple platforms. I could probably tidy this up a bit but it works and programmers are lazy.
+* Keybindings
+It's not a custom config without some fancy keybinds
 
-#+BEGIN_SRC emacs-lisp
-(defun platform-keyword-to-string (platform-keyword)
-  (cond
-   ((eq platform-keyword 'windows) "windows-nt")
-   ((eq platform-keyword 'cygwin) "cygwin")
-   ((eq platform-keyword 'osx) "darwin")
-   ((eq platform-keyword 'linux) "gnu/linux")))
+Swiper is /much/ better than isearch
 
-;; Define a macro that runs an elisp expression only on a particular platform
-(defmacro on-platform-do (&rest platform-expressions)
-  `(cond
-    ,@(mapcar
-       (lambda (platform-expr)
-     (let ((keyword (nth 0 platform-expr))
-           (expr (nth 1 platform-expr)))
-       `(,(if (listp keyword)
-         `(or
-           ,@(mapcar
-              (lambda (kw) `(string-equal system-type ,(platform-keyword-to-string kw)))
-              keyword))
-          `(string-equal system-type ,(platform-keyword-to-string keyword)))
-          ,expr)))
-       platform-expressions)))
-#+END_SRC
+#+begin_src emacs-lisp
+(map! :after evil :gnvi "C-f" #'swiper)
+#+end_src
+
+Back to a simpler time...
+
+#+begin_src emacs-lisp
+(map! :g "C-s" #'save-buffer)
+#+end_src
 
 * Org Mode
 ** General setup
 
-Set the default org directories across all platforms.
+Set the default org directories across all platforms. (I use [[https://mega.nz][Mega]] to sync everything as it's xplatform and even works fine on Android)
 
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/org/")
@@ -117,8 +104,7 @@ Enables archiving of tasks. Replaces the in-built version which only works for s
      (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
    "/DONE" 'file))
 
-(after! org-mode
-    (map! :map org-mode-map "C-c $" #'elken/org-archive-done-tasks))
+(map! :map org-mode-map :desc "Archive tasks marked DONE" "C-c DEL a" #'elken/org-archive-done-tasks)
 #+END_SRC
 
 Enables removal of killed tasks. I'm not /yet/ interested in tracking this long-term.
@@ -132,6 +118,8 @@ Enables removal of killed tasks. I'm not /yet/ interested in tracking this long-
      (pop kill-ring)
      (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
    "/KILL" 'file))
+
+(map! :map org-mode-map :desc "Remove tasks marked as KILL" "C-c DEL k" #'elken/org-remove-kill-tasks)
 #+END_SRC
 
 Show images inline by default
@@ -179,6 +167,11 @@ Font setup to prettify the fonts. Uses Montserrat in most places except where it
 
 #+BEGIN_SRC emacs-lisp
 (defun elken/org-font-setup ()
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
   ;; Set faces for heading levels
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
@@ -208,6 +201,7 @@ Useful settings and functions for [[github:theiceshell/firn][firn]]
 (setq enable-dir-local-variables t)
 (add-hook! 'before-save-hook 'time-stamp)
 #+end_src
+
 * User setup
 Use my name and emails for things like GPG, snippets, mail, magit, etc.
 
@@ -229,6 +223,7 @@ Email folders and setup. This might move to a new section if I start to use emai
                       (mu4e-compose-signature . "---\nelken"))
                     t)
 #+end_src
+
 * Languages
 Configuration for various programming languages.
 
@@ -319,7 +314,8 @@ Finally define the actual setup
 
 * EXWM
 
-Some config has to go here (so it's reloaded properly)
+Some config has to go here (so it's reloaded properly). Remove the posframe parent and ensure that it's properly centered in the workspace.
+
 #+begin_src emacs-lisp
 ;; Make posframes work in exwm
 ;; https://github.com/ch11ng/exwm/issues/550
@@ -349,18 +345,17 @@ Some config has to go here (so it's reloaded properly)
         ivy-posframe-parameters '((parent-frame nil)
                                   (z-group . above))))
 #+end_src
+
 * Graphical setup
 ** Fonts
 Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
-(on-platform-do
- ((windows cygwin)
-  (setq doom-font (font-spec :family "Hasklug NF" :size 12)
-        doom-variable-pitch-font (font-spec :family "Montserrat" :size 13)))
- ((linux)
+(if IS-WINDOWS
+    (setq doom-font (font-spec :family "Hasklug NF" :size 12)
+          doom-variable-pitch-font (font-spec :family "Montserrat" :size 13))
   (setq doom-font (font-spec :family "Hasklug Nerd Font" :size 12)
-        doom-variable-pitch-font (font-spec :family "Montserrat" :size 13))))
+        doom-variable-pitch-font (font-spec :family "Montserrat" :size 13)))
 #+END_SRC
 
 ** Theme
@@ -370,7 +365,8 @@ Load my current flavour-of-the-month colour scheme.
 (setq doom-theme 'doom-nord)
 #+END_SRC
 
-Change the default banner
+Change the default banner (need to add the ASCII banner at some point)
+
 #+BEGIN_SRC emacs-lisp
 (setq +doom-dashboard-banner-file (expand-file-name "banner.png" doom-private-dir))
 #+END_SRC
@@ -409,6 +405,7 @@ Tangle this into the packages.el file. Removes the need for it.
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! exwm)
 (package! rainbow-mode)
+(package! org-bullets)
 (package! visual-fill-column)
 (package! org-make-toc)
 (package! edit-server)
@@ -491,28 +488,28 @@ Used for editing things from Firefox
 (use-package! edit-server
   :commands edit-server-start
   :init (if after-init-time
-                (edit-server-start)
-                (add-hook 'after-init-hook
+            (edit-server-start)
+          (add-hook 'after-init-hook
                     #'(lambda() (edit-server-start))))
-  :config (on-platform-do
-            ((windows cygwin) (setq edit-server-new-frame-alist
-                '((name . "Edit with Emacs FRAME")
-                  (top . 200)
-                  (left . 200)
-                  (width . 80)
-                  (height . 25)
-                  (minibuffer . t)
-                  (menu-bar-lines . t)
-                  (window-system . w32))))
-            (linux) (setq edit-server-new-frame-alist
-                '((name . "Edit with Emacs FRAME")
-                  (top . 200)
-                  (left . 200)
-                  (width . 80)
-                  (height . 25)
-                  (minibuffer . t)
-                  (menu-bar-lines . t)
-                  (window-system . x)))))
+  :config (if IS-WINDOWS
+              (setq edit-server-new-frame-alist
+                    '((name . "Edit with Emacs FRAME")
+                      (top . 200)
+                      (left . 200)
+                      (width . 80)
+                      (height . 25)
+                      (minibuffer . t)
+                      (menu-bar-lines . t)
+                      (window-system . w32)))
+            (setq edit-server-new-frame-alist
+                  '((name . "Edit with Emacs FRAME")
+                    (top . 200)
+                    (left . 200)
+                    (width . 80)
+                    (height . 25)
+                    (minibuffer . t)
+                    (menu-bar-lines . t)
+                    (window-system . x)))))
 #+end_src
 
 *** Graphql-mode
