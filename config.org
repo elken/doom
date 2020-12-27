@@ -14,6 +14,8 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#table-of-contents][Table of Contents]]
 - [[#global-settings][Global settings]]
   - [[#auth-info][Auth info]]
+  - [[#modeline][Modeline]]
+  - [[#magit][Magit]]
 - [[#keybindings][Keybindings]]
 - [[#org-mode][Org Mode]]
   - [[#general-setup][General setup]]
@@ -49,6 +51,22 @@ Add plaintext authinfo file to the list of sources
 (add-to-list 'auth-sources "~/.authinfo")
 #+end_src
 
+** Modeline
+Some niceties for the modeline (further config can be found in [[file:desktop.org][Desktop]])
+
+#+begin_src emacs-lisp
+(after! doom-modeline
+  (setq doom-modeline-major-mode-icon t
+        doom-modeline-major-mode-color-icon t))
+#+end_src
+
+** Magit
+Show gravatars where possible
+
+#+begin_src emacs-lisp
+(setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
+#+end_src
+
 * Keybindings
 It's not a custom config without some fancy keybinds
 
@@ -72,6 +90,12 @@ Set the default org directories across all platforms. (I use [[https://mega.nz][
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/org/")
 #+END_SRC
+
+Default folding is very noisy, I /rarely/ need to see everything expanded
+
+#+begin_src emacs-lisp
+(setq org-statup-folded 'content)
+#+end_src
 
 Enable =org-indent-mode= by default to properly indent everything automagically, =variable-pitch-mode= to enable the more readable fonts where it makes sense and =visual-line-mode= to add a "current line" selection.
 

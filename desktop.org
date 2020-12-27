@@ -31,173 +31,174 @@ This is what all the cool kids are doing these days. Look ma, no DE!
      (exwm-layout-toggle-mode-line))
     ("discord" (exwm-workspace-move-window 3))
     ("Spotify" (exwm-workspace-move-window 4))
-    ("firefox" (exwm-workspace-move-window 2)))
+    ("firefox" (exwm-workspace-move-window 2))))
 
-  ;; (after! (exwm doom-modeline)
-  ;;   ;; TODO Make this show all workspaces, along with occupied/current
-  ;;   (doom-modeline-def-segment exwm-index (format " [%d] " (exwm-workspace--position (selected-frame))))
-  ;;   (doom-modeline-def-modeline 'main
-  ;;     '(bar exwm-index matches buffer-info remote-host buffer-position parrot selection-info)
-  ;;     '(misc-info minor-modes checker input-method buffer-encoding major-mode process vcs)))
+(after! (exwm doom-modeline)
+  (doom-modeline-def-segment exwm-workspaces
+    (exwm-workspace--update-switch-history)
+    (elt exwm-workspace--switch-history (exwm-workspace--position (selected-frame))))
+  (doom-modeline-def-modeline 'main
+    '(bar workspace-name " " exwm-workspaces modals matches buffer-info remote-host parrot selection-info)
+    '(objed-state misc-info persp-name grip mu4e gnus github debug repl lsp minor-modes buffer-encoding major-mode process vcs checker)))
 
-  (defun elken/run-application (command)
-    "Run the specified command as an application"
-    (call-process "gtk-launch" nil 0 nil command))
+(defun elken/run-application (command)
+  "Run the specified command as an application"
+  (call-process "gtk-launch" nil 0 nil command))
 
-  (defvar elken/process-alist '())
+(defvar elken/process-alist '())
 
-  (defun elken/kill-process--action (process)
-    "Do the actual process killing"
-    (when process
-      (ignore-errors
-        (kill-process (cdr process))))
-    (setq elken/process-alist (remove process elken/process-alist)))
+(defun elken/kill-process--action (process)
+  "Do the actual process killing"
+  (when process
+    (ignore-errors
+      (kill-process (cdr process))))
+  (setq elken/process-alist (remove process elken/process-alist)))
 
-  (defun elken/kill-process ()
-    "Kill a background process"
-    (interactive)
-    (ivy-read "Kill process: " elken/process-alist
-              :action #'elken/kill-process--action
-              :caller 'elken/kill-process))
+(defun elken/kill-process ()
+  "Kill a background process"
+  (interactive)
+  (ivy-read "Kill process: " elken/process-alist
+            :action #'elken/kill-process--action
+            :caller 'elken/kill-process))
 
-  (defun elken/run-in-background (command &optional args)
-    "Run the specified command as a daemon"
-    (elken/kill-process--action (assoc command elken/process-alist))
-    (setq elken/process-alist (cons `(,command . ,(start-process-shell-command command nil (format "%s %s" command (or args "")))) elken/process-alist)))
+(defun elken/run-in-background (command &optional args)
+  "Run the specified command as a daemon"
+  (elken/kill-process--action (assoc command elken/process-alist))
+  (setq elken/process-alist
+        (cons `(,command . ,(start-process-shell-command command nil (format "%s %s" command (or args "")))) elken/process-alist)))
 
-  (defun elken/set-wallpaper (file)
-    "Set the DE wallpaper to be $FILE"
-    (interactive)
-    (start-process-shell-command "feh" nil (format "feh --bg-scale %s" file)))
+(defun elken/set-wallpaper (file)
+  "Set the DE wallpaper to be $FILE"
+  (interactive)
+  (start-process-shell-command "feh" nil (format "feh --bg-scale %s" file)))
 
-  (defun elken/exwm-init-hook ()
-    "Various init processes for exwm"
-    ;; Default emacs behaviours
-    (exwm-workspace-switch-create 1)
+(defun elken/exwm-init-hook ()
+  "Various init processes for exwm"
+  ;; Default emacs behaviours
+  (exwm-workspace-switch-create 1)
 
-    ;; Daemon applications
-    (elken/run-in-background "pasystray")
-    (elken/run-in-background "megasync")
-    (elken/run-in-background "nm-applet")
+  ;; Daemon applications
+  (elken/run-in-background "pasystray")
+  (elken/run-in-background "megasync")
+  (elken/run-in-background "nm-applet")
 
-    ;; Startup applications
-    (elken/run-application "firefox")
-    (elken/run-application "discord")
-    (elken/run-application "spotify"))
+  ;; Startup applications
+  (elken/run-application "discord")
+  (elken/run-application "firefox"))
 
-  (use-package! desktop-environment
-    :after exwm
-    :config
-    (setq desktop-environment-screenlock-command "gnome-screensaver-command -l")
-    (desktop-environment-mode))
+(use-package! desktop-environment
+  :after exwm
+  :config
+  (setq desktop-environment-screenlock-command "gnome-screensaver-command -l")
+  (desktop-environment-mode))
 
-  (use-package! exwm
-    :config
-    ;; Show all buffers for switching
-    (setq exwm-workspace-show-all-buffers t)
+(use-package! exwm
+  :config
+  ;; Show all buffers for switching
+  (setq exwm-workspace-show-all-buffers t)
 
-    ;; Set a sane number of default workspaces
-    (setq exwm-workspace-number 10)
+  ;; Set a sane number of default workspaces
+  (setq exwm-workspace-number 10)
 
-    ;; Define workspace setup for monitors
-    (setq exwm-randr-workspace-monitor-plist '(2 "DP-0" 3 "DP-0"))
+  ;; Define workspace setup for monitors
+  (setq exwm-randr-workspace-monitor-plist '(2 "DP-0" 3 "DP-0"))
 
-    ;; Mouse follow me
-    (setq exwm-workspace-warp-cursor t)
+  ;; Mouse follow me
+  (setq exwm-workspace-warp-cursor t)
 
-    ;; Focus follow mouse
-    (setq mouse-autoselect-window t
-          focus-follows-mouse t)
+  ;; Focus follow mouse
+  (setq mouse-autoselect-window t
+        focus-follows-mouse t)
 
-    (setq exwm-workspace-index-map
-          (lambda (index) (number-to-string index)))
+  (setq exwm-workspace-index-map
+        (lambda (index) (number-to-string index)))
 
-    ;; Set the buffer to the name of the window class
-    (add-hook 'exwm-update-class-hook #'elken/exwm-update-class)
+  ;; Set the buffer to the name of the window class
+  (add-hook 'exwm-update-class-hook #'elken/exwm-update-class)
 
-    ;; Init hook
-    (add-hook 'exwm-init-hook #'elken/exwm-init-hook)
+  ;; Init hook
+  (add-hook 'exwm-init-hook #'elken/exwm-init-hook)
 
-    ;; Update window title
-    (add-hook 'exwm-update-title-hook #'elken/exwm-update-title)
+  ;; Update window title
+  (add-hook 'exwm-update-title-hook #'elken/exwm-update-title)
 
-    ;; Configure windows as created
-    (add-hook 'exwm-manage-finish-hook #'elken/configure-window-by-class)
+  ;; Configure windows as created
+  (add-hook 'exwm-manage-finish-hook #'elken/configure-window-by-class)
 
-    ;; /Always/ pass these to emacs
-    (setq exwm-input-prefix-keys
-          '(?\C-x
-            ?\C-u
-            ?\C-h
-            ?\M-x
-            ?\M-`
-            ?\M-&
-            ?\M-:
-            ?\C-\M-j
-            ?\C-\ ))
+  ;; /Always/ pass these to emacs
+  (setq exwm-input-prefix-keys
+        '(?\C-x
+          ?\C-u
+          ?\C-h
+          ?\M-x
+          ?\M-`
+          ?\M-&
+          ?\M-:
+          ?\C-\M-j
+          ?\C-\ ))
 
-    ;; Shortcut to passthrough next keys
-    (map! :map exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+  ;; Shortcut to passthrough next keys
+  (map! :map exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
-    ;; Setup screen layout
-    (require 'exwm-randr)
-    (exwm-randr-enable)
-    (start-process-shell-command "xrandr" nil "sh ~/.screenlayouts/default.sh")
+  ;; Setup screen layout
+  (require 'exwm-randr)
+  (exwm-randr-enable)
+  (start-process-shell-command "xrandr" nil "sh ~/.screenlayouts/default.sh")
 
-    ;; Set the wallpaper
-    (elken/set-wallpaper "~/Pictures/FFVIIR_Midgar.png")
+  ;; Set the wallpaper
+  (elken/set-wallpaper "~/Pictures/FFVIIR_Midgar.png")
 
-    ;; Setup tray
-    (require 'exwm-systemtray)
-    (setq exwm-systemtray-height 16)
-    (exwm-systemtray-enable)
+  ;; Setup tray
+  (require 'exwm-systemtray)
+  (setq exwm-systemtray-height 16)
+  (exwm-systemtray-enable)
 
-    (setq exwm-input-global-keys
-          '(
-            ([?\s- ] . counsel-linux-app)
-            ([?\s-r] . exwm-reset)
-            ([s-left] . windmove-left)
-            ([s-right] . windmove-right)
-            ([s-up] . windmove-up)
-            ([s-down] . windmove-down)
+  (setq exwm-input-global-keys
+        '(
+          ([?\s- ] . counsel-linux-app)
+          ([?\s-r] . exwm-reset)
+          ([s-left] . windmove-left)
+          ([s-right] . windmove-right)
+          ([s-up] . windmove-up)
+          ([s-down] . windmove-down)
 
-            ([?\s-&] . (lambda (command) (interactive (list (read-shell-command "> ")))
-                         (start-process-shell-command command nil command)))
+          ([?\s-&] . (lambda (command) (interactive (list (read-shell-command "> ")))
+                       (start-process-shell-command command nil command)))
 
-            ([?\s-w] . exwm-workspace-switch)
+          ([?\s-w] . exwm-workspace-switch)
 
-            ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
-            ([?\s-`] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 0)))
-            ([?\s-1] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 1)))
-            ([?\s-2] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 2)))
-            ([?\s-3] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 3)))
-            ([?\s-4] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 4)))
-            ([?\s-5] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 5)))
-            ([?\s-6] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 6)))
-            ([?\s-7] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 7)))
-            ([?\s-8] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 8)))
-            ([?\s-9] . (lambda ()
-                         (interactive)
-                         (exwm-workspace-switch-create 9)))))
-    (exwm-enable))
+          ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
+          ([?\s-`] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 0)))
+          ([?\s-1] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 1)))
+          ([?\s-2] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 2)))
+          ([?\s-3] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 3)))
+          ([?\s-4] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 4)))
+          ([?\s-5] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 5)))
+          ([?\s-6] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 6)))
+          ([?\s-7] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 7)))
+          ([?\s-8] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 8)))
+          ([?\s-9] . (lambda ()
+                       (interactive)
+                       (exwm-workspace-switch-create 9)))))
+  (exwm-enable))
 #+end_src
 
 *** Other config files
@@ -218,7 +219,7 @@ xset s off
 xss-lock -- gnome-screensaver-command -l &
 xhost +SI:localuser:$USER
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-emacs -mm -l ~/.doom.d/desktop.el
+emacsclient -c -a ""
 #+end_src
 
 **** Debug
@@ -235,7 +236,7 @@ xset -dpms
 xset s off
 xhost +SI:localuser:$USER
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-emacs -mm --debug-init -l ~/.doom.d/desktop.el
+emacsclient -c -a "" --debug-init
 #+end_src
 
 **** Picom config
