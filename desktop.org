@@ -26,7 +26,7 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   "Update the window title when needed"
   (pcase (downcase (or exwm-class-name ""))
     ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
-    ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "metadata" "{{ artist }} - {{ title }}"))))))
+    ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))))
 
 (defun elken/configure-window-by-class()
   "Configuration for windows (grouped by WM_CLASS)"
@@ -77,7 +77,7 @@ This is what all the cool kids are doing these days. Look ma, no DE!
        (doom-modeline-spc)
        status
        (doom-modeline-spc)
-       (propertize (truncate-string-to-width text 50 nil nil "...") 'face 'bold))))
+       (propertize (truncate-string-to-width text 40 nil nil "...") 'face 'bold))))
   (doom-modeline-def-segment exwm-workspaces
     (exwm-workspace--update-switch-history)
     (concat
