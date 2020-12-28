@@ -195,7 +195,7 @@ This is what all the cool kids are doing these days. Look ma, no DE!
   (exwm-systemtray-enable)
 
   ;; Date/time
-  (setq display-time-format " [ %H:%M %a,%d %b %Y]")
+  (setq display-time-format " [ %H:%M %d/%m/%y]")
   (setq display-time-default-load-average nil)
   (display-time-mode 1)
 
