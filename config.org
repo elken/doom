@@ -16,7 +16,11 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#auth-info][Auth info]]
   - [[#modeline][Modeline]]
   - [[#magit][Magit]]
+  - [[#eshell][EShell]]
+  - [[#exwm][EXWM]]
+  - [[#server][Server]]
 - [[#keybindings][Keybindings]]
+  - [[#dired][Dired]]
 - [[#org-mode][Org Mode]]
   - [[#general-setup][General setup]]
   - [[#font-setup][Font setup]]
@@ -24,8 +28,6 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#user-setup][User setup]]
 - [[#languages][Languages]]
   - [[#rust][Rust]]
-- [[#eshell][EShell]]
-- [[#exwm][EXWM]]
 - [[#graphical-setup][Graphical setup]]
   - [[#fonts][Fonts]]
   - [[#theme][Theme]]
@@ -67,6 +69,121 @@ Show gravatars where possible
 (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
 #+end_src
 
+Allow forge to create repos under my name
+
+#+begin_src emacs-lisp
+(setq forge-owned-accounts '(("elken")))
+#+end_src
+
+** EShell
+Eshell is a beautiful thing but ootb experience is a tad dated. Seems there is an issue with the magit section. I would also like to extend to add other sections later..
+
+#+begin_src emacs-lisp
+(require 'dash)
+(require 's)
+
+(defmacro with-face (STR &rest PROPS)
+  "Return STR propertized with PROPS."
+  `(propertize ,STR 'face (list ,@PROPS)))
+
+(defmacro esh-section (NAME ICON FORM &rest PROPS)
+  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
+  `(setq ,NAME
+         (lambda () (when ,FORM
+                      (-> ,ICON
+                          (concat esh-section-delim ,FORM)
+                          (with-face ,@PROPS))))))
+
+(defun esh-acc (acc x)
+  "Accumulator for evaluating and concatenating esh-sections."
+  (--if-let (funcall x)
+      (if (s-blank? acc)
+          it
+        (concat acc esh-sep it))
+    acc))
+
+(defun esh-prompt-func ()
+  "Build `eshell-prompt-function'"
+  (concat esh-header
+          (-reduce-from 'esh-acc "" eshell-funcs)
+          "\n"
+          eshell-prompt-string))
+#+end_src
+
+Finally define the actual setup
+
+#+begin_src emacs-lisp
+(esh-section esh-dir
+             ""  ;  (faicon folder)
+             (abbreviate-file-name (eshell/pwd))
+             '(:foreground "gold" :bold ultra-bold :underline t))
+
+(esh-section esh-git
+             ""  ;  (git icon)
+             (ignore-errors (magit-get-current-branch))
+             '(:foreground "pink"))
+
+(esh-section esh-clock
+             "\xf017"  ;  (clock icon)
+             (format-time-string "%H:%M" (current-time))
+             '(:foreground "forest green"))
+
+;; Below I implement a "prompt number" section
+(add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
+(advice-add 'eshell-send-input :before
+            (lambda (&rest args) (setq esh-prompt-num (incf esh-prompt-num))))
+
+(esh-section esh-num
+             ""  ;  (list icon)
+             (number-to-string esh-prompt-num)
+             '(:foreground "brown"))
+
+;; Choose which eshell-funcs to enable
+(setq eshell-funcs (list esh-dir esh-git esh-clock esh-num))
+
+;; Enable the new eshell prompt
+(after! eshell
+  (setq eshell-prompt-function 'esh-prompt-func
+        esh-sep " | "
+        esh-section-delim " "
+        esh-header "\n┌─"
+        eshell-prompt-regexp "└─> "
+        eshell-prompt-string "└─> "
+        esh-prompt-num 0))
+#+end_src
+** EXWM
+
+Some config has to go here (so it's reloaded properly). Remove the posframe parent and ensure that it's properly centered in the workspace.
+
+#+begin_src emacs-lisp
+;; Make posframes work in exwm
+;; https://github.com/ch11ng/exwm/issues/550
+(after! (ivy-posframe exwm)
+  :config
+  (defun +ivy-posframe-display-exwm (str)
+    (ivy-posframe--display str
+                           (lambda (info)
+                             (let* ((workarea (elt exwm-workspace--workareas exwm-workspace-current-index))
+                                    (x (aref workarea 0))
+                                    (y (aref workarea 1))
+
+                                    (fw (aref workarea 2))
+                                    (fh (aref workarea 3))
+
+                                    (pw (plist-get info :posframe-width))
+                                    (ph (plist-get info :posframe-height)))
+
+                               (cons (+ x (/ (- fw pw) 2)) (+ y (/ (- fh ph) 2)))))))
+  ;; force set frame-position on every posframe display
+  (advice-add 'posframe--set-frame-position :before
+              (lambda (&rest args)
+                (setq-local posframe--last-posframe-pixel-position nil)))
+  (setq ivy-posframe-display-functions-alist
+        '((t . +ivy-posframe-display-exwm))
+
+        ivy-posframe-parameters '((parent-frame nil)
+                                  (z-group . above))))
+#+end_src
 * Keybindings
 It's not a custom config without some fancy keybinds
 
@@ -82,6 +199,15 @@ Back to a simpler time...
 (map! :g "C-s" #'save-buffer)
 #+end_src
 
+** Dired
+Dired should behave better with evil mappings
+
+#+begin_src emacs-lisp
+(map! :map dired-mode-map
+      :n "h" #'dired-up-directory
+      :n "l" #'dired-find-file)
+#+end_src
+
 * Org Mode
 ** General setup
 
@@ -94,7 +220,7 @@ Set the default org directories across all platforms. (I use [[https://mega.nz][
 Default folding is very noisy, I /rarely/ need to see everything expanded
 
 #+begin_src emacs-lisp
-(setq org-statup-folded 'content)
+(setq org-startup-folded 'content)
 #+end_src
 
 Enable =org-indent-mode= by default to properly indent everything automagically, =variable-pitch-mode= to enable the more readable fonts where it makes sense and =visual-line-mode= to add a "current line" selection.
@@ -257,117 +383,6 @@ Make =rls= the default
 #+begin_src emacs-lisp
 (after! rustic
   (setq rustic-lsp-server 'rls))
-#+end_src
-
-* EShell
-Eshell is a beautiful thing but ootb experience is a tad dated. Seems there is an issue with the magit section. I would also like to extend to add other sections later..
-
-#+begin_src emacs-lisp
-(require 'dash)
-(require 's)
-
-(defmacro with-face (STR &rest PROPS)
-  "Return STR propertized with PROPS."
-  `(propertize ,STR 'face (list ,@PROPS)))
-
-(defmacro esh-section (NAME ICON FORM &rest PROPS)
-  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
-  `(setq ,NAME
-         (lambda () (when ,FORM
-                      (-> ,ICON
-                          (concat esh-section-delim ,FORM)
-                          (with-face ,@PROPS))))))
-
-(defun esh-acc (acc x)
-  "Accumulator for evaluating and concatenating esh-sections."
-  (--if-let (funcall x)
-      (if (s-blank? acc)
-          it
-        (concat acc esh-sep it))
-    acc))
-
-(defun esh-prompt-func ()
-  "Build `eshell-prompt-function'"
-  (concat esh-header
-          (-reduce-from 'esh-acc "" eshell-funcs)
-          "\n"
-          eshell-prompt-string))
-#+end_src
-
-Finally define the actual setup
-
-#+begin_src emacs-lisp
-(esh-section esh-dir
-             ""  ;  (faicon folder)
-             (abbreviate-file-name (eshell/pwd))
-             '(:foreground "gold" :bold ultra-bold :underline t))
-
-(esh-section esh-git
-             ""  ;  (git icon)
-             (ignore-errors (magit-get-current-branch))
-             '(:foreground "pink"))
-
-(esh-section esh-clock
-             "\xf017"  ;  (clock icon)
-             (format-time-string "%H:%M" (current-time))
-             '(:foreground "forest green"))
-
-;; Below I implement a "prompt number" section
-(add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
-(advice-add 'eshell-send-input :before
-            (lambda (&rest args) (setq esh-prompt-num (incf esh-prompt-num))))
-
-(esh-section esh-num
-             ""  ;  (list icon)
-             (number-to-string esh-prompt-num)
-             '(:foreground "brown"))
-
-;; Choose which eshell-funcs to enable
-(setq eshell-funcs (list esh-dir esh-git esh-clock esh-num))
-
-;; Enable the new eshell prompt
-(after! eshell
-  (setq eshell-prompt-function 'esh-prompt-func
-        esh-sep " | "
-        esh-section-delim " "
-        esh-header "\n┌─"
-        eshell-prompt-regexp "└─> "
-        eshell-prompt-string "└─> "
-        esh-prompt-num 0))
-#+end_src
-
-* EXWM
-
-Some config has to go here (so it's reloaded properly). Remove the posframe parent and ensure that it's properly centered in the workspace.
-
-#+begin_src emacs-lisp
-;; Make posframes work in exwm
-;; https://github.com/ch11ng/exwm/issues/550
-(after! (ivy-posframe exwm)
-  :config
-  (defun +ivy-posframe-display-exwm (str)
-    (ivy-posframe--display str
-                           (lambda (info)
-                             (let* ((workarea (elt exwm-workspace--workareas exwm-workspace-current-index))
-                                    (x (aref workarea 0))
-                                    (y (aref workarea 1))
-
-                                    (fw (aref workarea 2))
-                                    (fh (aref workarea 3))
-
-                                    (pw (plist-get info :posframe-width))
-                                    (ph (plist-get info :posframe-height)))
-
-                               (cons (+ x (/ (- fw pw) 2)) (+ y (/ (- fh ph) 2)))))))
-  ;; force set frame-position on every posframe display
-  (advice-add 'posframe--set-frame-position :before
-              (lambda (&rest args)
-                (setq-local posframe--last-posframe-pixel-position nil)))
-  (setq ivy-posframe-display-functions-alist
-        '((t . +ivy-posframe-display-exwm))
-
-        ivy-posframe-parameters '((parent-frame nil)
-                                  (z-group . above))))
 #+end_src
 
 * Graphical setup
