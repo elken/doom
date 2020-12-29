@@ -12,7 +12,6 @@
 
 # Ignore tangled files
 config.el
-desktop.el
 packages.el
 exwm/*
 
