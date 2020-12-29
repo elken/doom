@@ -1,6 +1,6 @@
 #+TITLE: Config
 #+CAPTION: Banner
-[[file:banner.png]]
+[[file:images/banner.png]]
 
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
 
@@ -12,20 +12,25 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 :END:
 :CONTENTS:
 - [[#table-of-contents][Table of Contents]]
+- [[#setup][Setup]]
+  - [[#exwm][EXWM]]
+    - [[#desktopel][=desktop.el=]]
+    - [[#gnome-flashback][GNOME-Flashback]]
+    - [[#startsh--start-debugsh][=start.sh= / =start-debug.sh=]]
+- [[#faq][FAQ]]
 - [[#global-settings][Global settings]]
   - [[#auth-info][Auth info]]
   - [[#modeline][Modeline]]
   - [[#magit][Magit]]
   - [[#eshell][EShell]]
   - [[#exwm][EXWM]]
-  - [[#server][Server]]
+  - [[#user-setup][User setup]]
 - [[#keybindings][Keybindings]]
   - [[#dired][Dired]]
 - [[#org-mode][Org Mode]]
   - [[#general-setup][General setup]]
   - [[#font-setup][Font setup]]
   - [[#firn-setup][Firn setup]]
-- [[#user-setup][User setup]]
 - [[#languages][Languages]]
   - [[#rust][Rust]]
 - [[#graphical-setup][Graphical setup]]
@@ -34,6 +39,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
 - [[#packages][Packages]]
+  - [[#packagesel][=packages.el=]]
   - [[#setup][Setup]]
     - [[#rainbow-mode][Rainbow Mode]]
     - [[#org][Org]]
@@ -45,16 +51,42 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#spotify][Spotify]]
 :END:
 
+* Setup
+If you (somehow) haven't already guessed, this depends on [[doom-repo:][Doom Emacs]], so also requires any dependency listed there. Outside of Doom, the only other dependency is =playerctl= for the now-playing modeline segment.
+
+This is also focused around an exwm workflow (although as I use multiple systems the exwm stuff is nicely filtered out).
+
+** EXWM
+As mentioned above, the primary use for this config is =exwm= which is pulled from a number of files in the current environment.
+
+*** =desktop.el=
+The primary lisp file where the bulk of the configuration is held, with everything from my process manager to a now-playing segment. Below are some usage screenshots.
+
+[[file:images/kill-process.png]]
+
+[[file:images/tray.png]]
+
+Transparency is handled both through [[*GUI/Frame][Doom]] and via [[file:exwm/picom.conf][picom]]
+
+*** GNOME-Flashback
+For the sake of simplicity, I use a slightly modified version of [[https://github.com/WJCFerguson/exwm-gnome-flashback][GNOME Flashback]] to run the startup scripts. It also gives me ootb access to things like =pinentry=, the various password stores, =gnome-screensaver= lock screen and the useful screenshot tool.
+
+As such, everything is themed around [[https://nordtheme.com][Nord]].
+
+*** =start.sh= / =start-debug.sh=
+The scripts responsible for starting up exwm in the right way, including env variables and picom.
+* FAQ
+None yet because luckily nobody else has seen this spaghetti junction
 * Global settings
 ** Auth info
-Add plaintext authinfo file to the list of sources
+Add plaintext authinfo file to the list of sources. I /know/ I should use a GPG file but I'll get around to it damn it.
 
 #+begin_src emacs-lisp
 (add-to-list 'auth-sources "~/.authinfo")
 #+end_src
 
 ** Modeline
-Some niceties for the modeline (further config can be found in [[file:desktop.org][Desktop]])
+Some niceties for the modeline (further config can be found in [[file:desktop.el][Desktop]])
 
 #+begin_src emacs-lisp
 (after! doom-modeline
@@ -116,17 +148,12 @@ Finally define the actual setup
 (esh-section esh-dir
              ""  ;  (faicon folder)
              (abbreviate-file-name (eshell/pwd))
-             '(:foreground "gold" :bold ultra-bold :underline t))
+             '(:foreground "#EBCB8B" :bold ultra-bold :underline t))
 
 (esh-section esh-git
              ""  ;  (git icon)
              (ignore-errors (magit-get-current-branch))
              '(:foreground "pink"))
-
-(esh-section esh-clock
-             "\xf017"  ;  (clock icon)
-             (format-time-string "%H:%M" (current-time))
-             '(:foreground "forest green"))
 
 ;; Below I implement a "prompt number" section
 (add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
@@ -139,7 +166,7 @@ Finally define the actual setup
              '(:foreground "brown"))
 
 ;; Choose which eshell-funcs to enable
-(setq eshell-funcs (list esh-dir esh-git esh-clock esh-num))
+(setq eshell-funcs (list esh-dir esh-git esh-num))
 
 ;; Enable the new eshell prompt
 (after! eshell
@@ -184,6 +211,28 @@ Some config has to go here (so it's reloaded properly). Remove the posframe pare
         ivy-posframe-parameters '((parent-frame nil)
                                   (z-group . above))))
 #+end_src
+** User setup
+Use my name and emails for things like GPG, snippets, mail, magit, etc.
+
+#+BEGIN_SRC emacs-lisp
+(setq user-full-name "Ellis Kenyo"
+      user-mail-address "me@elken.dev")
+#+END_SRC
+
+Email folders and setup. This might move to a new section if I start to use email seriously.
+
+#+begin_src emacs-lisp
+(set-email-account! "mail.elken.dev"
+                    '((mu4e-sent-folder       . "/mailbox/Sent Mail")
+                      (mu4e-drafts-folder     . "/mailbox/Drafts")
+                      (mu4e-trash-folder      . "/mailbox/Trash")
+                      (mu4e-refile-folder     . "/mailbox/All Mail")
+                      (smtpmail-smtp-user     . "me@elken.dev")
+                      (user-mail-address      . "me@elken.dev")    ;; only needed for mu < 1.4
+                      (mu4e-compose-signature . "---\nelken"))
+                    t)
+#+end_src
+
 * Keybindings
 It's not a custom config without some fancy keybinds
 
@@ -216,6 +265,12 @@ Set the default org directories across all platforms. (I use [[https://mega.nz][
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/org/")
 #+END_SRC
+
+Cycle by default (no idea why this isn't default)
+
+#+begin_src emacs-lisp
+(setq org-cycle-emulate-tab nil)
+#+end_src
 
 Default folding is very noisy, I /rarely/ need to see everything expanded
 
@@ -283,7 +338,7 @@ Auto reload config on save (both =config.org= and =init.el=)
 #+begin_src emacs-lisp
 (require 'cl-extra)
 (defvar elken/reload-files '("config.org" "init.el"))
-(defvar elken/extra-org-files '("desktop.org"))
+(defvar elken/extra-org-files '())
 
 (defun elken/doom-reload-on-save ()
   (cond
@@ -352,28 +407,6 @@ Useful settings and functions for [[github:theiceshell/firn][firn]]
 (add-hook! 'before-save-hook 'time-stamp)
 #+end_src
 
-* User setup
-Use my name and emails for things like GPG, snippets, mail, magit, etc.
-
-#+BEGIN_SRC emacs-lisp
-(setq user-full-name "Ellis Kenyo"
-      user-mail-address "me@elken.dev")
-#+END_SRC
-
-Email folders and setup. This might move to a new section if I start to use email seriously.
-
-#+begin_src emacs-lisp
-(set-email-account! "mail.elken.dev"
-                    '((mu4e-sent-folder       . "/mailbox/Sent Mail")
-                      (mu4e-drafts-folder     . "/mailbox/Drafts")
-                      (mu4e-trash-folder      . "/mailbox/Trash")
-                      (mu4e-refile-folder     . "/mailbox/All Mail")
-                      (smtpmail-smtp-user     . "me@elken.dev")
-                      (user-mail-address      . "me@elken.dev")    ;; only needed for mu < 1.4
-                      (mu4e-compose-signature . "---\nelken"))
-                    t)
-#+end_src
-
 * Languages
 Configuration for various programming languages.
 
@@ -407,7 +440,7 @@ Load my current flavour-of-the-month colour scheme.
 Change the default banner (need to add the ASCII banner at some point)
 
 #+BEGIN_SRC emacs-lisp
-(setq +doom-dashboard-banner-file (expand-file-name "banner.png" doom-private-dir))
+(setq +doom-dashboard-banner-file (expand-file-name "images/banner.png" doom-private-dir))
 #+END_SRC
 
 ** Line Numbers
@@ -439,6 +472,7 @@ Add some transparency
 
 * Packages
 
+** =packages.el=
 Tangle this into the packages.el file. Removes the need for it.
 
 #+BEGIN_SRC emacs-lisp :tangle packages.el
