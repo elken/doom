@@ -40,7 +40,7 @@
        (require 'subr-x)
        (defun elken/playerctl-format (function format)
          "Invoke playerctl for FUNCTION using FORMAT to present output"
-         (string-trim (shell-command-to-string (format "playerctl %s --format '%s'" function format))))
+         (string-trim (shell-command-to-string (format "playerctl --player=spotify %s --format '%s'" function format))))
        (let ((is-playingp (equal "playing" (elken/playerctl-format "status" "{{ lc(status) }}")))
              (player-icon (if (equal "spotify" (elken/playerctl-format "metadata" "{{ playerName }}")) "" "")))
          (concat
@@ -118,6 +118,7 @@
   "Various init processes for exwm"
   ;; Default emacs behaviours
   (exwm-workspace-switch-create 1)
+  (eshell)
 
   ;; Daemon applications
   (elken/run-in-background "pasystray")
@@ -126,8 +127,6 @@
 
   ;; Startup applications
   (elken/run-application "discord")
-  (elken/run-application "steam")
-  (elken/run-application "spotify")
   (elken/run-application "firefox"))
 
 (use-package! desktop-environment

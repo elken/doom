@@ -19,6 +19,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#startsh--start-debugsh][=start.sh= / =start-debug.sh=]]
 - [[#faq][FAQ]]
 - [[#global-settings][Global settings]]
+  - [[#better-defaults][Better defaults]]
   - [[#auth-info][Auth info]]
   - [[#modeline][Modeline]]
   - [[#magit][Magit]]
@@ -38,6 +39,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
+  - [[#modeline][Modeline]]
 - [[#packages][Packages]]
   - [[#packagesel][=packages.el=]]
   - [[#setup][Setup]]
@@ -78,6 +80,12 @@ The scripts responsible for starting up exwm in the right way, including env var
 * FAQ
 None yet because luckily nobody else has seen this spaghetti junction
 * Global settings
+** Better defaults
+Make the scratch buffer start in lisp mode
+
+#+begin_src emacs-lisp
+(setq doom-scratch-initial-major-mode 'lisp-interaction-mode)
+#+end_src
 ** Auth info
 Add plaintext authinfo file to the list of sources. I /know/ I should use a GPG file but I'll get around to it damn it.
 
@@ -470,6 +478,15 @@ Add some transparency
   (add-to-list 'default-frame-alist '(alpha . 90)))
 #+end_src
 
+** Modeline
+Define me a better modeline (for non-exwm)
+
+#+begin_src emacs-lisp
+(after! doom-modeline
+  (doom-modeline-def-modeline 'main
+    '(bar workspace-name modals matches buffer-info remote-host parrot selection-info)
+    '(objed-state misc-info persp-name grip mu4e gnus github debug repl lsp minor-modes major-mode process vcs checker)))
+#+end_src
 * Packages
 
 ** =packages.el=
