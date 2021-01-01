@@ -24,7 +24,8 @@
   (pcase (downcase (or exwm-class-name ""))
     ("mpv" (exwm-floating-toggle-floating)
      (exwm-layout-toggle-mode-line))
-    ("discord" (exwm-workspace-move-window 3))
+    ("discord" (exwm-workspace-move-window 3)
+     (elken/reload-tray))
     ("megasync" (exwm-floating-toggle-floating)
      (exwm-layout-toggle-mode-line))
     ("spotify" (exwm-workspace-move-window 4))
@@ -40,7 +41,7 @@
        (require 'subr-x)
        (defun elken/playerctl-format (function format)
          "Invoke playerctl for FUNCTION using FORMAT to present output"
-         (string-trim (shell-command-to-string (format "playerctl %s --format '%s'" function format))))
+         (string-trim (shell-command-to-string (format "playerctl --player=spotify %s --format '%s'" function format))))
        (let ((is-playingp (equal "playing" (elken/playerctl-format "status" "{{ lc(status) }}")))
              (player-icon (if (equal "spotify" (elken/playerctl-format "metadata" "{{ playerName }}")) "" "")))
          (concat
@@ -74,7 +75,7 @@
      (doom-modeline-spc)
      (elt exwm-workspace--switch-history (exwm-workspace--position (selected-frame)))))
   (doom-modeline-def-modeline 'main
-    '(bar workspace-name exwm-workspaces modals matches buffer-info remote-host parrot selection-info)
+    '(bar workspace-name exwm-workspaces modals matches buffer-info remote-host parrot selection-info buffer-position)
     '(now-playing objed-state misc-info persp-name grip mu4e gnus github debug repl lsp minor-modes major-mode process vcs checker)))
 
 (defun elken/run-application (command)
@@ -116,9 +117,6 @@
 
 (defun elken/exwm-init-hook ()
   "Various init processes for exwm"
-  ;; Default emacs behaviours
-  (exwm-workspace-switch-create 1)
-
   ;; Daemon applications
   (elken/run-in-background "pasystray")
   (elken/run-in-background "megasync")
@@ -126,9 +124,11 @@
 
   ;; Startup applications
   (elken/run-application "discord")
-  (elken/run-application "steam")
-  (elken/run-application "spotify")
-  (elken/run-application "firefox"))
+  (elken/run-application "firefox")
+
+  ;; Default emacs behaviours
+  (exwm-workspace-switch-create 1)
+  (eshell))
 
 (use-package! desktop-environment
   :after exwm
