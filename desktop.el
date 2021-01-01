@@ -24,12 +24,12 @@
   (pcase (downcase (or exwm-class-name ""))
     ("mpv" (exwm-floating-toggle-floating)
      (exwm-layout-toggle-mode-line))
-    ("discord" (exwm-workspace-move-window 3)
+    ("discord" (exwm-workspace-move-window 2)
      (elken/reload-tray))
     ("megasync" (exwm-floating-toggle-floating)
      (exwm-layout-toggle-mode-line))
-    ("spotify" (exwm-workspace-move-window 4))
-    ("firefox" (exwm-workspace-move-window 2))))
+    ("spotify" (exwm-workspace-move-window 3))
+    ("firefox" (exwm-workspace-move-window 1))))
 
 (after! (exwm doom-modeline)
   ;; Rudimentary version of my now-playing segment
@@ -70,12 +70,12 @@
        (doom-modeline-spc)
        (propertize (truncate-string-to-width text 40 nil nil "...") 'face 'bold))))
   (doom-modeline-def-segment exwm-workspaces
-    (exwm-workspace--update-switch-history)
-    (concat
-     (doom-modeline-spc)
-     (elt exwm-workspace--switch-history (exwm-workspace--position (selected-frame)))))
+      (exwm-workspace--update-switch-history)
+      (concat
+       (doom-modeline-spc)
+       (elt exwm-workspace--switch-history (exwm-workspace--position (selected-frame)))))
   (doom-modeline-def-modeline 'main
-    '(bar workspace-name exwm-workspaces modals matches buffer-info remote-host parrot selection-info buffer-position)
+    '(bar workspace-name exwm-workspaces modals matches buffer-info remote-host parrot selection-info)
     '(now-playing objed-state misc-info persp-name grip mu4e gnus github debug repl lsp minor-modes major-mode process vcs checker)))
 
 (defun elken/run-application (command)
@@ -145,7 +145,7 @@
   (setq exwm-workspace-number 10)
 
   ;; Define workspace setup for monitors
-  (setq exwm-randr-workspace-monitor-plist '(2 "DP-0" 3 "DP-0"))
+  (setq exwm-randr-workspace-monitor-plist '(1 "DP-0" 2 "DP-0"))
 
   (setq exwm-workspace-index-map
         (lambda (index) (number-to-string index)))

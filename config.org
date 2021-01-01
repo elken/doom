@@ -40,7 +40,6 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
-  - [[#modeline][Modeline]]
 - [[#packages][Packages]]
   - [[#packagesel][=packages.el=]]
   - [[#setup][Setup]]
@@ -488,17 +487,6 @@ Add some transparency
   (add-to-list 'default-frame-alist '(alpha . 90)))
 #+end_src
 
-** Modeline
-Define me a better modeline (for non-exwm)
-
-#+begin_src emacs-lisp
-(after! doom-modeline
-  (nyan-mode)
-  (nyan-start-animation)
-  (doom-modeline-def-modeline 'main
-    '(bar workspace-name modals matches buffer-info remote-host parrot selection-info buffer-position)
-    '(objed-state misc-info persp-name grip mu4e gnus github debug repl lsp minor-modes major-mode process vcs checker)))
-#+end_src
 * Packages
 
 ** =packages.el=
@@ -513,7 +501,6 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! edit-server)
 (package! graphql-mode)
 (package! desktop-environment)
-(package! nyan-mode)
 ;; (package! oauth2)
 ;; (package! simple-httpd)
 ;; (package! dotenv.el
