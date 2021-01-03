@@ -16,7 +16,7 @@
   "Update the window title when needed"
   (pcase (downcase (or exwm-class-name ""))
     ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
-    ("discord" (exwm-workspace-rename-buffer (format "Discord: %s" exwm-title)))
+    ("discord" (exwm-workspace-rename-buffer (format "%s" exwm-title)))
     ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))))
 
 (defun elken/configure-window-by-class()
@@ -129,7 +129,6 @@
 
   ;; Default emacs behaviours
   (exwm-workspace-switch-create 1)
-  (vterm)
   (mu4e t))
 
 (use-package! desktop-environment
@@ -185,7 +184,7 @@
   (start-process-shell-command "xrandr" nil "sh ~/.screenlayouts/default.sh")
 
   ;; Set the wallpaper
-  (elken/set-wallpaper "~/Pictures/FFVIIR_Midgar.png")
+  (elken/set-wallpaper (expand-file-name "images/background.png" doom-private-dir))
 
   ;; Setup tray
   (require 'exwm-systemtray)
@@ -196,6 +195,8 @@
   (setq display-time-format " [ %H:%M %d/%m/%y]")
   (setq display-time-default-load-average nil)
   (display-time-mode 1)
+
+  (exwm-input-set-key (kbd "<s-return>") 'vterm)
 
   (setq exwm-input-global-keys
         '(
@@ -208,6 +209,8 @@
 
           ([?\s-&] . (lambda (command) (interactive (list (read-shell-command "> ")))
                        (start-process-shell-command command nil command)))
+
+          ([?\s-E] . (lambda () (interactive) (dired "~")))
 
           ([?\s-w] . exwm-workspace-switch)
 

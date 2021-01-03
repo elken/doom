@@ -18,6 +18,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#gnome-flashback][GNOME-Flashback]]
     - [[#startsh--start-debugsh][=start.sh= / =start-debug.sh=]]
 - [[#faq][FAQ]]
+- [[#functions][Functions]]
 - [[#global-settings][Global settings]]
   - [[#better-defaults][Better defaults]]
   - [[#auth-info][Auth info]]
@@ -52,6 +53,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#edit-server][Edit Server]]
     - [[#graphql-mode][Graphql-mode]]
     - [[#spotify][Spotify]]
+    - [[#which-key-posframe][which-key-posframe]]
 :END:
 
 * Setup
@@ -82,6 +84,29 @@ As such, everything is themed around [[https://nordtheme.com][Nord]].
 The scripts responsible for starting up exwm in the right way, including env variables and picom.
 * FAQ
 None yet because luckily nobody else has seen this spaghetti junction
+* Functions
+Global functions used throughout. Some are more complex than others.
+
+Posframes by default don't work in exwm, so let's fix that by making sure they're centered.
+
+#+begin_src emacs-lisp
+(defun elken/posframe-poshandler (info)
+  "Handler to place posframe in the correct area in exwm."
+  (if (not (featurep 'exwm)) (posframe-poshandler-frame-center info)
+    (let* ((workarea (elt exwm-workspace--workareas exwm-workspace-current-index))
+           (x (aref workarea 0))
+           (y (aref workarea 1))
+
+           (fw (aref workarea 2))
+           (fh (aref workarea 3))
+
+           (pw (plist-get info :posframe-width))
+           (ph (plist-get info :posframe-height)))
+
+      (cons
+       (+ x (/ (- fw pw) 2))
+       (+ y (/ (- fh ph) 2))))))
+#+end_src
 * Global settings
 ** Better defaults
 Make the scratch buffer start in lisp mode
@@ -200,19 +225,7 @@ Some config has to go here (so it's reloaded properly). Remove the posframe pare
 (after! (ivy-posframe exwm)
   :config
   (defun +ivy-posframe-display-exwm (str)
-    (ivy-posframe--display str
-                           (lambda (info)
-                             (let* ((workarea (elt exwm-workspace--workareas exwm-workspace-current-index))
-                                    (x (aref workarea 0))
-                                    (y (aref workarea 1))
-
-                                    (fw (aref workarea 2))
-                                    (fh (aref workarea 3))
-
-                                    (pw (plist-get info :posframe-width))
-                                    (ph (plist-get info :posframe-height)))
-
-                               (cons (+ x (/ (- fw pw) 2)) (+ y (/ (- fh ph) 2)))))))
+    (ivy-posframe--display str #'elken/posframe-poshandler))
   ;; force set frame-position on every posframe display
   (advice-add 'posframe--set-frame-position :before
               (lambda (&rest args)
@@ -389,7 +402,7 @@ Make tangled shell files executable (I trust myself, ish...)
 #+end_src
 
 ** Font setup
-Font setup to prettify the fonts. Uses Montserrat in most places except where it makes sense to use the defined fixed width font.
+Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where it makes sense to use the defined fixed width font.
 
 #+BEGIN_SRC emacs-lisp
 (defun elken/org-font-setup ()
@@ -407,7 +420,7 @@ Font setup to prettify the fonts. Uses Montserrat in most places except where it
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Montserrat" :weight 'regular :height (cdr face)))
+    (set-face-attribute (car face) nil :font "IBM Plex Sans" :weight 'regular :height (cdr face)))
 
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
@@ -487,9 +500,9 @@ Configure the fonts across all used platforms (slightly different names).
 #+BEGIN_SRC emacs-lisp
 (if IS-WINDOWS
     (setq doom-font (font-spec :family "Hasklug NF" :size 12)
-          doom-variable-pitch-font (font-spec :family "Montserrat" :size 13))
+          doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 13))
   (setq doom-font (font-spec :family "Hasklug Nerd Font" :size 12)
-        doom-variable-pitch-font (font-spec :family "Montserrat" :size 13)))
+        doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 13)))
 #+END_SRC
 
 ** Theme
@@ -546,6 +559,7 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! edit-server)
 (package! graphql-mode)
 (package! desktop-environment)
+(package! which-key-posframe)
 ;; (package! oauth2)
 ;; (package! simple-httpd)
 ;; (package! dotenv.el
@@ -668,4 +682,17 @@ Used for displaying graphql queries nicely & sending.
 ;;          spotify-transport 'connect
 ;;          spotify-status-location 'modeline))
 ;;  (global-spotify-remote-mode))
+#+end_src
+*** which-key-posframe
+The last piece of Exodia. Now I can posframe everything for vague satisfation.
+
+#+begin_src emacs-lisp
+
+  (use-package! which-key-posframe
+    :config
+    (which-key-posframe-mode)
+    (after! exwm
+      (setq which-key-posframe-parameters '((parent-frame nil)
+                                            (z-group . above))
+            which-key-posframe-poshandler #'elken/posframe-poshandler)))
 #+end_src
