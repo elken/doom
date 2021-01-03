@@ -13,7 +13,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 :CONTENTS:
 - [[#table-of-contents][Table of Contents]]
 - [[#setup][Setup]]
-  - [[#exwm][EXWM]]
+  - [[#exwm-setup][EXWM Setup]]
     - [[#desktopel][=desktop.el=]]
     - [[#gnome-flashback][GNOME-Flashback]]
     - [[#startsh--start-debugsh][=start.sh= / =start-debug.sh=]]
@@ -33,6 +33,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#general-setup][General setup]]
   - [[#font-setup][Font setup]]
   - [[#firn-setup][Firn setup]]
+- [[#email][Email]]
 - [[#languages][Languages]]
   - [[#rust][Rust]]
 - [[#graphical-setup][Graphical setup]]
@@ -56,9 +57,11 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 * Setup
 If you (somehow) haven't already guessed, this depends on [[doom-repo:][Doom Emacs]], so also requires any dependency listed there. Outside of Doom, the only other dependency is =playerctl= for the now-playing modeline segment.
 
+Email depends on =mbsync= to be setup to read email.
+
 This is also focused around an exwm workflow (although as I use multiple systems the exwm stuff is nicely filtered out).
 
-** EXWM
+** EXWM Setup
 As mentioned above, the primary use for this config is =exwm= which is pulled from a number of files in the current environment.
 
 *** =desktop.el=
@@ -179,6 +182,7 @@ Finally define the actual setup
 ;; Enable the new eshell prompt
 (after! eshell
   (setq eshell-prompt-function 'esh-prompt-func
+        eshell-prefer-lisp-functions t
         esh-sep " | "
         esh-section-delim " "
         esh-header "\n┌─"
@@ -223,7 +227,7 @@ Some config has to go here (so it's reloaded properly). Remove the posframe pare
 Use my name and emails for things like GPG, snippets, mail, magit, etc.
 
 #+BEGIN_SRC emacs-lisp
-(setq user-full-name "Ellis Kenyo"
+(setq user-full-name "Ellis Kenyő"
       user-mail-address "me@elken.dev")
 #+END_SRC
 
@@ -421,9 +425,50 @@ Useful settings and functions for [[github:theiceshell/firn][firn]]
 
 #+begin_src emacs-lisp
 (setq enable-dir-local-variables t)
-(add-hook! 'before-save-hook 'time-stamp)
+(defun elken/find-time-property (property)
+  "Find the PROPETY in the current buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (let ((first-heading
+           (save-excursion
+             (re-search-forward org-outline-regexp-bol nil t))))
+      (when (re-search-forward (format "^#\\+%s:" property) nil t)
+        (point)))))
+
+(defun elken/has-time-property-p (property)
+  "Gets the position of PROPETY if it exists, nil if not and empty string if it's undefined."
+  (when-let ((pos (elken/find-time-property property)))
+    (save-excursion
+      (goto-char pos)
+      (if (and (looking-at-p " ")
+               (progn (forward-char)
+                      (org-at-timestamp-p 'lax)))
+          pos
+        ""))))
+
+(defun elken/set-time-property (property &optional pos)
+  "Set the PROPERTY in the current buffer.
+Can pass the position as POS if already computed."
+  (when-let ((pos (or pos (elken/find-time-property property))))
+    (save-excursion
+      (goto-char pos)
+      (if (looking-at-p " ")
+          (forward-char)
+        (insert " "))
+      (delete-region (point) (line-end-position))
+      (let* ((now (format-time-string "<%Y-%m-%d %H:%M>")))
+        (insert now)))))
+
+(add-hook! 'before-save-hook (when (derived-mode-p 'org-mode) (elken/set-time-property "DATE_UPDATED")))
 #+end_src
 
+* Email
+Currently handled through =mu4e=, works easy enough and I don't need too much out of email.
+
+Set the interval to a sensible timeout (10 minutes is plenty)
+#+begin_src emacs-lisp
+(setq mu4e-update-interval (* 10 60))
+#+end_src
 * Languages
 Configuration for various programming languages.
 

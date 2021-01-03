@@ -16,6 +16,7 @@
   "Update the window title when needed"
   (pcase (downcase (or exwm-class-name ""))
     ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
+    ("discord" (exwm-workspace-rename-buffer (format "Discord: %s" exwm-title)))
     ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))))
 
 (defun elken/configure-window-by-class()
@@ -128,7 +129,8 @@
 
   ;; Default emacs behaviours
   (exwm-workspace-switch-create 1)
-  (eshell))
+  (vterm)
+  (mu4e t))
 
 (use-package! desktop-environment
   :after exwm
