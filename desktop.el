@@ -134,7 +134,8 @@
 (use-package! desktop-environment
   :after exwm
   :config
-  (setq desktop-environment-screenlock-command "gnome-screensaver-command -l")
+  (setq desktop-environment-screenlock-command "gnome-screensaver-command -l"
+        desktop-environment-screenshot-command "flameshot gui")
   (desktop-environment-mode))
 
 (use-package! exwm
