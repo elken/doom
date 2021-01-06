@@ -6,6 +6,7 @@
 
 Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original; snippets from stackoverflow, modernemacs and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
 
+
 * Table of Contents
 :PROPERTIES:
 :TOC:      :include all
@@ -62,6 +63,8 @@ If you (somehow) haven't already guessed, this depends on [[doom-repo:][Doom Ema
 Email depends on =mbsync= to be setup to read email.
 
 This is also focused around an exwm workflow (although as I use multiple systems the exwm stuff is nicely filtered out).
+
+[[file:images/overview.png]]
 
 ** EXWM Setup
 As mentioned above, the primary use for this config is =exwm= which is pulled from a number of files in the current environment.
