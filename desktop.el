@@ -23,12 +23,15 @@
   "Configuration for windows (grouped by WM_CLASS)"
   (interactive)
   (pcase (downcase (or exwm-class-name ""))
-    ("mpv" (exwm-floating-toggle-floating)
-     (exwm-layout-toggle-mode-line))
-    ("discord" (exwm-workspace-move-window 2)
-     (elken/reload-tray))
-    ("megasync" (exwm-floating-toggle-floating)
-     (exwm-layout-toggle-mode-line))
+    ("mpv" (progn
+             (exwm-floating-toggle-floating)
+             (exwm-layout-toggle-mode-line)))
+    ("discord" (progn
+                 (exwm-workspace-move-window 2)
+                 (elken/reload-tray)))
+    ("megasync" (progn
+                  (exwm-floating-toggle-floating)
+                  (exwm-layout-toggle-mode-line)))
     ("spotify" (exwm-workspace-move-window 3))
     ("firefox" (exwm-workspace-move-window 1))))
 
@@ -61,7 +64,7 @@
           (run-with-timer 5 5 #'now-playing-fetch)))
   (now-playing-timer)
   (doom-modeline-def-segment now-playing
-    (let ((player (elt now-playing-text 0))
+    (when-let ((player (elt now-playing-text 0))
           (status (elt now-playing-text 1))
           (text (elt now-playing-text 2)))
       (concat
@@ -140,11 +143,14 @@
 
 (use-package! exwm
   :config
+  (advice-add #'exwm-input--on-buffer-list-update :before
+            (lambda (&rest r)
+              (exwm--log "CALL STACK: %s" (cddr (reverse (xcb-debug:-call-stack))))))
   ;; Show all buffers for switching
   (setq exwm-workspace-show-all-buffers t)
 
   ;; Set a sane number of default workspaces
-  (setq exwm-workspace-number 10)
+  (setq exwm-workspace-number 5)
 
   ;; Define workspace setup for monitors
   (setq exwm-randr-workspace-monitor-plist '(1 "DP-0" 2 "DP-0"))
@@ -173,6 +179,7 @@
           ?\M-`
           ?\M-&
           ?\M-:
+          ?\M-
           ?\C-\M-j
           ?\C-\ ))
 
@@ -182,7 +189,7 @@
   ;; Setup screen layout
   (require 'exwm-randr)
   (exwm-randr-enable)
-  (start-process-shell-command "xrandr" nil "sh ~/.screenlayouts/default.sh")
+  (start-process-shell-command "xrandr" nil "sh ~/.screenlayout/default.sh")
 
   ;; Set the wallpaper
   (elken/set-wallpaper (expand-file-name "images/background.png" doom-private-dir))

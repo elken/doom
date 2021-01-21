@@ -14,29 +14,52 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 :CONTENTS:
 - [[#table-of-contents][Table of Contents]]
 - [[#setup][Setup]]
+  - [[#workflow][Workflow]]
   - [[#exwm-setup][EXWM Setup]]
-    - [[#desktopel][=desktop.el=]]
-    - [[#gnome-flashback][GNOME-Flashback]]
+    - [[#desktoporg][=desktop.org=]]
+    - [[#session][Session]]
     - [[#startsh--start-debugsh][=start.sh= / =start-debug.sh=]]
 - [[#faq][FAQ]]
-- [[#functions][Functions]]
-- [[#global-settings][Global settings]]
-  - [[#better-defaults][Better defaults]]
-  - [[#auth-info][Auth info]]
-  - [[#modeline][Modeline]]
-  - [[#magit][Magit]]
-  - [[#eshell][EShell]]
-  - [[#exwm][EXWM]]
-  - [[#user-setup][User setup]]
-  - [[#server][Server]]
+- [[#globals][Globals]]
+  - [[#constants-and-variables][Constants and Variables]]
+    - [[#exwm-flag-handling][EXWM flag handling]]
+  - [[#functions][Functions]]
+  - [[#settings][Settings]]
+    - [[#better-defaults][Better defaults]]
+    - [[#auth-info][Auth info]]
+    - [[#modeline][Modeline]]
+    - [[#magit][Magit]]
+    - [[#eshell][EShell]]
+    - [[#exwm][EXWM]]
+    - [[#user-setup][User setup]]
+    - [[#server][Server]]
+    - [[#vterm][vterm]]
+      - [[#kill-buffer][Kill buffer]]
+      - [[#fix-c-backspace][Fix =c-backspace=]]
 - [[#keybindings][Keybindings]]
+  - [[#defaults][Defaults]]
+  - [[#swiper][Swiper]]
   - [[#dired][Dired]]
 - [[#org-mode][Org Mode]]
   - [[#general-setup][General setup]]
+    - [[#ellipsis][Ellipsis]]
+    - [[#keywords][Keywords]]
+    - [[#agendalog][Agenda/Log]]
+    - [[#cycle][Cycle]]
+    - [[#folding][Folding]]
+    - [[#indent--variable-pitch][Indent & variable pitch]]
+    - [[#archivecleanup][Archive/Cleanup]]
+    - [[#show-images][Show images]]
+    - [[#autoreload-configuration][Autoreload Configuration]]
+    - [[#autoexecute-tangled-shell-files][Autoexecute tangled shell files]]
   - [[#font-setup][Font setup]]
   - [[#firn-setup][Firn setup]]
+  - [[#visual-column-mode][Visual column mode]]
+  - [[#table-of-contents][Table of Contents]]
+  - [[#better-snippets][Better snippets]]
 - [[#email][Email]]
 - [[#languages][Languages]]
+  - [[#lsp][LSP]]
   - [[#rust][Rust]]
 - [[#graphical-setup][Graphical setup]]
   - [[#fonts][Fonts]]
@@ -47,47 +70,57 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#packagesel][=packages.el=]]
   - [[#setup][Setup]]
     - [[#rainbow-mode][Rainbow Mode]]
-    - [[#org][Org]]
-    - [[#visual-fill-column][Visual Fill Column]]
-    - [[#org-make-toc][Org-make-toc]]
-    - [[#org-tempo][Org-tempo]]
-    - [[#edit-server][Edit Server]]
     - [[#graphql-mode][Graphql-mode]]
     - [[#spotify][Spotify]]
     - [[#which-key-posframe][which-key-posframe]]
 :END:
 
 * Setup
-If you (somehow) haven't already guessed, this depends on [[doom-repo:][Doom Emacs]], so also requires any dependency listed there. Outside of Doom, the only other dependency is =playerctl= for the now-playing modeline segment.
+If you (somehow) haven't already guessed, this depends on [[doom-repo:][Doom Emacs]], so also requires any dependency listed there. Outside of Doom, the only other dependency is =playerctl= for the now-playing modeline segment. Because of the configuration required for =vterm=, there is also a soft dependency on my [[github:elken/.files][dotfiles]] for the shell-side integration but it shouldn't cause it to break.
 
 Email depends on =mbsync= to be setup to read email.
 
 This is also focused around an exwm workflow (although as I use multiple systems the exwm stuff is nicely filtered out).
 
+** Workflow
 [[file:images/overview.png]]
 
 ** EXWM Setup
-As mentioned above, the primary use for this config is =exwm= which is pulled from a number of files in the current environment.
+As mentioned above, the primary use for this config is =exwm= which is pulled from a number of files in the current environment. Loading =exwm= is quite simple, simply pass =--with-exwm= to the emacs call and everything will be loaded. The setting of this flag also loads any related configuration (ie transparency, which I don't normally care about outside of =exwm=)
 
-*** =desktop.el=
+*** =desktop.org=
 The primary lisp file where the bulk of the configuration is held, with everything from my process manager to a now-playing segment. Below are some usage screenshots.
 
 [[file:images/kill-process.png]]
 
 [[file:images/tray.png]]
 
-Transparency is handled both through [[*GUI/Frame][Doom]] and via [[file:exwm/picom.conf][picom]]
+Transparency is handled both through [[*GUI/Frame][Doom]] and via [[file:exwm/picom.conf][picom]]. The org file is tangled out to a =desktop.el= file to be later loaded by the aforementioned processes.
 
-*** GNOME-Flashback
+*** Session
 For the sake of simplicity, I use a slightly modified version of [[https://github.com/WJCFerguson/exwm-gnome-flashback][GNOME Flashback]] to run the startup scripts. It also gives me ootb access to things like =pinentry=, the various password stores, =gnome-screensaver= lock screen and the useful screenshot tool.
 
 As such, everything is themed around [[https://nordtheme.com][Nord]].
+
+Over time and due to various issues, I have been migrating to a plain =exwm= session but I haven't yet settled on the best approach.
 
 *** =start.sh= / =start-debug.sh=
 The scripts responsible for starting up exwm in the right way, including env variables and picom.
 * FAQ
 None yet because luckily nobody else has seen this spaghetti junction
-* Functions
+* Globals
+** Constants and Variables
+I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't think of one? Would have thought of one.
+
+*** EXWM flag handling
+Set a constant to check if we're in exwm or not. Setting this as early as possible as I don't completely trust =package.el=
+
+#+begin_src emacs-lisp
+(defconst IS-EXWM (member "--with-exwm" command-line-args))
+(add-to-list 'command-switch-alist '("--with-exwm" . (lambda (_) (pop command-line-args-left))))
+#+end_src
+
+** Functions
 Global functions used throughout. Some are more complex than others.
 
 Posframes by default don't work in exwm, so let's fix that by making sure they're centered.
@@ -110,21 +143,30 @@ Posframes by default don't work in exwm, so let's fix that by making sure they'r
        (+ x (/ (- fw pw) 2))
        (+ y (/ (- fh ph) 2))))))
 #+end_src
-* Global settings
-** Better defaults
+** Settings
+*** Better defaults
 Make the scratch buffer start in lisp mode
 
 #+begin_src emacs-lisp
 (setq doom-scratch-initial-major-mode 'lisp-interaction-mode)
 #+end_src
-** Auth info
+
+Adjust the which-key delay because I always worry I broke something
+
+#+begin_src emacs-lisp
+(use-package! which-key
+  :init
+  (setq which-key-idle-delay 0.3))
+#+end_src
+
+*** Auth info
 Add plaintext authinfo file to the list of sources. I /know/ I should use a GPG file but I'll get around to it damn it.
 
 #+begin_src emacs-lisp
 (add-to-list 'auth-sources "~/.authinfo")
 #+end_src
 
-** Modeline
+*** Modeline
 Some niceties for the modeline (further config can be found in [[file:desktop.el][Desktop]])
 
 #+begin_src emacs-lisp
@@ -133,7 +175,7 @@ Some niceties for the modeline (further config can be found in [[file:desktop.el
         doom-modeline-major-mode-color-icon t))
 #+end_src
 
-** Magit
+*** Magit
 Show gravatars where possible
 
 #+begin_src emacs-lisp
@@ -146,7 +188,7 @@ Allow forge to create repos under my name
 (setq forge-owned-accounts '(("elken")))
 #+end_src
 
-** EShell
+*** EShell
 Eshell is a beautiful thing but ootb experience is a tad dated. Seems there is an issue with the magit section. I would also like to extend to add other sections later..
 
 #+begin_src emacs-lisp
@@ -197,7 +239,7 @@ Finally define the actual setup
 ;; Below I implement a "prompt number" section
 (add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
 (advice-add 'eshell-send-input :before
-            (lambda (&rest args) (setq esh-prompt-num (incf esh-prompt-num))))
+            (lambda (&rest args) (setq esh-prompt-num (cl-incf esh-prompt-num))))
 
 (esh-section esh-num
              ""  ;  (list icon)
@@ -218,7 +260,7 @@ Finally define the actual setup
         eshell-prompt-string "└─> "
         esh-prompt-num 0))
 #+end_src
-** EXWM
+*** EXWM
 
 Some config has to go here (so it's reloaded properly). Remove the posframe parent and ensure that it's properly centered in the workspace.
 
@@ -239,7 +281,7 @@ Some config has to go here (so it's reloaded properly). Remove the posframe pare
         ivy-posframe-parameters '((parent-frame nil)
                                   (z-group . above))))
 #+end_src
-** User setup
+*** User setup
 Use my name and emails for things like GPG, snippets, mail, magit, etc.
 
 #+BEGIN_SRC emacs-lisp
@@ -261,7 +303,7 @@ Email folders and setup. This might move to a new section if I start to use emai
                     t)
 #+end_src
 
-** Server
+*** Server
 Start a server (if not running already)
 
 #+begin_src emacs-lisp
@@ -270,19 +312,35 @@ Start a server (if not running already)
     (server-start)))
 #+end_src
 
+*** vterm
+Vterm clearly wins the terminal war. Also doesn't need much configuration out of the box, although the shell integration does. That currently exists in my [[github:elken/.files][dotfiles]]
+
+**** Kill buffer
+If the process exits, kill the =vterm= buffer
+#+begin_src emacs-lisp
+(setq vterm-kill-buffer-on-exit t)
+#+end_src
+**** Fix =c-backspace=
+I've picked this up in muscle memory now and I'm fed up with it not working. Not anymore!
+
+#+begin_src emacs-lisp
+(define-key vterm-mode-map (kbd "<C-backspace>") (lambda () (interactive) (vterm-send-key (kbd "C-w"))))
+#+end_src
 * Keybindings
 It's not a custom config without some fancy keybinds
 
-Swiper is /much/ better than isearch
-
-#+begin_src emacs-lisp
-(map! :after evil :gnvi "C-f" #'swiper)
-#+end_src
-
+** Defaults
 Back to a simpler time...
 
 #+begin_src emacs-lisp
 (map! :g "C-s" #'save-buffer)
+#+end_src
+
+** Swiper
+Swiper is /much/ better than isearch
+
+#+begin_src emacs-lisp
+(map! :after evil :gnvi "C-f" #'swiper)
 #+end_src
 
 ** Dired
@@ -296,25 +354,53 @@ Dired should behave better with evil mappings
 
 * Org Mode
 ** General setup
+*** Ellipsis
+Change the dropdown icon to be something /neater/
 
-Set the default org directories across all platforms. (I use [[https://mega.nz][Mega]] to sync everything as it's xplatform and even works fine on Android)
+#+begin_src emacs-lisp
+(setq org-ellipsis " ▾")
+#+end_src
+*** Keywords
+Default keywords are /far/ too minimal. This will need further tweaking as I start using org mode for organisation more.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-directory "~/org/")
-#+END_SRC
+#+begin_src emacs-lisp
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STORY(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
+        (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")))
+#+end_src
+*** Agenda/Log
+Enable log-mode so we see =DONE= tasks and the like
 
+#+begin_src emacs-lisp
+(setq org-agenda-start-with-log-mode t)
+#+end_src
+
+Auto add a timestamp to =DONE= items
+
+#+begin_src emacs-lisp
+(setq org-log-done 'time)
+#+end_src
+
+And log items in the drawer
+
+#+begin_src emacs-lisp
+(setq org-log-into-drawer t)
+#+end_src
+*** Cycle
 Cycle by default (no idea why this isn't default)
 
 #+begin_src emacs-lisp
 (setq org-cycle-emulate-tab nil)
 #+end_src
 
+*** Folding
 Default folding is very noisy, I /rarely/ need to see everything expanded
 
 #+begin_src emacs-lisp
 (setq org-startup-folded 'content)
 #+end_src
 
+*** Indent & variable pitch
 Enable =org-indent-mode= by default to properly indent everything automagically, =variable-pitch-mode= to enable the more readable fonts where it makes sense and =visual-line-mode= to add a "current line" selection.
 
 #+BEGIN_SRC emacs-lisp
@@ -325,14 +411,19 @@ Enable =org-indent-mode= by default to properly indent everything automagically,
   (visual-line-mode 1))
 #+END_SRC
 
-Enable =visual-fill-column-mode= to center an org document for nicer editing.
+Add a hook to load our super sweet function
 
-#+BEGIN_SRC emacs-lisp
-(defun elken/org-mode-visual-fill ()
-  (setq visual-fill-column-width 200
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-#+END_SRC
+#+begin_src emacs-lisp
+(add-hook 'org-mode #'elken/org-mode-setup)
+(add-hook 'org-mode #'elken/org-font-setup)
+#+end_src
+*** Archive/Cleanup
+Adjust the format of archived org files (so they don't show up in orgzly)
+
+#+begin_src emacs-lisp
+(setq org-archive-location "archive/Archive_%s::")
+#+end_src
+
 
 Enables archiving of tasks. Replaces the in-built version which only works for single tasks.
 
@@ -364,11 +455,14 @@ Enables removal of killed tasks. I'm not /yet/ interested in tracking this long-
 (map! :map org-mode-map :desc "Remove tasks marked as KILL" "C-c DEL k" #'elken/org-remove-kill-tasks)
 #+END_SRC
 
+*** Show images
 Show images inline by default
 
 #+BEGIN_SRC emacs-lisp
 (setq org-startup-with-inline-images t)
 #+END_SRC
+
+*** Autoreload Configuration
 
 Auto reload config on save (both =config.org= and =init.el=)
 
@@ -394,6 +488,7 @@ Auto reload config on save (both =config.org= and =init.el=)
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'elken/doom-reload-on-save)))
 #+end_src
 
+*** Autoexecute tangled shell files
 Make tangled shell files executable (I trust myself, ish...)
 
 #+begin_src emacs-lisp
@@ -478,6 +573,50 @@ Can pass the position as POS if already computed."
 (add-hook! 'before-save-hook (when (derived-mode-p 'org-mode) (elken/set-time-property "DATE_UPDATED")))
 #+end_src
 
+** Visual column mode
+Enable =visual-fill-column-mode= to center an org document for nicer editing.
+
+First we need the package
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! visual-fill-column)
+#+end_src
+
+Then we define a setup function
+
+#+BEGIN_SRC emacs-lisp
+(defun elken/org-mode-visual-fill ()
+  (setq visual-fill-column-width 200
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+#+END_SRC
+
+And add a hook to load it
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode #'elken/org-mode-visual-fill)
+#+end_src
+
+** Table of Contents
+There's still a few bugs with this, but it works fine on Github mostly.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-make-toc)
+#+end_src
+
+And then load it
+
+#+begin_src emacs-lisp
+(use-package! org-make-toc
+  :after org)
+#+end_src
+** Better snippets
+Programmers are, by design, lazy
+
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+#+end_src
 * Email
 Currently handled through =mu4e=, works easy enough and I don't need too much out of email.
 
@@ -488,6 +627,20 @@ Set the interval to a sensible timeout (10 minutes is plenty)
 * Languages
 Configuration for various programming languages.
 
+** LSP
+Add some extra ignored directories for =+lsp=.
+
+#+begin_src emacs-lisp
+(after! lsp-mode
+    (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\vendor"))
+#+end_src
+
+And some more for projectile
+
+#+begin_src emacs-lisp
+(after! projectile
+  (add-to-list 'projectile-globally-ignored-directories "vendor"))
+#+end_src
 ** Rust
 Make =rls= the default
 
@@ -556,10 +709,6 @@ Tangle this into the packages.el file. Removes the need for it.
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! exwm)
 (package! rainbow-mode)
-(package! org-bullets)
-(package! visual-fill-column)
-(package! org-make-toc)
-(package! edit-server)
 (package! graphql-mode)
 (package! desktop-environment)
 (package! which-key-posframe)
@@ -585,84 +734,6 @@ Colouring parentheses so I don't get confused by the scary lisp dialects.
     (prog-mode . rainbow-mode)
     (text-mode . rainbow-mode))
 #+END_SRC
-
-*** Org
-
-This is where the various org hooks are applied along with a few other settings
-
-#+BEGIN_SRC emacs-lisp
-    (use-package! org
-    :hook (org-mode . elken/org-mode-setup)
-    :config
-    (setq org-ellipsis " ▾"                                 ;; Change the dropdown icon
-          org-todo-keywords
-          '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STRT(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
-            (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")) ;; Keywords
-          org-agenda-start-with-log-mode t                  ;; Use log-mode for agenda
-          org-archive-location "archive/Archive_%s::"           ;; Change archive location
-          org-log-done 'time                                ;; Add timestamp to DONE items
-          org-log-into-drawer t                             ;; Log items into drawer
-          org-hide-emphasis-markers t)                      ;; Only show the last marker
-    (elken/org-font-setup))
-#+END_SRC
-
-*** Visual Fill Column
-Center the org mode documents
-
-#+BEGIN_SRC emacs-lisp
-(use-package! visual-fill-column
-:hook (org-mode . elken/org-mode-visual-fill))
-#+END_SRC
-
-*** Org-make-toc
-Used to create the table of contents
-
-#+BEGIN_SRC emacs-lisp
-(use-package! org-make-toc
-  :after org)
-#+END_SRC
-
-*** Org-tempo
-Better snippets for org-mode =src= blocks
-
-#+BEGIN_SRC emacs-lisp
-(use-package! org-tempo
-  :after org
-  :init
-  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
-#+END_SRC
-
-*** Edit Server
-Used for editing things from Firefox
-
-#+begin_src emacs-lisp
-(use-package! edit-server
-  :commands edit-server-start
-  :init (if after-init-time
-            (edit-server-start)
-          (add-hook 'after-init-hook
-                    #'(lambda() (edit-server-start))))
-  :config (if IS-WINDOWS
-              (setq edit-server-new-frame-alist
-                    '((name . "Edit with Emacs FRAME")
-                      (top . 200)
-                      (left . 200)
-                      (width . 80)
-                      (height . 25)
-                      (minibuffer . t)
-                      (menu-bar-lines . t)
-                      (window-system . w32)))
-            (setq edit-server-new-frame-alist
-                  '((name . "Edit with Emacs FRAME")
-                    (top . 200)
-                    (left . 200)
-                    (width . 80)
-                    (height . 25)
-                    (minibuffer . t)
-                    (menu-bar-lines . t)
-                    (window-system . x)))))
-#+end_src
 
 *** Graphql-mode
 Used for displaying graphql queries nicely & sending.
