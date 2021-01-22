@@ -41,18 +41,17 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#swiper][Swiper]]
   - [[#dired][Dired]]
 - [[#org-mode][Org Mode]]
-  - [[#general-setup][General setup]]
-    - [[#ellipsis][Ellipsis]]
-    - [[#keywords][Keywords]]
-    - [[#agendalog][Agenda/Log]]
-    - [[#cycle][Cycle]]
-    - [[#folding][Folding]]
-    - [[#indent--variable-pitch][Indent & variable pitch]]
-    - [[#archivecleanup][Archive/Cleanup]]
-    - [[#show-images][Show images]]
-    - [[#autoreload-configuration][Autoreload Configuration]]
-    - [[#autoexecute-tangled-shell-files][Autoexecute tangled shell files]]
   - [[#font-setup][Font setup]]
+  - [[#ellipsis][Ellipsis]]
+  - [[#keywords][Keywords]]
+  - [[#agendalog][Agenda/Log]]
+  - [[#cycle][Cycle]]
+  - [[#folding][Folding]]
+  - [[#indent--variable-pitch][Indent & variable pitch]]
+  - [[#archivecleanup][Archive/Cleanup]]
+  - [[#show-images][Show images]]
+  - [[#autoreload-configuration][Autoreload Configuration]]
+  - [[#autoexecute-tangled-shell-files][Autoexecute tangled shell files]]
   - [[#firn-setup][Firn setup]]
   - [[#visual-column-mode][Visual column mode]]
   - [[#table-of-contents][Table of Contents]]
@@ -354,14 +353,50 @@ Dired should behave better with evil mappings
 #+end_src
 
 * Org Mode
-** General setup
-*** Ellipsis
+** Font setup
+Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where it makes sense to use the defined fixed width font.
+
+#+BEGIN_SRC emacs-lisp
+(defun elken/org-font-setup ()
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "IBM Plex Sans" :weight 'regular :height (cdr face)))
+
+
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+#+END_SRC
+Add a hook to load our super sweet function
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook #'elken/org-font-setup)
+#+end_src
+
+** Ellipsis
 Change the dropdown icon to be something /neater/
 
 #+begin_src emacs-lisp
 (setq org-ellipsis " ▾")
 #+end_src
-*** Keywords
+** Keywords
 Default keywords are /far/ too minimal. This will need further tweaking as I start using org mode for organisation more.
 
 #+begin_src emacs-lisp
@@ -369,7 +404,7 @@ Default keywords are /far/ too minimal. This will need further tweaking as I sta
       '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STORY(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
         (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")))
 #+end_src
-*** Agenda/Log
+** Agenda/Log
 Enable log-mode so we see =DONE= tasks and the like
 
 #+begin_src emacs-lisp
@@ -387,21 +422,28 @@ And log items in the drawer
 #+begin_src emacs-lisp
 (setq org-log-into-drawer t)
 #+end_src
-*** Cycle
+** Cycle
 Cycle by default (no idea why this isn't default)
 
 #+begin_src emacs-lisp
 (setq org-cycle-emulate-tab nil)
 #+end_src
 
-*** Folding
+** Folding
 Default folding is very noisy, I /rarely/ need to see everything expanded
 
 #+begin_src emacs-lisp
 (setq org-startup-folded 'content)
 #+end_src
 
-*** Indent & variable pitch
+** Indent & variable pitch
+Add the package
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-variable-pitch
+  :recipe (:host github
+           :repo "cadadr/elisp"))
+#+end_src
+
 Enable =org-indent-mode= by default to properly indent everything automagically, =variable-pitch-mode= to enable the more readable fonts where it makes sense and =visual-line-mode= to add a "current line" selection.
 
 #+BEGIN_SRC emacs-lisp
@@ -409,16 +451,17 @@ Enable =org-indent-mode= by default to properly indent everything automagically,
   (org-make-toc-mode)
   (org-indent-mode)
   (variable-pitch-mode 1)
-  (visual-line-mode 1))
+  (visual-line-mode 1)
+  (org-variable-pitch-setup))
 #+END_SRC
 
 Add a hook to load our super sweet function
 
 #+begin_src emacs-lisp
-(add-hook 'org-mode #'elken/org-mode-setup)
-(add-hook 'org-mode #'elken/org-font-setup)
+(add-hook 'org-mode-hook #'elken/org-mode-setup)
 #+end_src
-*** Archive/Cleanup
+
+** Archive/Cleanup
 Adjust the format of archived org files (so they don't show up in orgzly)
 
 #+begin_src emacs-lisp
@@ -456,14 +499,14 @@ Enables removal of killed tasks. I'm not /yet/ interested in tracking this long-
 (map! :map org-mode-map :desc "Remove tasks marked as KILL" "C-c DEL k" #'elken/org-remove-kill-tasks)
 #+END_SRC
 
-*** Show images
+** Show images
 Show images inline by default
 
 #+BEGIN_SRC emacs-lisp
 (setq org-startup-with-inline-images t)
 #+END_SRC
 
-*** Autoreload Configuration
+** Autoreload Configuration
 
 Auto reload config on save (both =config.org= and =init.el=)
 
@@ -489,7 +532,7 @@ Auto reload config on save (both =config.org= and =init.el=)
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'elken/doom-reload-on-save)))
 #+end_src
 
-*** Autoexecute tangled shell files
+** Autoexecute tangled shell files
 Make tangled shell files executable (I trust myself, ish...)
 
 #+begin_src emacs-lisp
@@ -499,38 +542,6 @@ Make tangled shell files executable (I trust myself, ish...)
 
 (add-hook 'org-babel-post-tangle-hook 'elken/make-tangled-shell-executable)
 #+end_src
-
-** Font setup
-Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where it makes sense to use the defined fixed width font.
-
-#+BEGIN_SRC emacs-lisp
-(defun elken/org-font-setup ()
-  ;; Replace list hyphen with dot
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-
-  ;; Set faces for heading levels
-  (dolist (face '((org-level-1 . 1.2)
-                  (org-level-2 . 1.1)
-                  (org-level-3 . 1.05)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "IBM Plex Sans" :weight 'regular :height (cdr face)))
-
-
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
-#+END_SRC
 
 ** Firn setup
 Useful settings and functions for [[github:theiceshell/firn][firn]]
@@ -595,7 +606,7 @@ Then we define a setup function
 And add a hook to load it
 
 #+begin_src emacs-lisp
-(add-hook 'org-mode #'elken/org-mode-visual-fill)
+(add-hook 'org-mode-hook #'elken/org-mode-visual-fill)
 #+end_src
 
 ** Table of Contents
@@ -615,7 +626,7 @@ And then load it
 Programmers are, by design, lazy
 
 #+begin_src emacs-lisp
-(after! org-tempo
+(after! org
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
