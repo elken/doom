@@ -324,7 +324,8 @@ If the process exits, kill the =vterm= buffer
 I've picked this up in muscle memory now and I'm fed up with it not working. Not anymore!
 
 #+begin_src emacs-lisp
-(define-key vterm-mode-map (kbd "<C-backspace>") (lambda () (interactive) (vterm-send-key (kbd "C-w"))))
+(after! vterm
+  (define-key vterm-mode-map (kbd "<C-backspace>") (lambda () (interactive) (vterm-send-key (kbd "C-w"))))        )
 #+end_src
 * Keybindings
 It's not a custom config without some fancy keybinds
@@ -614,8 +615,9 @@ And then load it
 Programmers are, by design, lazy
 
 #+begin_src emacs-lisp
-(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+(after! org-tempo
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
 * Email
 Currently handled through =mu4e=, works easy enough and I don't need too much out of email.
