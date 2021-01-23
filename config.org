@@ -384,17 +384,18 @@ Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+END_SRC
-Add a hook to load our super sweet function
-
-#+begin_src emacs-lisp
-(add-hook 'org-mode-hook #'elken/org-font-setup)
-#+end_src
 
 ** Ellipsis
 Change the dropdown icon to be something /neater/
 
 #+begin_src emacs-lisp
 (setq org-ellipsis " ▾")
+#+end_src
+
+And get rid of emphasis markers
+
+#+begin_src emacs-lisp
+(setq org-hide-emphasis-markers t)
 #+end_src
 ** Keywords
 Default keywords are /far/ too minimal. This will need further tweaking as I start using org mode for organisation more.
@@ -452,7 +453,8 @@ Enable =org-indent-mode= by default to properly indent everything automagically,
   (org-indent-mode)
   (variable-pitch-mode 1)
   (visual-line-mode 1)
-  (org-variable-pitch-setup))
+  (org-variable-pitch-setup)
+  (elken/org-font-setup))
 #+END_SRC
 
 Add a hook to load our super sweet function
@@ -626,7 +628,9 @@ And then load it
 Programmers are, by design, lazy
 
 #+begin_src emacs-lisp
-(after! org
+(use-package! org-tempo
+  :after org
+  :init
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
@@ -725,6 +729,8 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! graphql-mode)
 (package! desktop-environment)
 (package! which-key-posframe)
+(package! doom-modeline-now-playing
+  :recipe (:host github :repo "elken/doom-modeline-now-playing"))
 ;; (package! oauth2)
 ;; (package! simple-httpd)
 ;; (package! dotenv.el

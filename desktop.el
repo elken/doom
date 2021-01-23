@@ -36,43 +36,7 @@
     ("firefox" (exwm-workspace-move-window 1))))
 
 (after! (exwm doom-modeline)
-  ;; Rudimentary version of my now-playing segment
-  (defvar now-playing--timer nil)
-  (defvar now-playing-text '())
-  (defun now-playing-fetch ()
-    (async-start
-     (lambda ()
-       (require 'subr-x)
-       (defun elken/playerctl-format (function format)
-         "Invoke playerctl for FUNCTION using FORMAT to present output"
-         (string-trim (shell-command-to-string (format "playerctl --player=spotify %s --format '%s'" function format))))
-       (let ((is-playingp (equal "playing" (elken/playerctl-format "status" "{{ lc(status) }}")))
-             (player-icon (if (equal "spotify" (elken/playerctl-format "metadata" "{{ playerName }}")) "" "")))
-         (concat
-          player-icon
-          "|"
-          (if is-playingp "" "")
-          "|"
-          (elken/playerctl-format "metadata" "{{ artist }} - {{ title }}") )))
-     (lambda (result)
-       (message "")
-       (setq now-playing-text (split-string result "|")))))
-  (defun now-playing-timer ()
-    (if (timerp now-playing--timer)
-        (cancel-timer now-playing--timer))
-    (setq now-playing--timer
-          (run-with-timer 5 5 #'now-playing-fetch)))
-  (now-playing-timer)
-  (doom-modeline-def-segment now-playing
-    (when-let ((player (elt now-playing-text 0))
-          (status (elt now-playing-text 1))
-          (text (elt now-playing-text 2)))
-      (concat
-       (propertize player 'face 'success)
-       (doom-modeline-spc)
-       status
-       (doom-modeline-spc)
-       (propertize (truncate-string-to-width text 40 nil nil "...") 'face 'bold))))
+  (use-package! doom-modeline-now-playing)
   (doom-modeline-def-segment exwm-workspaces
       (exwm-workspace--update-switch-history)
       (concat
@@ -131,8 +95,9 @@
   (elken/run-application "firefox")
 
   ;; Default emacs behaviours
-  (exwm-workspace-switch-create 1)
-  (mu4e t))
+  ;; TODO Take this out of emacs
+  ;; (mu4e t))
+  )
 
 (use-package! desktop-environment
   :after exwm
@@ -180,6 +145,7 @@
           ?\M-&
           ?\M-:
           ?\M-
+          ?\C-g
           ?\C-\M-j
           ?\C-\ ))
 
