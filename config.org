@@ -68,6 +68,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#packages][Packages]]
   - [[#packagesel][=packages.el=]]
   - [[#setup][Setup]]
+    - [[#nix--mode][Nix  Mode]]
     - [[#rainbow-mode][Rainbow Mode]]
     - [[#graphql-mode][Graphql-mode]]
     - [[#spotify][Spotify]]
@@ -731,6 +732,7 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! which-key-posframe)
 (package! doom-modeline-now-playing
   :recipe (:host github :repo "elken/doom-modeline-now-playing"))
+(package! nix-mode)
 ;; (package! oauth2)
 ;; (package! simple-httpd)
 ;; (package! dotenv.el
@@ -742,6 +744,14 @@ Tangle this into the packages.el file. Removes the need for it.
 ** Setup
 
 Configuration for any packages included above
+
+*** Nix  Mode
+Config related to =nix-mode=, for now just load it really
+
+#+begin_src emacs-lisp
+(use-package! nix-mode
+  :mode "\\.nix\\'")
+#+end_src
 
 *** Rainbow Mode
 
