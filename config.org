@@ -36,6 +36,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#vterm][vterm]]
       - [[#kill-buffer][Kill buffer]]
       - [[#fix-c-backspace][Fix =c-backspace=]]
+      - [[#functions][Functions]]
 - [[#keybindings][Keybindings]]
   - [[#defaults][Defaults]]
   - [[#swiper][Swiper]]
@@ -334,6 +335,14 @@ I've picked this up in muscle memory now and I'm fed up with it not working. Not
 #+begin_src emacs-lisp
 (after! vterm
   (define-key vterm-mode-map (kbd "<C-backspace>") (lambda () (interactive) (vterm-send-key (kbd "C-w"))))        )
+#+end_src
+**** Functions
+Useful functions for the shell-side integration provided by vterm.
+#+begin_src emacs-lisp
+(push (list "magit-status"
+            (lambda (path)
+              (magit-status path)))
+      vterm-eval-cmds)
 #+end_src
 * Keybindings
 It's not a custom config without some fancy keybinds
@@ -829,4 +838,8 @@ The last piece of Exodia. Now I can posframe everything for vague satisfation.
       (setq which-key-posframe-parameters '((parent-frame nil)
                                             (z-group . above))
             which-key-posframe-poshandler #'elken/posframe-poshandler)))
+#+end_src
+
+#+begin_src emacs-lisp
+(mapc (lambda (p) (add-load-path! p)) (split-string (getenv "EMACSLOADPATH") ":"))
 #+end_src
