@@ -6,7 +6,6 @@
 
 Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original; snippets from stackoverflow, modernemacs and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
 
-
 * Table of Contents
 :PROPERTIES:
 :TOC:      :include all
@@ -25,6 +24,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#exwm-flag-handling][EXWM flag handling]]
   - [[#functions][Functions]]
   - [[#settings][Settings]]
+    - [[#evil][Evil]]
     - [[#better-defaults][Better defaults]]
     - [[#auth-info][Auth info]]
     - [[#modeline][Modeline]]
@@ -53,11 +53,12 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#show-images][Show images]]
   - [[#autoreload-configuration][Autoreload Configuration]]
   - [[#autoexecute-tangled-shell-files][Autoexecute tangled shell files]]
-  - [[#firn-setup][Firn setup]]
+  - [[#weblog-setup][Weblog setup]]
   - [[#visual-column-mode][Visual column mode]]
-  - [[#table-of-contents][Table of Contents]]
+  - [[#org-make-toc][org-make-toc]]
   - [[#better-snippets][Better snippets]]
 - [[#email][Email]]
+  - [[#notifications][Notifications]]
 - [[#languages][Languages]]
   - [[#lsp][LSP]]
   - [[#rust][Rust]]
@@ -76,7 +77,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 :END:
 
 * Setup
-If you (somehow) haven't already guessed, this depends on [[doom-repo:][Doom Emacs]], so also requires any dependency listed there. Outside of Doom, the only other dependency is =playerctl= for the now-playing modeline segment. Because of the configuration required for =vterm=, there is also a soft dependency on my [[github:elken/.files][dotfiles]] for the shell-side integration but it shouldn't cause it to break.
+If you (somehow) haven't already guessed, this depends on [[https://github.com/hlissner/doom-emacs][Doom Emacs]], so also requires any dependency listed there. Outside of Doom, the only other dependency is =playerctl= for the now-playing modeline segment. Because of the configuration required for =vterm=, there is also a soft dependency on my [[https://github.com/elken/.files][dotfiles]] for the shell-side integration but it shouldn't cause it to break.
 
 Email depends on =mbsync= to be setup to read email.
 
@@ -144,6 +145,13 @@ Posframes by default don't work in exwm, so let's fix that by making sure they'r
        (+ y (/ (- fh ph) 2))))))
 #+end_src
 ** Settings
+*** Evil
+I make a lot of splits, and it finally got annoying having to swap to them all the time. So, let's change that
+
+#+begin_src emacs-lisp
+(setq evil-split-window-below t
+      evil-vsplit-window-right t)
+#+end_src
 *** Better defaults
 Make the scratch buffer start in lisp mode
 
@@ -299,7 +307,7 @@ Email folders and setup. This might move to a new section if I start to use emai
                       (mu4e-refile-folder     . "/mailbox/All Mail")
                       (smtpmail-smtp-user     . "me@elken.dev")
                       (user-mail-address      . "me@elken.dev")    ;; only needed for mu < 1.4
-                      (mu4e-compose-signature . "---\nelken"))
+                      (mu4e-compose-signature . "Regards,\nelken"))
                     t)
 #+end_src
 
@@ -313,7 +321,7 @@ Start a server (if not running already)
 #+end_src
 
 *** vterm
-Vterm clearly wins the terminal war. Also doesn't need much configuration out of the box, although the shell integration does. That currently exists in my [[github:elken/.files][dotfiles]]
+Vterm clearly wins the terminal war. Also doesn't need much configuration out of the box, although the shell integration does. That currently exists in my [[https://github.com/elken/.files][dotfiles]]
 
 **** Kill buffer
 If the process exits, kill the =vterm= buffer
@@ -554,8 +562,18 @@ Make tangled shell files executable (I trust myself, ish...)
 (add-hook 'org-babel-post-tangle-hook 'elken/make-tangled-shell-executable)
 #+end_src
 
-** Firn setup
-Useful settings and functions for [[github:theiceshell/firn][firn]]
+** Weblog setup
+Useful settings and functions for [[https://github.com/theiceshell/firn][firn]] and other blogging tools
+
+Testing out weblorg, might encourage me to finally finish my site revamp...
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! weblorg)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! weblorg)
+#+end_src
 
 #+begin_src emacs-lisp
 (setq enable-dir-local-variables t)
@@ -620,7 +638,7 @@ And add a hook to load it
 (add-hook 'org-mode-hook #'elken/org-mode-visual-fill)
 #+end_src
 
-** Table of Contents
+** org-make-toc
 There's still a few bugs with this, but it works fine on Github mostly.
 
 #+begin_src emacs-lisp :tangle packages.el
@@ -633,6 +651,7 @@ And then load it
 (use-package! org-make-toc
   :after org)
 #+end_src
+
 ** Better snippets
 Programmers are, by design, lazy
 
@@ -649,6 +668,17 @@ Currently handled through =mu4e=, works easy enough and I don't need too much ou
 Set the interval to a sensible timeout (10 minutes is plenty)
 #+begin_src emacs-lisp
 (setq mu4e-update-interval (* 10 60))
+#+end_src
+** Notifications
+Notifications are quite nifty, especially if I'm as lazy as I am
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! mu4e-alert)
+#+end_src
+
+#+begin_src emacs-lisp
+(mu4e-alert-set-default-style 'libnotify)
+(add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
 #+end_src
 * Languages
 Configuration for various programming languages.

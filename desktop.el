@@ -19,6 +19,10 @@
     ("discord" (exwm-workspace-rename-buffer (format "%s" exwm-title)))
     ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))))
 
+(defun elken/exwm-move-window (index)
+  "Wrapper for `exwm-workspace-move-window' to account for adjusted indexes"
+  (exwm-workspace-move-window (- index 1)))
+
 (defun elken/configure-window-by-class()
   "Configuration for windows (grouped by WM_CLASS)"
   (interactive)
@@ -27,16 +31,18 @@
              (exwm-floating-toggle-floating)
              (exwm-layout-toggle-mode-line)))
     ("discord" (progn
-                 (exwm-workspace-move-window 2)
+                 (elken/exwm-move-window 3)
                  (elken/reload-tray)))
     ("megasync" (progn
                   (exwm-floating-toggle-floating)
                   (exwm-layout-toggle-mode-line)))
-    ("spotify" (exwm-workspace-move-window 3))
-    ("firefox" (exwm-workspace-move-window 1))))
+    ("spotify" (elken/exwm-move-window 4))
+    ("firefox" (elken/exwm-move-window 2))))
 
 (after! (exwm doom-modeline)
-  (use-package! doom-modeline-now-playing)
+  (use-package! doom-modeline-now-playing
+    :config
+    (doom-modeline-now-playing-timer))
   (doom-modeline-def-segment exwm-workspaces
       (exwm-workspace--update-switch-history)
       (concat
@@ -121,7 +127,7 @@
   (setq exwm-randr-workspace-monitor-plist '(1 "DP-0" 2 "DP-0"))
 
   (setq exwm-workspace-index-map
-        (lambda (index) (number-to-string index)))
+        (lambda (index) (number-to-string (+ 1 index))))
 
   ;; Set the buffer to the name of the window class
   (add-hook 'exwm-update-class-hook #'elken/exwm-update-class)
@@ -141,6 +147,7 @@
           ?\C-u
           ?\C-h
           ?\M-x
+          ?\C-w
           ?\M-`
           ?\M-&
           ?\M-:
@@ -155,7 +162,7 @@
   ;; Setup screen layout
   (require 'exwm-randr)
   (exwm-randr-enable)
-  (start-process-shell-command "xrandr" nil "sh ~/.screenlayout/default.sh")
+  (start-process-shell-command "xrandr" nil "xrandr --output HDMI-0 --primary --mode 2560x1440 --pos 0x1080 --output DP-0 --mode 2560x1080 --pos 0x0")
 
   ;; Set the wallpaper
   (elken/set-wallpaper (expand-file-name "images/background.png" doom-private-dir))
@@ -181,42 +188,39 @@
           ([s-up] . windmove-up)
           ([s-down] . windmove-down)
 
-          ([?\s-&] . (lambda (command) (interactive (list (read-shell-command "> ")))
+          ([?\s-&] . (lambda (command) (interactive (list (read-shell-command "[command] $ ")))
                        (start-process-shell-command command nil command)))
 
-          ([?\s-E] . (lambda () (interactive) (dired "~")))
+          ([?\s-e] . (lambda () (interactive) (dired "~")))
 
           ([?\s-w] . exwm-workspace-switch)
 
           ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
-          ([?\s-`] . (lambda ()
-                       (interactive)
-                       (exwm-workspace-switch-create 0)))
           ([?\s-1] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 1)))
+                       (exwm-workspace-switch-create 0)))
           ([?\s-2] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 2)))
+                       (exwm-workspace-switch-create 1)))
           ([?\s-3] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 3)))
+                       (exwm-workspace-switch-create 2)))
           ([?\s-4] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 4)))
+                       (exwm-workspace-switch-create 3)))
           ([?\s-5] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 5)))
+                       (exwm-workspace-switch-create 4)))
           ([?\s-6] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 6)))
+                       (exwm-workspace-switch-create 5)))
           ([?\s-7] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 7)))
+                       (exwm-workspace-switch-create 6)))
           ([?\s-8] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 8)))
+                       (exwm-workspace-switch-create 7)))
           ([?\s-9] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 9)))))
+                       (exwm-workspace-switch-create 8)))))
   (exwm-enable))
