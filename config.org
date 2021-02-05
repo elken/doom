@@ -75,6 +75,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#graphql-mode][Graphql-mode]]
     - [[#spotify][Spotify]]
     - [[#which-key-posframe][which-key-posframe]]
+- [[#guix][Guix]]
 :END:
 
 * Setup
@@ -334,15 +335,16 @@ I've picked this up in muscle memory now and I'm fed up with it not working. Not
 
 #+begin_src emacs-lisp
 (after! vterm
-  (define-key vterm-mode-map (kbd "<C-backspace>") (lambda () (interactive) (vterm-send-key (kbd "C-w"))))        )
+  (define-key vterm-mode-map (kbd "<C-backspace>") (lambda () (interactive) (vterm-send-key (kbd "C-w")))))
 #+end_src
 **** Functions
 Useful functions for the shell-side integration provided by vterm.
 #+begin_src emacs-lisp
+(after! vterm
 (push (list "magit-status"
             (lambda (path)
               (magit-status path)))
-      vterm-eval-cmds)
+      vterm-eval-cmds))
 #+end_src
 * Keybindings
 It's not a custom config without some fancy keybinds
@@ -727,6 +729,7 @@ Configure the fonts across all used platforms (slightly different names).
 #+END_SRC
 
 ** Theme
+
 Load my current flavour-of-the-month colour scheme.
 
 #+BEGIN_SRC emacs-lisp
@@ -840,6 +843,8 @@ The last piece of Exodia. Now I can posframe everything for vague satisfation.
             which-key-posframe-poshandler #'elken/posframe-poshandler)))
 #+end_src
 
+* Guix
 #+begin_src emacs-lisp
-(mapc (lambda (p) (add-load-path! p)) (split-string (getenv "EMACSLOADPATH") ":"))
+(when (getenv "EMACSLOADPATH")
+  (mapc (lambda (p) (add-load-path! p)) (split-string (getenv "EMACSLOADPATH") ":")))
 #+end_src

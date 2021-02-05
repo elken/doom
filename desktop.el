@@ -19,9 +19,9 @@
     ("discord" (exwm-workspace-rename-buffer (format "%s" exwm-title)))
     ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))))
 
-(defun elken/exwm-move-window (index)
-  "Wrapper for `exwm-workspace-move-window' to account for adjusted indexes"
-  (exwm-workspace-move-window (- index 1)))
+(defun elken/exwm-get-index (index)
+  "Get the correct index from the passed index"
+  (- index 1))
 
 (defun elken/configure-window-by-class()
   "Configuration for windows (grouped by WM_CLASS)"
@@ -31,23 +31,23 @@
              (exwm-floating-toggle-floating)
              (exwm-layout-toggle-mode-line)))
     ("discord" (progn
-                 (elken/exwm-move-window 3)
+                 (exwm-workspace-move-window (elken/exwm-get-index 3))
                  (elken/reload-tray)))
     ("megasync" (progn
                   (exwm-floating-toggle-floating)
                   (exwm-layout-toggle-mode-line)))
-    ("spotify" (elken/exwm-move-window 4))
-    ("firefox" (elken/exwm-move-window 2))))
+    ("spotify" (exwm-workspace-move-window (elken/exwm-get-index 4)))
+    ("firefox" (exwm-workspace-move-window (elken/exwm-get-index 2)))))
 
 (after! (exwm doom-modeline)
   (use-package! doom-modeline-now-playing
     :config
     (doom-modeline-now-playing-timer))
   (doom-modeline-def-segment exwm-workspaces
-      (exwm-workspace--update-switch-history)
-      (concat
-       (doom-modeline-spc)
-       (elt exwm-workspace--switch-history (exwm-workspace--position (selected-frame)))))
+    (exwm-workspace--update-switch-history)
+    (concat
+     (doom-modeline-spc)
+     (elt exwm-workspace--switch-history (exwm-workspace--position (selected-frame)))))
   (doom-modeline-def-modeline 'main
     '(bar workspace-name exwm-workspaces modals matches buffer-info remote-host parrot selection-info)
     '(now-playing objed-state misc-info persp-name grip mu4e gnus github debug repl lsp minor-modes major-mode process vcs checker)))
@@ -115,8 +115,8 @@
 (use-package! exwm
   :config
   (advice-add #'exwm-input--on-buffer-list-update :before
-            (lambda (&rest r)
-              (exwm--log "CALL STACK: %s" (cddr (reverse (xcb-debug:-call-stack))))))
+              (lambda (&rest r)
+                (exwm--log "CALL STACK: %s" (cddr (reverse (xcb-debug:-call-stack))))))
   ;; Show all buffers for switching
   (setq exwm-workspace-show-all-buffers t)
 
@@ -124,7 +124,7 @@
   (setq exwm-workspace-number 5)
 
   ;; Define workspace setup for monitors
-  (setq exwm-randr-workspace-monitor-plist '(1 "DP-0" 2 "DP-0"))
+  (setq exwm-randr-workspace-monitor-plist `(,(elken/exwm-get-index 2) "DP-0" ,(elken/exwm-get-index 3) "DP-0"))
 
   (setq exwm-workspace-index-map
         (lambda (index) (number-to-string (+ 1 index))))
@@ -198,29 +198,29 @@
           ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
           ([?\s-1] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 0)))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 1))))
           ([?\s-2] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 1)))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 2))))
           ([?\s-3] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 2)))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 3))))
           ([?\s-4] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 3)))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 4))))
           ([?\s-5] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 4)))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 5))))
           ([?\s-6] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 5)))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 6))))
           ([?\s-7] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 6)))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 7))))
           ([?\s-8] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 7)))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 8))))
           ([?\s-9] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create 8)))))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 9))))))
   (exwm-enable))
