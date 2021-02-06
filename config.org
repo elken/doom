@@ -70,11 +70,10 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#guiframe][GUI/Frame]]
 - [[#packages][Packages]]
   - [[#packagesel][=packages.el=]]
-  - [[#setup][Setup]]
-    - [[#rainbow-mode][Rainbow Mode]]
-    - [[#graphql-mode][Graphql-mode]]
-    - [[#spotify][Spotify]]
-    - [[#which-key-posframe][which-key-posframe]]
+  - [[#rainbow-mode][Rainbow Mode]]
+  - [[#graphql-mode][Graphql-mode]]
+  - [[#spotify][Spotify]]
+  - [[#which-key-posframe][which-key-posframe]]
 - [[#guix][Guix]]
 :END:
 
@@ -341,10 +340,9 @@ I've picked this up in muscle memory now and I'm fed up with it not working. Not
 Useful functions for the shell-side integration provided by vterm.
 #+begin_src emacs-lisp
 (after! vterm
-(push (list "magit-status"
-            (lambda (path)
-              (magit-status path)))
-      vterm-eval-cmds))
+  (setf (alist-get "magit-status" vterm-eval-cmds nil nil #'equal)
+        (lambda (path)
+          (magit-status path))))
 #+end_src
 * Keybindings
 It's not a custom config without some fancy keybinds
@@ -792,11 +790,8 @@ Tangle this into the packages.el file. Removes the need for it.
 ;;   :recipe (:host github :repo "danielfm/spotify.el"))
 #+END_SRC
 
-** Setup
 
-Configuration for any packages included above
-
-*** Rainbow Mode
+** Rainbow Mode
 
 Colouring parentheses so I don't get confused by the scary lisp dialects.
 
@@ -807,14 +802,14 @@ Colouring parentheses so I don't get confused by the scary lisp dialects.
     (text-mode . rainbow-mode))
 #+END_SRC
 
-*** Graphql-mode
+** Graphql-mode
 Used for displaying graphql queries nicely & sending.
 
 #+begin_src emacs-lisp
 (use-package! graphql-mode)
 #+end_src
 
-*** Spotify
+** Spotify
 /Possible/ configuration for spotify, however seems to be a few bugs floating so not usable yet.
 
 #+begin_src emacs-lisp
@@ -829,7 +824,7 @@ Used for displaying graphql queries nicely & sending.
 ;;          spotify-status-location 'modeline))
 ;;  (global-spotify-remote-mode))
 #+end_src
-*** which-key-posframe
+** which-key-posframe
 The last piece of Exodia. Now I can posframe everything for vague satisfation.
 
 #+begin_src emacs-lisp
