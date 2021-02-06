@@ -97,6 +97,7 @@
   (elken/run-in-background "nm-applet")
 
   ;; Startup applications
+  (elken/run-application "spotify")
   (elken/run-application "discord")
   (elken/run-application "firefox")
 
@@ -110,6 +111,10 @@
   :config
   (setq desktop-environment-screenlock-command "gnome-screensaver-command -l"
         desktop-environment-screenshot-command "flameshot gui")
+  ;; HHKB media keys
+  (map! "<kp-add>" #'desktop-environment-toggle-music)
+  (map! "<kp-multiply>" #'desktop-environment-music-previous)
+  (map! "<kp-divide>" #'desktop-environment-music-next)
   (desktop-environment-mode))
 
 (use-package! exwm
