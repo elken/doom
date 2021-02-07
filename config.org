@@ -43,7 +43,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#dired][Dired]]
 - [[#org-mode][Org Mode]]
   - [[#font-setup][Font setup]]
-  - [[#ellipsis][Ellipsis]]
+  - [[#characters][Characters]]
   - [[#keywords][Keywords]]
   - [[#agendalog][Agenda/Log]]
   - [[#cycle][Cycle]]
@@ -403,7 +403,21 @@ Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+END_SRC
 
-** Ellipsis
+** Characters
+Simplify the headline bullets
+
+#+begin_src emacs-lisp
+(setq org-superstar-headline-bullets-list '("› "))
+#+end_src
+
+And the item bullets
+
+#+begin_src emacs-lisp
+(setq org-superstar-item-bullet-alist '((?* . ?⋆)
+                                        (?+ . ?‣)
+                                        (?- . ?•)))
+#+end_src
+
 Change the dropdown icon to be something /neater/
 
 #+begin_src emacs-lisp
@@ -415,6 +429,13 @@ And get rid of emphasis markers
 #+begin_src emacs-lisp
 (setq org-hide-emphasis-markers t)
 #+end_src
+
+Show entities in a nicer format, rather than UTF8 characters
+
+#+begin_src emacs-lisp
+(setq org-pretty-entities t)
+#+end_src
+
 ** Keywords
 Default keywords are /far/ too minimal. This will need further tweaking as I start using org mode for organisation more.
 

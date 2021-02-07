@@ -48,8 +48,8 @@
      (let ((face (if (doom-modeline--active)
                      'doom-modeline-buffer-file
                    'mode-line-inactive)))
-     (doom-modeline-icon 'octicon "browser" "" ""
-                         :face face :v-adjust -0.07 :height 1.15))
+       (doom-modeline-icon 'octicon "browser" "" ""
+                           :face face :v-adjust -0.07 :height 1.15))
      (doom-modeline-spc)
      (doom-modeline--buffer-name)))
   (doom-modeline-def-segment exwm-workspaces
@@ -146,8 +146,7 @@
 
   ;; Default emacs behaviours
   ;; TODO Take this out of emacs
-  ;; (mu4e t))
-  )
+  (mu4e t))
 
 (use-package! desktop-environment
   :after exwm
