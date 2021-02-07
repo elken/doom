@@ -47,10 +47,35 @@
     (exwm-workspace--update-switch-history)
     (concat
      (doom-modeline-spc)
-     (elt exwm-workspace--switch-history (exwm-workspace--position (selected-frame)))))
+     (elt (let* ((num (exwm-workspace--count))
+                 (sequence (number-sequence 0 (1- num)))
+                 (not-empty (make-vector num nil)))
+            (dolist (i exwm--id-buffer-alist)
+              (with-current-buffer (cdr i)
+                (when exwm--frame
+                  (setf (aref not-empty
+                              (exwm-workspace--position exwm--frame))
+                        t))))
+            (mapcar
+             (lambda (i)
+               (mapconcat
+                (lambda (j)
+                  (format (if (= i j) "[%s]" " %s ")
+                          (propertize
+                           (apply exwm-workspace-index-map (list j))
+                           'face
+                           (cond ((frame-parameter (elt exwm-workspace--list j)
+                                                   'exwm-urgency)
+                                  '(:inherit warning :weight bold))
+                                 ((= i j) '(:inherit underline :weight bold))
+                                 ((aref not-empty j) '(:inherit success :weight bold))
+                                 (t `((:foreground ,(face-foreground 'mode-line-inactive))))))))
+                sequence ""))
+             sequence))
+          (exwm-workspace--position (selected-frame)))))
   (doom-modeline-def-modeline 'main
-    '(bar workspace-name exwm-workspaces modals matches buffer-info remote-host parrot selection-info)
-    '(now-playing objed-state misc-info persp-name grip mu4e gnus github debug repl lsp minor-modes major-mode process vcs checker)))
+    '(bar workspace-name exwm-workspaces debug modals matches buffer-info remote-host parrot selection-info)
+    '(now-playing objed-state misc-info persp-name grip mu4e gnus github repl lsp major-mode process vcs checker " ")))
 
 (defun elken/run-application (command)
   "Run the specified command as an application"
