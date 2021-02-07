@@ -43,6 +43,15 @@
   (use-package! doom-modeline-now-playing
     :config
     (doom-modeline-now-playing-timer))
+  (doom-modeline-def-segment exwm-buffer-info
+    (concat
+     (let ((face (if (doom-modeline--active)
+                     'doom-modeline-buffer-file
+                   'mode-line-inactive)))
+     (doom-modeline-icon 'octicon "browser" "" ""
+                         :face face :v-adjust -0.07 :height 1.15))
+     (doom-modeline-spc)
+     (doom-modeline--buffer-name)))
   (doom-modeline-def-segment exwm-workspaces
     (exwm-workspace--update-switch-history)
     (concat
@@ -73,6 +82,15 @@
                 sequence ""))
              sequence))
           (exwm-workspace--position (selected-frame)))))
+  (setf (alist-get 'exwm-mode all-the-icons-mode-icon-alist)
+        '(all-the-icons-octicon "browser" :v-adjust -0.05))
+  (doom-modeline-def-modeline 'exwm
+    '(bar workspace-name exwm-workspaces debug exwm-buffer-info)
+    '(now-playing objed-state misc-info persp-name grip mu4e gnus github repl lsp major-mode process " "))
+  (defun doom-modeline-set-exwm-modeline ()
+    "Set exwm mode-line"
+    (doom-modeline-set-modeline 'exwm))
+  (add-hook 'exwm-mode-hook #'doom-modeline-set-exwm-modeline)
   (doom-modeline-def-modeline 'main
     '(bar workspace-name exwm-workspaces debug modals matches buffer-info remote-host parrot selection-info)
     '(now-playing objed-state misc-info persp-name grip mu4e gnus github repl lsp major-mode process vcs checker " ")))
