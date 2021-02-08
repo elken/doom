@@ -799,8 +799,7 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! graphql-mode)
 (package! desktop-environment)
 (package! which-key-posframe)
-(package! doom-modeline-now-playing
-  :recipe (:host github :repo "elken/doom-modeline-now-playing"))
+(package! doom-modeline-now-playing)
 (package! org-appear
   :recipe (:host github :repo "awth13/org-appear"))
 ;; (package! oauth2)
@@ -810,7 +809,6 @@ Tangle this into the packages.el file. Removes the need for it.
 ;; (package! spotify.el
 ;;   :recipe (:host github :repo "danielfm/spotify.el"))
 #+END_SRC
-
 
 ** Rainbow Mode
 
