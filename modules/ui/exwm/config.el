@@ -1,4 +1,5 @@
-(require 'subr-x)
+;;; ui/exwm/config.el -*- lexical-binding: t; -*-
+
 ;; Make the launcher only show app names
 (use-package! counsel
   :custom
@@ -8,20 +9,39 @@
   "Invoke playerctl for FUNCTION using FORMAT to present output"
   (string-trim (shell-command-to-string (format "playerctl %s --format '%s'" function format))))
 
+(defun elken/exwm-get-index (index)
+  "Get the correct index from the passed index"
+  (- index 1))
+
+(defun elken/run-application (command)
+  "Run the specified command as an application"
+  (call-process "gtk-launch" nil 0 nil command))
+
 (defun elken/exwm-update-class ()
   "Update the buffer to be the name of the window"
   (exwm-workspace-rename-buffer exwm-class-name))
 
+(defun elken/run-in-background (command &optional args)
+  "Run the specified command as a daemon"
+  (elken/kill-process--action (assoc command elken/process-alist))
+  (setq elken/process-alist
+        (cons `(,command . ,(start-process-shell-command command nil (format "%s %s" command (or args "")))) elken/process-alist)))
+
+(defun elken/reload-tray ()
+  "Restart the systemtray"
+  (interactive)
+  (exwm-systemtray--exit)
+  (exwm-systemtray--init))
+
+(defun elken/set-wallpaper (file)
+  "Set the DE wallpaper to be $FILE"
+  (interactive)
+  (start-process-shell-command "feh" nil (format "feh --bg-scale %s" file)))
+
 (defun elken/exwm-update-title ()
   "Update the window title when needed"
   (pcase (downcase (or exwm-class-name ""))
-    ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
-    ("discord" (exwm-workspace-rename-buffer (format "%s" exwm-title)))
     ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))))
-
-(defun elken/exwm-get-index (index)
-  "Get the correct index from the passed index"
-  (- index 1))
 
 (defun elken/configure-window-by-class()
   "Configuration for windows (grouped by WM_CLASS)"
@@ -39,7 +59,40 @@
     ("spotify" (exwm-workspace-move-window (elken/exwm-get-index 4)))
     ("firefox" (exwm-workspace-move-window (elken/exwm-get-index 2)))))
 
+(defun elken/exwm-init-hook ()
+  "Various init processes for exwm"
+  ;; Daemon applications
+  (elken/run-in-background "pasystray")
+  (elken/run-in-background "megasync")
+  (elken/run-in-background "nm-applet")
+
+  ;; Startup applications
+  (elken/run-application "spotify")
+  (elken/run-application "discord")
+  (elken/run-application "firefox")
+
+  ;; Default emacs behaviours
+  ;; TODO Take this out of emacs
+  (mu4e t))
+
+(defvar elken/process-alist '())
+
+(defun elken/kill-process--action (process)
+  "Do the actual process killing"
+  (when process
+    (ignore-errors
+      (kill-process (cdr process))))
+  (setq elken/process-alist (remove process elken/process-alist)))
+
+(defun elken/kill-process ()
+  "Kill a background process"
+  (interactive)
+  (ivy-read "Kill process: " elken/process-alist
+            :action #'elken/kill-process--action
+            :caller 'elken/kill-process))
+
 (after! (exwm doom-modeline)
+  (setq all-the-icons-scale-factor 1.1)
   (use-package! doom-modeline-now-playing
     :config
     (doom-modeline-now-playing-timer))
@@ -49,7 +102,7 @@
                      'doom-modeline-buffer-file
                    'mode-line-inactive)))
        (doom-modeline-icon 'octicon "browser" "" ""
-                           :face face :v-adjust -0.07 :height 1.15))
+                           :face face :v-adjust -0.05))
      (doom-modeline-spc)
      (doom-modeline--buffer-name)))
   (doom-modeline-def-segment exwm-workspaces
@@ -86,84 +139,33 @@
         '(all-the-icons-octicon "browser" :v-adjust -0.05))
   (doom-modeline-def-modeline 'exwm
     '(bar workspace-name exwm-workspaces debug exwm-buffer-info)
-    '(now-playing objed-state misc-info persp-name grip mu4e gnus github repl lsp major-mode process " "))
+    '(now-playing objed-state misc-info persp-name grip mu4e gnus github repl lsp major-mode process "  "))
   (defun doom-modeline-set-exwm-modeline ()
     "Set exwm mode-line"
     (doom-modeline-set-modeline 'exwm))
   (add-hook 'exwm-mode-hook #'doom-modeline-set-exwm-modeline)
   (doom-modeline-def-modeline 'main
     '(bar workspace-name exwm-workspaces debug modals matches buffer-info remote-host parrot selection-info)
-    '(now-playing objed-state misc-info persp-name grip mu4e gnus github repl lsp major-mode process vcs checker " ")))
+    '(now-playing objed-state misc-info persp-name grip mu4e gnus github repl lsp major-mode process vcs checker "  ")))
 
-(defun elken/run-application (command)
-  "Run the specified command as an application"
-  (call-process "gtk-launch" nil 0 nil command))
-
-(defvar elken/process-alist '())
-
-(defun elken/kill-process--action (process)
-  "Do the actual process killing"
-  (when process
-    (ignore-errors
-      (kill-process (cdr process))))
-  (setq elken/process-alist (remove process elken/process-alist)))
-
-(defun elken/kill-process ()
-  "Kill a background process"
-  (interactive)
-  (ivy-read "Kill process: " elken/process-alist
-            :action #'elken/kill-process--action
-            :caller 'elken/kill-process))
-
-(defun elken/run-in-background (command &optional args)
-  "Run the specified command as a daemon"
-  (elken/kill-process--action (assoc command elken/process-alist))
-  (setq elken/process-alist
-        (cons `(,command . ,(start-process-shell-command command nil (format "%s %s" command (or args "")))) elken/process-alist)))
-
-(defun elken/reload-tray ()
-  "Restart the systemtray"
-  (interactive)
-  (exwm-systemtray--exit)
-  (exwm-systemtray--init))
-
-(defun elken/set-wallpaper (file)
-  "Set the DE wallpaper to be $FILE"
-  (interactive)
-  (start-process-shell-command "feh" nil (format "feh --bg-scale %s" file)))
-
-(defun elken/exwm-init-hook ()
-  "Various init processes for exwm"
-  ;; Daemon applications
-  (elken/run-in-background "pasystray")
-  (elken/run-in-background "megasync")
-  (elken/run-in-background "nm-applet")
-
-  ;; Startup applications
-  (elken/run-application "spotify")
-  (elken/run-application "discord")
-  (elken/run-application "firefox")
-
-  ;; Default emacs behaviours
-  ;; TODO Take this out of emacs
-  (mu4e t))
-
+;; Used to handle screen locking (currently unused), media keys and screenshotting
 (use-package! desktop-environment
   :after exwm
   :config
   (setq desktop-environment-screenlock-command "gnome-screensaver-command -l"
         desktop-environment-screenshot-command "flameshot gui")
-  ;; HHKB media keys
-  (map! "<kp-add>" #'desktop-environment-toggle-music)
-  (map! "<kp-multiply>" #'desktop-environment-music-previous)
-  (map! "<kp-divide>" #'desktop-environment-music-next)
   (desktop-environment-mode))
 
+;; The meat and potatoes as they say
 (use-package! exwm
   :config
-  (advice-add #'exwm-input--on-buffer-list-update :before
-              (lambda (&rest r)
+  ;; Enabled debugging when doom is in debug mode
+  (when doom-debug-p
+    (advice-add #'exwm-input--on-buffer-list-update :before
+                (lambda (&rest r)
                 (exwm--log "CALL STACK: %s" (cddr (reverse (xcb-debug:-call-stack))))))
+    (exwm-debug))
+
   ;; Show all buffers for switching
   (setq exwm-workspace-show-all-buffers t)
 
@@ -198,7 +200,7 @@
           ?\M-`
           ?\M-&
           ?\M-:
-          ?\M-
+          ?\M-\
           ?\C-g
           ?\C-\M-j
           ?\C-\ ))
@@ -269,5 +271,4 @@
                        (exwm-workspace-switch-create (elken/exwm-get-index 8))))
           ([?\s-9] . (lambda ()
                        (interactive)
-                       (exwm-workspace-switch-create (elken/exwm-get-index 9))))))
-  (exwm-enable))
+                       (exwm-workspace-switch-create (elken/exwm-get-index 9)))))))

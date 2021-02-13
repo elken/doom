@@ -21,9 +21,9 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#faq][FAQ]]
 - [[#globals][Globals]]
   - [[#constants-and-variables][Constants and Variables]]
-    - [[#exwm-flag-handling][EXWM flag handling]]
   - [[#functions][Functions]]
   - [[#settings][Settings]]
+    - [[#dired][Dired]]
     - [[#evil][Evil]]
     - [[#better-defaults][Better defaults]]
     - [[#auth-info][Auth info]]
@@ -113,14 +113,6 @@ None yet because luckily nobody else has seen this spaghetti junction
 * Globals
 ** Constants and Variables
 I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't think of one? Would have thought of one.
-
-*** EXWM flag handling
-Set a constant to check if we're in exwm or not. Setting this as early as possible as I don't completely trust =package.el=
-
-#+begin_src emacs-lisp
-(defconst IS-EXWM (member "--with-exwm" command-line-args))
-(add-to-list 'command-switch-alist '("--with-exwm" . (lambda (_) (pop command-line-args-left))))
-#+end_src
 
 ** Functions
 Global functions used throughout. Some are more complex than others.

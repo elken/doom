@@ -11,8 +11,8 @@
 *.~undo-tree
 
 # Ignore tangled files
-config.el
-packages.el
+/config.el
+/packages.el
 
 # Random emacs files
 custom.el
