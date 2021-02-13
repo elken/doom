@@ -41,6 +41,8 @@
 (defun elken/exwm-update-title ()
   "Update the window title when needed"
   (pcase (downcase (or exwm-class-name ""))
+    ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
+    ("discord" (exwm-workspace-rename-buffer (format "%s" exwm-title)))
     ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))))
 
 (defun elken/configure-window-by-class()
