@@ -4,4 +4,4 @@
                ("playerctl" . "song information")
                ("picom" . "transparency")))
   (when (not (executable-find (car app)))
-    (print (format "%s is missing, %s won't work" (car app) (cdr app)))))
+    (warn! (format "%s is missing, %s won't work" (car app) (cdr app)))))

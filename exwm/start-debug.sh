@@ -8,4 +8,4 @@ xset -dpms
 xset s off
 xhost +SI:localuser:$USER
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-emacs -mm -f exwm-enable --debug-init
+emacs -mm --with-exwm --debug-init

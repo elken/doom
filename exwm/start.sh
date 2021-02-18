@@ -11,4 +11,4 @@ xset s off
 xss-lock -- gnome-screensaver-command -l &
 xhost +SI:localuser:$USER
 picom -b --experimental-backends --dbus --config ~/.doom.d/exwm/picom.conf
-emacs -mm -f exwm-enable
+emacs -mm --with-exwm

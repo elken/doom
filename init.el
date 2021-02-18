@@ -13,7 +13,6 @@
 ;
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
-(defconst IS-EXWM (fboundp 'exwm-state))
 
 ;; Loading before emacs
 (setq treemacs-git-mode 'deferred)

@@ -41,9 +41,8 @@
 (defun elken/exwm-update-title ()
   "Update the window title when needed"
   (pcase (downcase (or exwm-class-name ""))
-    ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
-    ("discord" (exwm-workspace-rename-buffer (format "%s" exwm-title)))
-    ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))))
+    ("spotify" (exwm-workspace-rename-buffer (format "Spotify: %s" (elken/playerctl-format "--player=spotify metadata" "{{ artist }} - {{ title }}"))))
+    (_ (exwm-workspace-rename-buffer (format "%s" exwm-title)))))
 
 (defun elken/configure-window-by-class()
   "Configuration for windows (grouped by WM_CLASS)"
@@ -154,12 +153,12 @@
 (use-package! desktop-environment
   :after exwm
   :config
-  (setq desktop-environment-screenlock-command "gnome-screensaver-command -l"
-        desktop-environment-screenshot-command "flameshot gui")
+  (setq desktop-environment-screenshot-command "flameshot gui")
   (desktop-environment-mode))
 
 ;; The meat and potatoes as they say
 (use-package! exwm
+  :commands (exwm-enable)
   :config
   ;; Enabled debugging when doom is in debug mode
   (when doom-debug-p
@@ -228,7 +227,7 @@
   (setq display-time-default-load-average nil)
   (display-time-mode 1)
 
-  (exwm-input-set-key (kbd "<s-return>") 'vterm)
+  (exwm-input-set-key (kbd "<s-return>") '+eshell/toggle)
 
   (setq exwm-input-global-keys
         '(
