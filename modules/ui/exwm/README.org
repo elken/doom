@@ -1,0 +1,98 @@
+#+TITLE:   ui/exwm
+#+DATE:    February 18, 2021
+#+SINCE:   v2.0.9
+#+STARTUP: inlineimages nofold
+
+* Table of Contents :TOC_3:noexport:
+- [[#description][Description]]
+  - [[#maintainers][Maintainers]]
+  - [[#module-flags][Module Flags]]
+  - [[#plugins][Plugins]]
+- [[#prerequisites][Prerequisites]]
+- [[#features][Features]]
+- [[#configuration][Configuration]]
+  - [[#background][Background]]
+  - [[#monitor-layout][Monitor Layout]]
+  - [[#exwm-startup][EXWM Startup]]
+  - [[#window-titles][Window Titles]]
+  - [[#window-behaviour][Window Behaviour]]
+- [[#troubleshooting][Troubleshooting]]
+
+* Description
+/Don't be a chump, don't use stump./
+
+[file:../../../images/overview.png]]
+
+EXWM is the best thing since sliced bread. And this config proves that. It's
+time to give in and use emacs for everything.
+
+EXWM (Emacs X Windows Manager) is a package for Emacs that lets us manage X
+Windows from the safety of emacs, with everything you'd expect from a tiling
+window manager.
+
+The features include:
+
+    + Fully keyboard-driven operations
+    + Hybrid layout modes (tiling & stacking)
+    + Dynamic workspace support
+    + ICCCM/EWMH compliance
+    + (Optional) RandR (multi-monitor) support
+    + (Optional) Builtin system tray
+    + (Optional) Builtin input method
+
+This module also includes a number of niceties from other packages, providing a
+quite complete desktop experience; such as media key and brightness key support,
+a /tray/, a built-in primitive daemon process manager
+
+** Maintainers
++ [[https://github.com/elken][elken]] (Author)
+
+** Module Flags
++ =+modeline-panel= Includes various segments to make the modeline function more like a panel
++ =+tray= Embed a tray in the minibufer of the current window to show tray icons
+
+** Plugins
++ [[https://github.com/ch11ng/exwm][exwm]]
++ [[https://gitea.petton.fr/DamienCassou/desktop-environment][desktop-environment]]
++ [[https://github.com/elken/doom-modeline-now-playing][doom-modeline-now-playing]] (=+modeline-panel=)
+
+* Prerequisites
+Should work out of the box, but a few extra packages are /recommended/
+
++ =picom=
+  Fancy transparency and /rounded windows/
+
++ =flameshot=
+  Best screenshot tool out there imo, supports area selection and
+  drawing on the image
+
+* Features
+# An in-depth list of features, how to use them, and their dependencies.
+
+* Configuration
+This (surprisingly) is tweaked for my preference, but that doesn't mean it's
+untouchable! Change this as needed, below are the more obvious areas I can think
+of
+
+** Background
+Replace the =images/background.png= in the root doom directory
+
+** Monitor Layout
+Replace the =xrandr= shell command line with the configuration of your monitors
+
+** EXWM Startup
+Modify the =elken/exwm-init-hook= function to add any startup processes
+
+** Window Titles
+=elken/exwm-update-title= is the (trivial) function for controlling window titles
+
+** Window Behaviour
+=elken/configure-window-by-class= is the function that controls the default
+behaviour for applications.
+
+*NOTE*
+Spotify doesn't work out of the box and requires [[https://github.com/dasJ/spotifywm][=spotifywm=]] to be installed separately.
+
+* Troubleshooting
+Running in debug mode (=--debug-init=) will also enable =exwm-debug= and make the
+log more active. If this doesn't help, check the troubleshooting steps on the [[https://github.com/ch11ng/exwm/wiki#how-to-report-a-bug][exwm wiki]].

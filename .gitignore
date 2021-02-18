@@ -17,6 +17,6 @@
 # Random emacs files
 custom.el
 
-README.org
+/README.org
 
 .env*
