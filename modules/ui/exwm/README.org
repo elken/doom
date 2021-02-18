@@ -21,7 +21,7 @@
 * Description
 /Don't be a chump, don't use stump./
 
-[file:../../../images/overview.png]]
+[[file:../../../images/overview.png]]
 
 EXWM is the best thing since sliced bread. And this config proves that. It's
 time to give in and use emacs for everything.
