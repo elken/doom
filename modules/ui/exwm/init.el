@@ -5,6 +5,7 @@
 (add-to-list 'command-switch-alist '("--with-exwm" . (lambda (_) (pop command-line-args-left))))
 
 (when (and doom-interactive-p
-           (not doom-reloading-p))
+           (not doom-reloading-p)
+	   IS-EXWM)
   (require 'exwm)
   (exwm-enable))
