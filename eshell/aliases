@@ -32,7 +32,7 @@ alias pacu yay --sync --refresh && sudo asp update
 alias pacx yay --remove $*
 alias po popd
 alias pu pushd
-alias q (kill-buffer)
+alias q exit
 alias reboot sudo systemctl reboot
 alias shutdown sudo systemctl poweroff
 alias wine32 WINEARCH=win32 WINEPREFIX=~/.wine32 wine

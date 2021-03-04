@@ -25,11 +25,14 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#settings][Settings]]
     - [[#dired][Dired]]
     - [[#evil][Evil]]
+      - [[#lispyville][Lispyville]]
     - [[#better-defaults][Better defaults]]
     - [[#auth-info][Auth info]]
     - [[#modeline][Modeline]]
     - [[#magit][Magit]]
     - [[#eshell][EShell]]
+      - [[#prompt][Prompt]]
+      - [[#settings][Settings]]
     - [[#exwm][EXWM]]
     - [[#user-setup][User setup]]
     - [[#server][Server]]
@@ -76,6 +79,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#rainbow-mode][Rainbow Mode]]
   - [[#graphql-mode][Graphql-mode]]
   - [[#which-key-posframe][which-key-posframe]]
+  - [[#vue-mode][vue-mode]]
 - [[#guix][Guix]]
 :END:
 
@@ -139,6 +143,7 @@ Posframes by default don't work in exwm, so let's fix that by making sure they'r
        (+ x (/ (- fw pw) 2))
        (+ y (/ (- fh ph) 2))))))
 #+end_src
+
 ** Settings
 *** Dired
 Dired is very cool, and basically perfect out-of-the-box. We do however want ranger as the default.
@@ -147,12 +152,28 @@ Dired is very cool, and basically perfect out-of-the-box. We do however want ran
 (after! ranger
   (setq ranger-override-dired 'ranger))
 #+end_src
+
 *** Evil
 I make a lot of splits, and it finally got annoying having to swap to them all the time. So, let's change that
 
 #+begin_src emacs-lisp
 (setq evil-split-window-below t
       evil-vsplit-window-right t)
+#+end_src
+
+**** Lispyville
+This structured-editing thing is apparently really neat, so let's see how we go
+
+#+begin_src emacs-lisp
+(after! lispy
+  (setq lispyville-key-theme
+        '((operators normal)
+          c-w
+          (prettify insert)
+          (atom-movement normal visual)
+          (additional-movement normal)
+          slurp/barf-lispy
+          additional)))
 #+end_src
 
 *** Better defaults
@@ -200,77 +221,36 @@ Allow forge to create repos under my name
 #+end_src
 
 *** EShell
-Eshell is a beautiful thing but ootb experience is a tad dated. Seems there is an issue with the magit section. I would also like to extend to add other sections later..
+**** Prompt
+Eshell is a beautiful thing but ootb experience is a tad dated. Custom prompt based on a combination of the famous p10k and eshell-git-prompt. I only /really/ need the minimum out of a prompt:
 
-#+begin_src emacs-lisp
-(require 'dash)
-(require 's)
++ =cwd=; almost impossible to work without knowing the current working directory
++ =git= info; current branch, dirty/clean status, etc
++ prompt number: useful for jumping up and down for fast history in a given session
 
-(defmacro with-face (STR &rest PROPS)
-  "Return STR propertized with PROPS."
-  `(propertize ,STR 'face (list ,@PROPS)))
+Can't get enough out of the default powerline theme, and removing a dependancy we're rolling our own prompt called =eshell-p10kline=
 
-(defmacro esh-section (NAME ICON FORM &rest PROPS)
-  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
-  `(setq ,NAME
-         (lambda () (when ,FORM
-                      (-> ,ICON
-                          (concat esh-section-delim ,FORM)
-                          (with-face ,@PROPS))))))
-
-(defun esh-acc (acc x)
-  "Accumulator for evaluating and concatenating esh-sections."
-  (--if-let (funcall x)
-      (if (s-blank? acc)
-          it
-        (concat acc esh-sep it))
-    acc))
-
-(defun esh-prompt-func ()
-  "Build `eshell-prompt-function'"
-  (concat esh-header
-          (-reduce-from 'esh-acc "" eshell-funcs)
-          "\n"
-          eshell-prompt-string))
+#+begin_src emacs-lisp :tangle packages.el
+(package! eshell-p10k
+  :recipe (:local-repo "/home/elken/build/elisp/eshell-p10k"
+           :build (:not compile)))
 #+end_src
 
-Finally define the actual setup
+#+begin_src emacs-lisp
+(use-package! eshell-p10k
+  :after eshell
+  :config
+  (setq eshell-prompt-function #'eshell-p10k-prompt-function
+        eshell-prompt-regexp eshell-p10k-prompt-string))
+#+end_src
+
+**** Settings
+We use eshell in a cross platform world, so we should prefer the lisp version of things to ensure a more consistent experience.
 
 #+begin_src emacs-lisp
-(esh-section esh-dir
-             ""  ;  (faicon folder)
-             (abbreviate-file-name (eshell/pwd))
-             '(:foreground "#EBCB8B" :bold ultra-bold :underline t))
-
-(esh-section esh-git
-             ""  ;  (git icon)
-             (ignore-errors (magit-get-current-branch))
-             '(:foreground "pink"))
-
-;; Below I implement a "prompt number" section
-(add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
-(advice-add 'eshell-send-input :before
-            (lambda (&rest args) (setq esh-prompt-num (cl-incf esh-prompt-num))))
-
-(esh-section esh-num
-             ""  ;  (list icon)
-             (number-to-string esh-prompt-num)
-             '(:foreground "brown"))
-
-;; Choose which eshell-funcs to enable
-(setq eshell-funcs (list esh-dir esh-git esh-num))
-
-;; Enable the new eshell prompt
-(after! eshell
-  (setq eshell-prompt-function 'esh-prompt-func
-        eshell-prefer-lisp-functions t
-        esh-sep " | "
-        esh-section-delim " "
-        esh-header "\n┌─"
-        eshell-prompt-regexp "└─> "
-        eshell-prompt-string "└─> "
-        esh-prompt-num 0))
+(setq eshell-prefer-lisp-functions t)
 #+end_src
+
 *** EXWM
 
 Some config has to go here (so it's reloaded properly). Remove the posframe parent and ensure that it's properly centered in the workspace.
@@ -292,6 +272,7 @@ Some config has to go here (so it's reloaded properly). Remove the posframe pare
         ivy-posframe-parameters '((parent-frame nil)
                                   (z-group . above))))
 #+end_src
+
 *** User setup
 Use my name and emails for things like GPG, snippets, mail, magit, etc.
 
@@ -328,9 +309,11 @@ Vterm clearly wins the terminal war. Also doesn't need much configuration out of
 
 **** Kill buffer
 If the process exits, kill the =vterm= buffer
+
 #+begin_src emacs-lisp
 (setq vterm-kill-buffer-on-exit t)
 #+end_src
+
 **** Fix =c-backspace=
 I've picked this up in muscle memory now and I'm fed up with it not working. Not anymore!
 
@@ -338,14 +321,17 @@ I've picked this up in muscle memory now and I'm fed up with it not working. Not
 (after! vterm
   (define-key vterm-mode-map (kbd "<C-backspace>") (lambda () (interactive) (vterm-send-key (kbd "C-w")))))
 #+end_src
+
 **** Functions
 Useful functions for the shell-side integration provided by vterm.
+
 #+begin_src emacs-lisp
 (after! vterm
   (setf (alist-get "magit-status" vterm-eval-cmds nil nil #'equal)
-        (lambda (path)
-          (magit-status path))))
+        '((lambda (path)
+            (magit-status path)))))
 #+end_src
+
 * Keybindings
 It's not a custom config without some fancy keybinds
 
@@ -369,7 +355,7 @@ Dired should behave better with evil mappings
 #+begin_src emacs-lisp
 (map! :map dired-mode-map
       :n "h" #'dired-up-directory
-      :n "l" #'dired-find-file)
+      :n "l" #'dired-find-alternate-file)
 #+end_src
 
 * Org Mode
@@ -450,6 +436,7 @@ Default keywords are /far/ too minimal. This will need further tweaking as I sta
         '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STORY(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
           (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))))
 #+end_src
+
 ** Agenda/Log
 Enable log-mode so we see =DONE= tasks and the like
 
@@ -468,6 +455,7 @@ And log items in the drawer
 #+begin_src emacs-lisp
 (setq org-log-into-drawer t)
 #+end_src
+
 ** Cycle
 Cycle by default (no idea why this isn't default)
 
@@ -497,6 +485,7 @@ Setup for =org-appear= mode
       org-appear-autolinks t
       org-appear-autosubmarkers t)
 #+end_src
+
 ** Indent & variable pitch
 Add the package
 #+begin_src emacs-lisp :tangle packages.el
@@ -699,6 +688,7 @@ Programmers are, by design, lazy
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
+
 ** Capture
 It's about time I start using =org-capture=, but because I'm a developer I'm inhernetly lazy so time to steal from other people.
 
@@ -906,13 +896,15 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                            :file +org-capture-project-notes-file)))
               )))
 #+end_src
+
 * Email
 Currently handled through =mu4e=, works easy enough and I don't need too much out of email.
 
 Set the interval to a sensible timeout (10 minutes is plenty)
 #+begin_src emacs-lisp
-(setq mu4e-update-interval (* 10 60))
+(setq mu4e-update-interval 600)
 #+end_src
+
 ** Notifications
 Notifications are quite nifty, especially if I'm as lazy as I am
 
@@ -924,6 +916,7 @@ Notifications are quite nifty, especially if I'm as lazy as I am
 (mu4e-alert-set-default-style 'libnotify)
 (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
 #+end_src
+
 * Languages
 Configuration for various programming languages.
 
@@ -941,6 +934,7 @@ And some more for projectile
 (after! projectile
   (add-to-list 'projectile-globally-ignored-directories "vendor"))
 #+end_src
+
 ** Rust
 Make =rls= the default
 
@@ -1008,12 +1002,10 @@ Add some transparency
 Tangle this into the packages.el file. Removes the need for it.
 
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! exwm)
 (package! rainbow-mode)
 (package! graphql-mode)
-(package! desktop-environment)
 (package! which-key-posframe)
-(package! doom-modeline-now-playing)
+(package! vue-mode)
 #+END_SRC
 
 ** Rainbow Mode
@@ -1048,6 +1040,13 @@ The last piece of Exodia. Now I can posframe everything for vague satisfation.
             which-key-posframe-poshandler #'elken/posframe-poshandler)))
 #+end_src
 
+** vue-mode
+VueJS is my web framework of choice. At some point I will try and improve the ootb doom experience, but for now /laziness/
+
+#+begin_src emacs-lisp
+(use-package! vue-mode
+  :mode "\\.vue\\")
+#+end_src
 * Guix
 #+begin_src emacs-lisp
 (when (getenv "EMACSLOADPATH")
