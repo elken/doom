@@ -79,7 +79,6 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#rainbow-mode][Rainbow Mode]]
   - [[#graphql-mode][Graphql-mode]]
   - [[#which-key-posframe][which-key-posframe]]
-  - [[#vue-mode][vue-mode]]
 - [[#guix][Guix]]
 :END:
 
@@ -813,8 +812,9 @@ is selected, only the bare key is returned."
 (advice-add 'org-mks :override #'org-mks-pretty)
 #+end_src
 
-The [[file:~/.emacs.d/bin/org-capture][org-capture bin]] is rather nice, but I'd be nicer with a smaller frame, and
+The [[file:~/.emacs.doom/bin/org-capture][org-capture bin]] is rather nice, but I'd be nicer with a smaller frame, and
 no modeline.
+
 #+begin_src emacs-lisp
 (setf (alist-get 'height +org-capture-frame-parameters) 15)
 ;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
@@ -948,11 +948,8 @@ Make =rls= the default
 Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
-(if IS-WINDOWS
-    (setq doom-font (font-spec :family "Hasklug NF" :size 12)
-          doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 13))
-  (setq doom-font (font-spec :family "Hasklug Nerd Font" :size 12)
-        doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 13)))
+(setq doom-font (font-spec :family "Hasklug Nerd Font" :size 12)
+      doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 13))
 #+END_SRC
 
 ** Theme
@@ -1005,7 +1002,6 @@ Tangle this into the packages.el file. Removes the need for it.
 (package! rainbow-mode)
 (package! graphql-mode)
 (package! which-key-posframe)
-(package! vue-mode)
 #+END_SRC
 
 ** Rainbow Mode
@@ -1040,13 +1036,6 @@ The last piece of Exodia. Now I can posframe everything for vague satisfation.
             which-key-posframe-poshandler #'elken/posframe-poshandler)))
 #+end_src
 
-** vue-mode
-VueJS is my web framework of choice. At some point I will try and improve the ootb doom experience, but for now /laziness/
-
-#+begin_src emacs-lisp
-(use-package! vue-mode
-  :mode "\\.vue\\")
-#+end_src
 * Guix
 #+begin_src emacs-lisp
 (when (getenv "EMACSLOADPATH")
