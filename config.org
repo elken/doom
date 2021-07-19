@@ -64,6 +64,8 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#capture][Capture]]
     - [[#prettify][Prettify]]
     - [[#templates][Templates]]
+  - [[#export][Export]]
+    - [[#chameleon][Chameleon]]
 - [[#email][Email]]
   - [[#notifications][Notifications]]
 - [[#languages][Languages]]
@@ -80,6 +82,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#graphql-mode][Graphql-mode]]
   - [[#which-key-posframe][which-key-posframe]]
 - [[#guix][Guix]]
+- [[#macos][MacOS]]
 :END:
 
 * Setup
@@ -118,6 +121,10 @@ None yet because luckily nobody else has seen this spaghetti junction
 * Globals
 ** Constants and Variables
 I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't think of one? Would have thought of one.
+
+#+begin_src elisp
+(global-subword-mode 1)
+#+end_src
 
 ** Functions
 Global functions used throughout. Some are more complex than others.
@@ -231,8 +238,7 @@ Can't get enough out of the default powerline theme, and removing a dependancy w
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! eshell-p10k
-  :recipe (:local-repo "/home/elken/build/elisp/eshell-p10k"
-           :build (:not compile)))
+  :recipe (:host github :repo "elken/eshell-p10k"))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -897,6 +903,132 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
               )))
 #+end_src
 
+** Export
+*** Chameleon
+Attempt to improve default PDF export by using the current theme
+#+begin_src elisp
+(after! ox
+    (defadvice! ox-chameleon-org-latex-export (orig-fn info &optional template snippet?)
+    :around #'org-latex-make-preamble
+          (concat (funcall orig-fn info template snippet?)
+                  (ox-chameleon-generate-colourings))
+      (funcall orig-fn info template snippet?))
+
+  (defun ox-chameleon-generate-colourings ()
+    (apply #'format
+           "%% make document follow Emacs theme
+\\definecolor{bg}{HTML}{%s}
+\\definecolor{fg}{HTML}{%s}
+
+\\definecolor{red}{HTML}{%s}
+\\definecolor{orange}{HTML}{%s}
+\\definecolor{green}{HTML}{%s}
+\\definecolor{teal}{HTML}{%s}
+\\definecolor{yellow}{HTML}{%s}
+\\definecolor{blue}{HTML}{%s}
+\\definecolor{dark-blue}{HTML}{%s}
+\\definecolor{magenta}{HTML}{%s}
+\\definecolor{violet}{HTML}{%s}
+\\definecolor{cyan}{HTML}{%s}
+\\definecolor{dark-cyan}{HTML}{%s}
+
+\\definecolor{documentTitle}{HTML}{%s}
+\\definecolor{documentInfo}{HTML}{%s}
+\\definecolor{level1}{HTML}{%s}
+\\definecolor{level2}{HTML}{%s}
+\\definecolor{level3}{HTML}{%s}
+\\definecolor{level4}{HTML}{%s}
+\\definecolor{level5}{HTML}{%s}
+\\definecolor{level6}{HTML}{%s}
+\\definecolor{level7}{HTML}{%s}
+\\definecolor{level8}{HTML}{%s}
+
+\\definecolor{link}{HTML}{%s}
+\\definecolor{cite}{HTML}{%s}
+\\definecolor{itemlabel}{HTML}{%s}
+\\definecolor{code}{HTML}{%s}
+\\definecolor{verbatim}{HTML}{%s}
+
+\\definecolor{codebackground}{HTML}{%s}
+\\colorlet{EFD}{fg}
+\\definecolor{codeborder}{HTML}{%s}
+
+\\pagecolor{bg}
+\\color{fg}
+
+\\addtokomafont{title}{\\color{documentTitle}}
+\\addtokomafont{author}{\\color{documentInfo}}
+\\addtokomafont{date}{\\color{documentInfo}}
+\\addtokomafont{section}{\\color{level1}}
+\\newkomafont{sectionprefix}{\\color{level1}}
+\\addtokomafont{subsection}{\\color{level2}}
+\\newkomafont{subsectionprefix}{\\color{level2}}
+\\addtokomafont{subsubsection}{\\color{level3}}
+\\newkomafont{subsubsectionprefix}{\\color{level3}}
+\\addtokomafont{paragraph}{\\color{level4}}
+\\newkomafont{paragraphprefix}{\\color{level4}}
+\\addtokomafont{subparagraph}{\\color{level5}}
+\\newkomafont{subparagraphprefix}{\\color{level5}}
+
+\\renewcommand{\\labelitemi}{\\textcolor{itemlabel}{\\textbullet}}
+\\renewcommand{\\labelitemii}{\\textcolor{itemlabel}{\\normalfont\\bfseries \\textendash}}
+\\renewcommand{\\labelitemiii}{\\textcolor{itemlabel}{\\textasteriskcentered}}
+\\renewcommand{\\labelitemiv}{\\textcolor{itemlabel}{\\textperiodcentered}}
+
+\\renewcommand{\\labelenumi}{\\textcolor{itemlabel}{\\theenumi.}}
+\\renewcommand{\\labelenumii}{\\textcolor{itemlabel}{(\\theenumii)}}
+\\renewcommand{\\labelenumiii}{\\textcolor{itemlabel}{\\theenumiii.}}
+\\renewcommand{\\labelenumiv}{\\textcolor{itemlabel}{\\theenumiv.}}
+
+\\DeclareTextFontCommand{\\texttt}{\\color{code}\\ttfamily}
+\\makeatletter
+\\def\\verbatim@font{\\color{verbatim}\\normalfont\\ttfamily}
+\\makeatother
+%% end customisations
+"
+           (mapcar (doom-rpartial #'substring 1)
+                   (list
+                    (face-attribute 'solaire-default-face :background)
+                    (face-attribute 'default :foreground)
+                    ;;
+                    (doom-color 'red)
+                    (doom-color 'orange)
+                    (doom-color 'green)
+                    (doom-color 'teal)
+                    (doom-color 'yellow)
+                    (doom-color 'blue)
+                    (doom-color 'dark-blue)
+                    (doom-color 'magenta)
+                    (doom-color 'violet)
+                    (doom-color 'cyan)
+                    (doom-color 'dark-cyan)
+                    ;;
+                    (face-attribute 'org-document-title :foreground)
+                    (face-attribute 'org-document-info :foreground)
+                    (face-attribute 'outline-1 :foreground)
+                    (face-attribute 'outline-2 :foreground)
+                    (face-attribute 'outline-3 :foreground)
+                    (face-attribute 'outline-4 :foreground)
+                    (face-attribute 'outline-5 :foreground)
+                    (face-attribute 'outline-6 :foreground)
+                    (face-attribute 'outline-7 :foreground)
+                    (face-attribute 'outline-8 :foreground)
+                    ;;
+                    (face-attribute 'link :foreground)
+                    (doom-color 'yellow)
+                    (face-attribute 'org-list-dt :foreground)
+                    (face-attribute 'org-code :foreground)
+                    (face-attribute 'org-verbatim :foreground)
+                    ;;
+                    (face-attribute 'default :background)
+                    (doom-blend (face-attribute 'default :background)
+                                (face-attribute 'default :foreground)
+                                0.95))))))
+#+end_src
+
+#+RESULTS:
+: ox-chameleon-generate-colourings
+
 * Email
 Currently handled through =mu4e=, works easy enough and I don't need too much out of email.
 
@@ -948,8 +1080,10 @@ Make =rls= the default
 Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-font (font-spec :family "Hasklug Nerd Font" :size 12)
-      doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 13))
+(setq doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 13)
+      doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 13)
+      doom-emoji-fallback-font-families nil
+      doom-symbol-fallback-font-families nil)
 #+END_SRC
 
 ** Theme
@@ -1040,4 +1174,28 @@ The last piece of Exodia. Now I can posframe everything for vague satisfation.
 #+begin_src emacs-lisp
 (when (getenv "EMACSLOADPATH")
   (mapc (lambda (p) (add-load-path! p)) (split-string (getenv "EMACSLOADPATH") ":")))
+#+end_src
+
+* MacOS
+Currently my primary platform, so we have to make sure everything works as expected.
+
+#+begin_src elisp
+(if (and (fboundp 'native-comp-available-p)
+         (native-comp-available-p))
+    (progn
+      (message "Native comp is available")
+      ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
+      ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
+      ;; Append to path to give priority to values from exec-path-from-shell-initialize.
+      (add-to-list 'exec-path (concat invocation-directory (file-name-as-directory "bin")) t)
+      (setenv "LIBRARY_PATH" (concat (getenv "LIBRARY_PATH")
+                                     (when (getenv "LIBRARY_PATH")
+                                       ":")
+                                     ;; This is where Homebrew puts libgccjit libraries.
+                                     (car (file-expand-wildcards
+                                           (expand-file-name (concat (shell-command-to-string "brew --prefix libgccjit") "/lib/gcc/*"))))))
+      ;; Only set after LIBRARY_PATH can find gcc libraries.
+      (setq comp-deferred-compilation t)
+      (setq comp-speed 3))
+  (message "Native comp is *not* available"))
 #+end_src
