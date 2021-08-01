@@ -29,11 +29,12 @@
 
        :completion
        (company +childframe); the ultimate code completion backend
+       (vertico +icons)
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (ivy +childframe
-            +prescient
-            +icons)                     ; a search engine for love and life
+       ;;(ivy +childframe
+       ;;     +prescient
+       ;;     +icons)                     ; a search engine for love and life
 
        :ui
        ;;deft              ; notational velocity for Emacs
@@ -45,7 +46,7 @@
        ;;fill-column     ; a `fill-column' indicator
        hl-todo            ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra
-       ;;indent-guides     ; highlighted indent columns
+       indent-guides     ; highlighted indent columns
        (ligatures +extra) ; ligatures and symbols to make your code pretty again
        ;; minimap           ; show a map of the code on the side
        modeline    ; snazzy, Atom-inspired modeline, plus API
@@ -54,13 +55,13 @@
        ophints           ; highlight the region an operation acts on
        (popup +defaults) ; tame sudden yet inevitable temporary windows
        ;; tabs              ; a tab bar for Emacs
-       treemacs          ; a project drawer, like neotree but cooler
+       (treemacs +lsp)          ; a project drawer, like neotree but cooler
        unicode           ; extended unicode support for various languages
        vc-gutter         ; vcs diff in the fringe
        ;; vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        (window-select +numbers)         ; visually switch windows
        workspaces       ; tab emulation, persistence & separate workspaces
-       ;;zen               ; distraction-free coding or writing
+       zen               ; distraction-free coding or writing
 
        :editor
        (evil +everywhere)               ; come to the dark side, we have cookies
@@ -77,8 +78,7 @@
        ;;word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
-       (dired +ranger
-              +icons)      ; making dired pretty [functional]
+       (dired +icons)      ; making dired pretty [functional]
        electric            ; smarter, keyword-based electric-indent
        ;; (ibuffer +icons) ; interactive buffer management
        (undo +tree)        ; persistent, smarter undo for your inevitable mistakes
@@ -103,9 +103,10 @@
        editorconfig      ; let someone else argue about tabs vs spaces
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)       ; run code, run (also, repls)
-       ;;gist              ; interacting with github gists
-       lookup                         ; navigate your code and its documentation
-       (lsp +peek)
+       gist              ; interacting with github gists
+       (lookup +docsets)                         ; navigate your code and its documentation
+       (lsp +peek
+            +eglot)
        (magit +forge)           ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
@@ -124,27 +125,28 @@
        :lang
        ;;agda              ; types of types of types of types...
        ;;cc                ; C/C++/Obj-C madness
-       (clojure +lsp)                   ; java with a lisp
+       ;; (clojure +lsp)                   ; java with a lisp
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
-       (csharp +lsp)            ; unity, .NET, and mono shenanigans
+       ;; (csharp +lsp)            ; unity, .NET, and mono shenanigans
        data                     ; config/data formats
-       ;;(dart +flutter)   ; paint ui and not much else
+       (dart +lsp
+             +flutter)   ; paint ui and not much else
        ;;elixir            ; erlang done right
        ;;elm               ; care for a cup of TEA?
        emacs-lisp                       ; drown in parentheses
        ;;erlang            ; an elegant language for a more civilized age
        ;;ess               ; emacs speaks statistics
        ;;faust             ; dsp, but you get to keep your soul
-       fsharp                           ; ML stands for Microsoft's Language
+       ;; fsharp                           ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
        ;;(go +lsp)         ; the hipster dialect
        ;; (haskell +dante)  ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        ;;idris             ; a language you can depend on
-       ;;json              ; At least it ain't XML
+       (json +lsp)              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
        (javascript +lsp)    ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
@@ -154,12 +156,14 @@
        ;;factor
        ;;ledger            ; an accounting system in Emacs
        ;;lua               ; one-based indices? one-based indices
-       ;;markdown          ; writing docs for people to ignore
+       (markdown +grip)          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
-       nix                              ; I hereby declare "nix geht mehr!"
+       ;; nix                              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org +dragndrop
             +hugo
+            +roam2
+            +pandoc
             +present
             +pretty)    ; organize your plain life in plain text
        (php +lsp)       ; perl's insecure younger brother
@@ -172,7 +176,7 @@
        rest                             ; Emacs as a REST client
        ;;rst               ; ReST in peace
        ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       (rust +lsp)          ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ;; (rust +lsp)          ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        scheme ; a fully conniving family of lisps
        sh     ; she sells {ba,z,fi}sh shells on the C xor
@@ -183,10 +187,11 @@
        (web +html
             +lsp
             +css)                       ; the tubes
-       ;;yaml              ; JSON, but readable
+       (yaml +lsp)              ; JSON, but readable
 
        :email
-       mu4e
+       (mu4e +gmail
+             +org)
        ;;notmuch
        ;;(wanderlust +gmail)
 

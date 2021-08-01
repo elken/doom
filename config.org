@@ -15,17 +15,16 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#setup][Setup]]
   - [[#workflow][Workflow]]
   - [[#exwm-setup][EXWM Setup]]
-    - [[#desktoporg][=desktop.org=]]
+    - [[#modulesuiexwm][modules/ui/exwm]]
     - [[#session][Session]]
-    - [[#startsh--start-debugsh][=start.sh= / =start-debug.sh=]]
+    - [[#startsh--start-debugsh][start.sh / start-debug.sh]]
 - [[#faq][FAQ]]
 - [[#globals][Globals]]
   - [[#constants-and-variables][Constants and Variables]]
   - [[#functions][Functions]]
   - [[#settings][Settings]]
-    - [[#dired][Dired]]
     - [[#evil][Evil]]
-      - [[#lispyville][Lispyville]]
+    - [[#lispyville][Lispyville]]
     - [[#better-defaults][Better defaults]]
     - [[#auth-info][Auth info]]
     - [[#modeline][Modeline]]
@@ -42,7 +41,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
       - [[#functions][Functions]]
 - [[#keybindings][Keybindings]]
   - [[#defaults][Defaults]]
-  - [[#swiper][Swiper]]
+  - [[#search][Search]]
   - [[#dired][Dired]]
 - [[#org-mode][Org Mode]]
   - [[#font-setup][Font setup]]
@@ -61,16 +60,21 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#visual-column-mode][Visual column mode]]
   - [[#org-make-toc][org-make-toc]]
   - [[#better-snippets][Better snippets]]
+  - [[#roam][Roam]]
   - [[#capture][Capture]]
     - [[#prettify][Prettify]]
     - [[#templates][Templates]]
   - [[#export][Export]]
     - [[#chameleon][Chameleon]]
 - [[#email][Email]]
+  - [[#sending-email][Sending email]]
   - [[#notifications][Notifications]]
 - [[#languages][Languages]]
   - [[#lsp][LSP]]
   - [[#rust][Rust]]
+  - [[#php][PHP]]
+    - [[#intelephense][Intelephense]]
+    - [[#eglot][Eglot]]
 - [[#graphical-setup][Graphical setup]]
   - [[#fonts][Fonts]]
   - [[#theme][Theme]]
@@ -79,10 +83,8 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#packages][Packages]]
   - [[#packagesel][=packages.el=]]
   - [[#rainbow-mode][Rainbow Mode]]
-  - [[#graphql-mode][Graphql-mode]]
   - [[#which-key-posframe][which-key-posframe]]
-- [[#guix][Guix]]
-- [[#macos][MacOS]]
+  - [[#prescient][prescient]]
 :END:
 
 * Setup
@@ -96,16 +98,22 @@ This is also focused around an exwm workflow (although as I use multiple systems
 [[file:images/overview.png]]
 
 ** EXWM Setup
-As mentioned above, the primary use for this config is =exwm= which is pulled from a number of files in the current environment. Loading =exwm= is quite simple, simply pass =--with-exwm= to the emacs call and everything will be loaded. The setting of this flag also loads any related configuration (ie transparency, which I don't normally care about outside of =exwm=)
+One of the many usecases for this config is =exwm= which is pulled from a number of files in the current environment. Loading =exwm= is a simple case of enabling the exwm module, although it's /wildly/ untested and is basically hardcoded to just work for me. Any input is welcome, although unlikely to make it into /this/ module (until I stop being lazy and attempt to make it better for upstream....)
 
-*** =desktop.org=
+*** modules/ui/exwm
 The primary lisp file where the bulk of the configuration is held, with everything from my process manager to a now-playing segment. Below are some usage screenshots.
+Standard doom module layout, nothing fishy going on. For those unfamiliar,
+
+ - =init.el= is loaded before anything else really, which is important to properly check if the flag exists to load the exwm code as early as possible
+ - =config.el= is the main bread and butter, all the config lives here (surprisingly)
+ - =doctor.el= is currently just used for detecting missing exe's, by plugging into =doom doctor=
+ - =packages.el= is a list of extra packages to be installed by doom's package manager
 
 [[file:images/kill-process.png]]
 
 [[file:images/tray.png]]
 
-Transparency is handled both through [[*GUI/Frame][Doom]] and via [[file:exwm/picom.conf][picom]]. The org file is tangled out to a =desktop.el= file to be later loaded by the aforementioned processes.
+Transparency is handled both through [[*GUI/Frame][Doom]] and via [[file:exwm/picom.conf][picom]].
 
 *** Session
 For the sake of simplicity, I use a slightly modified version of [[https://github.com/WJCFerguson/exwm-gnome-flashback][GNOME Flashback]] to run the startup scripts. It also gives me ootb access to things like =pinentry=, the various password stores, =gnome-screensaver= lock screen and the useful screenshot tool.
@@ -114,13 +122,15 @@ As such, everything is themed around [[https://nordtheme.com][Nord]].
 
 Over time and due to various issues, I have been migrating to a plain =exwm= session but I haven't yet settled on the best approach.
 
-*** =start.sh= / =start-debug.sh=
+*** start.sh / start-debug.sh
 The scripts responsible for starting up exwm in the right way, including env variables and picom.
 * FAQ
 None yet because luckily nobody else has seen this spaghetti junction
 * Globals
 ** Constants and Variables
 I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't think of one? Would have thought of one.
+
+Subword mode is a good start because PHP uses a lot of CamelCase and it makes refactoring slightly easier
 
 #+begin_src elisp
 (global-subword-mode 1)
@@ -130,6 +140,8 @@ I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't th
 Global functions used throughout. Some are more complex than others.
 
 Posframes by default don't work in exwm, so let's fix that by making sure they're centered.
+
+Now that I've moved to vertico, I'm quite enjoying the window being at the bottom so this will likely only stay for exwm.
 
 #+begin_src emacs-lisp
 (defun elken/posframe-poshandler (info)
@@ -151,14 +163,6 @@ Posframes by default don't work in exwm, so let's fix that by making sure they'r
 #+end_src
 
 ** Settings
-*** Dired
-Dired is very cool, and basically perfect out-of-the-box. We do however want ranger as the default.
-
-#+begin_src emacs-lisp
-(after! ranger
-  (setq ranger-override-dired 'ranger))
-#+end_src
-
 *** Evil
 I make a lot of splits, and it finally got annoying having to swap to them all the time. So, let's change that
 
@@ -167,7 +171,7 @@ I make a lot of splits, and it finally got annoying having to swap to them all t
       evil-vsplit-window-right t)
 #+end_src
 
-**** Lispyville
+*** Lispyville
 This structured-editing thing is apparently really neat, so let's see how we go
 
 #+begin_src emacs-lisp
@@ -204,8 +208,22 @@ Add plaintext authinfo file to the list of sources. I /know/ I should use a GPG 
 (add-to-list 'auth-sources "~/.authinfo")
 #+end_src
 
+Also useful to store passwords for later use.
+
+#+begin_src emacs-lisp
+(defun fetch-auth-source (&rest params)
+(require 'auth-source)
+  (let ((match (car (apply #'auth-source-search params))))
+    (if match
+        (let ((secret (plist-get match :secret)))
+          (if (functionp secret)
+              (funcall secret)
+            secret))
+      (error "Password not found for %S" params))))
+#+end_src
+
 *** Modeline
-Some niceties for the modeline (further config can be found in [[file:desktop.el][Desktop]])
+Some niceties for the modeline (further config can be found in [[file:modules/ui/exwm/config.el][EXWM Module]])
 
 #+begin_src emacs-lisp
 (after! doom-modeline
@@ -260,6 +278,8 @@ We use eshell in a cross platform world, so we should prefer the lisp version of
 
 Some config has to go here (so it's reloaded properly). Remove the posframe parent and ensure that it's properly centered in the workspace.
 
+Again, the relies on ivy which is no longer in use. If I ever go back to linux, this might be looked into but for now it's dead code
+
 #+begin_src emacs-lisp
 ;; Make posframes work in exwm
 ;; https://github.com/ch11ng/exwm/issues/550
@@ -279,25 +299,36 @@ Some config has to go here (so it's reloaded properly). Remove the posframe pare
 #+end_src
 
 *** User setup
-Use my name and emails for things like GPG, snippets, mail, magit, etc.
+Use my name and emails for things like GPG, snippets, mail, magit, etc. Differs based on which OS I'm on.
 
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Ellis Kenyő"
-      user-mail-address "me@elken.dev")
+      user-mail-address (if IS-MAC "ellis@coreblue.co.uk" "me@elken.dev"))
 #+END_SRC
 
 Email folders and setup. This might move to a new section if I start to use email seriously.
 
 #+begin_src emacs-lisp
-(set-email-account! "mail.elken.dev"
-                    '((mu4e-sent-folder       . "/mailbox/Sent Mail")
-                      (mu4e-drafts-folder     . "/mailbox/Drafts")
-                      (mu4e-trash-folder      . "/mailbox/Trash")
-                      (mu4e-refile-folder     . "/mailbox/All Mail")
-                      (smtpmail-smtp-user     . "me@elken.dev")
-                      (user-mail-address      . "me@elken.dev")    ;; only needed for mu < 1.4
-                      (mu4e-compose-signature . "Regards,\nelken"))
-                    t)
+(if IS-MAC
+    (set-email-account! "gmail"
+                        '((mu4e-sent-folder       . "/gmail/Sent Mail")
+                          (mu4e-drafts-folder     . "/gmail/Drafts")
+                          (mu4e-trash-folder      . "/gmail/Trash")
+                          (mu4e-refile-folder     . "/gmail/All Mail")
+                          (smtpmail-smtp-user     . "ellis@coreblue.co.uk")
+                          (user-mail-address      . "ellis@coreblue.co.uk")) ;; only needed for mu < 1.4
+                        t)
+  (set-email-account! "mail.elken.dev"
+                      '((mu4e-sent-folder       . "/mailbox/Sent Mail")
+                        (mu4e-drafts-folder     . "/mailbox/Drafts")
+                        (mu4e-trash-folder      . "/mailbox/Trash")
+                        (mu4e-refile-folder     . "/mailbox/All Mail")
+                        (smtpmail-smtp-user     . "me@elken.dev")
+                        (user-mail-address      . "me@elken.dev") ;; only needed for mu < 1.4
+                        (mu4e-compose-signature . "Regards,\nelken"))
+                      t))
+
+(setq +mu4e-gmail-accounts '(("ellis@coreblue.co.uk" . "/gmail")))
 #+end_src
 
 *** Server
@@ -306,7 +337,8 @@ Start a server (if not running already)
 #+begin_src emacs-lisp
 (after! server
   (when (not (server-running-p))
-    (server-start)))
+    (server-start)
+    (mu4e)))
 #+end_src
 
 *** vterm
@@ -347,11 +379,11 @@ Back to a simpler time...
 (map! :g "C-s" #'save-buffer)
 #+end_src
 
-** Swiper
-Swiper is /much/ better than isearch
+** Search
++Swiper+ Consult is /much/ better than isearch
 
 #+begin_src emacs-lisp
-(map! :after evil :gnvi "C-f" #'swiper)
+(map! :after evil :gnvi "C-f" #'consult-line)
 #+end_src
 
 ** Dired
@@ -368,6 +400,12 @@ Dired should behave better with evil mappings
 
 #+begin_src emacs-lisp
 (add-hook! org-mode #'(elken/org-mode-setup elken/org-font-setup))
+#+end_src
+
+Let's set a sane default directory based on where I am
+
+#+begin_src emacs-lisp
+(setq org-directory (if IS-MAC "/Volumes/me@elken.dev/org" "~/org"))
 #+end_src
 
 ** Font setup
@@ -571,14 +609,9 @@ Auto reload config on save (both =config.org= and =init.el=)
                (string-equal
                 (buffer-file-name)
                 (expand-file-name s doom-private-dir)))
-             elken/reload-files) (doom/reload))
-   ((cl-some (lambda (s)
-               (string-equal
-                (buffer-file-name)
-                (expand-file-name s doom-private-dir)))
-             elken/extra-org-files) (let ((org-confirm-babel-evaluate nil))
-             (org-babel-tangle)))))
-
+             elken/reload-files)
+    (doom/reload))))
+(add-hook! 'doom-after-reload-hook (doom-load-envvars-file "~/.emacs.d/.local/env" t))
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'elken/doom-reload-on-save)))
 #+end_src
 
@@ -694,6 +727,13 @@ Programmers are, by design, lazy
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
 
+** Roam
+Let's jump on the bandwagon and start taking useful notes.
+
+#+begin_src emacs-lisp
+(setq org-roam-directory (expand-file-name "roam" org-directory))
+#+end_src
+
 ** Capture
 It's about time I start using =org-capture=, but because I'm a developer I'm inhernetly lazy so time to steal from other people.
 
@@ -701,6 +741,7 @@ Useful wrapper package for creating more declarative templates
 #+begin_src emacs-lisp :tangle packages.el
 (package! doct)
 #+end_src
+
 #+begin_src emacs-lisp
 (use-package! doct
   :commands (doct))
@@ -1026,27 +1067,40 @@ Attempt to improve default PDF export by using the current theme
                                 0.95))))))
 #+end_src
 
-#+RESULTS:
-: ox-chameleon-generate-colourings
-
 * Email
 Currently handled through =mu4e=, works easy enough and I don't need too much out of email.
 
 Set the interval to a sensible timeout (10 minutes is plenty)
 #+begin_src emacs-lisp
-(setq mu4e-update-interval 600)
+(setq mu4e-update-interval 300)
+#+end_src
+
+Improve performance as we only use gmail here.
+
+#+begin_src emacs-lisp
+;; don't need to run cleanup after indexing for gmail
+(setq mu4e-index-cleanup nil
+      ;; because gmail uses labels as folders we can use lazy check since
+      ;; messages don't really "move"
+      mu4e-index-lazy-check t)
+#+end_src
+
+** Sending email
+Handled via =msmtp=, mostly because teco said so. We don't question teco.
+
+#+begin_src emacs-lisp
+(setq sendmail-program "/opt/homebrew/bin/msmtp"
+        send-mail-function #'smtpmail-send-it
+        message-sendmail-f-is-evil t
+        message-sendmail-extra-arguments '("--read-envelope-from")
+        message-send-mail-function #'message-send-mail-with-sendmail)
 #+end_src
 
 ** Notifications
 Notifications are quite nifty, especially if I'm as lazy as I am
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! mu4e-alert)
-#+end_src
-
-#+begin_src emacs-lisp
-(mu4e-alert-set-default-style 'libnotify)
-(add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+(setq alert-default-style 'osx-notifier)
 #+end_src
 
 * Languages
@@ -1067,12 +1121,61 @@ And some more for projectile
   (add-to-list 'projectile-globally-ignored-directories "vendor"))
 #+end_src
 
+The default completions are quite bad
+
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (setq +lsp-company-backends
+        '(:separate company-capf company-yasnippet)))
+#+end_src
+
 ** Rust
 Make =rls= the default
 
 #+begin_src emacs-lisp
 (after! rustic
   (setq rustic-lsp-server 'rls))
+#+end_src
+
+** PHP
+*** Intelephense
+Because I'm a massive sellout who likes features
+
+#+begin_src emacs-lisp
+(setq lsp-intelephense-licence-key (fetch-auth-source :user "intelephense"))
+#+end_src
+
+*** Eglot
+Trying out this eglot thing for a bit, let's see how it goes.
+
+Make sure it's loaded in php-mode
+
+#+begin_src emacs-lisp
+(when (featurep! :tools lsp +eglot)
+  (after! eglot
+    (add-hook 'php-mode-hook 'eglot-ensure)))
+#+end_src
+
+Set some config needed for the server
+
+#+begin_src emacs-lisp
+(when (featurep! :tools lsp +eglot)
+  (defvar php-intelephense-storage-path (expand-file-name "lsp-intelephense" doom-etc-dir))
+  (defvar php-intelephense-command (expand-file-name "lsp/npm/intelephense/bin/intelephense" doom-etc-dir)))
+#+end_src
+
+And set the server to be loaded
+
+#+begin_src emacs-lisp
+(when (featurep! :tools lsp +eglot)
+  (after! eglot
+    (defclass eglot-php (eglot-lsp-server) () :documentation "PHP's Intelephense")
+    (cl-defmethod eglot-initialization-options ((server eglot-php))
+      "Passes through required intelephense options"
+      `(:storagePath ,php-intelephense-storage-path
+        :licenceKey ,lsp-intelephense-licence-key
+        :clearCache t))
+    (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio"))))))
 #+end_src
 
 * Graphical setup
@@ -1093,6 +1196,25 @@ Load my current flavour-of-the-month colour scheme.
 #+BEGIN_SRC emacs-lisp
 (setq doom-theme 'doom-nord)
 #+END_SRC
+
+Along with a few face overrides (thought about merging upstream but it would have sparked a discussion, maybe later)
+
+#+begin_src emacs-lisp
+(when `(= ,doom-theme 'doom-nord)
+  (custom-set-faces!
+    `(php-class :foreground ,(doom-color 'blue))
+    `(php-php-tag :foreground ,(doom-color 'blue))
+    `(php-constant :foreground ,(doom-color 'violet))
+    `(php-magical-constant :foreground ,(doom-color 'orange))
+    `(php-operator :foreground ,(doom-color 'blue))
+    `(php-doc-$this :foreground ,(doom-color 'cyan))
+    `(php-object-op :foreground ,(doom-color 'cyan))
+    `(php-string-op :foreground ,(doom-color 'blue))
+    `(php-static-method-call :foreground ,(doom-color 'magenta))
+    `(php-method-call :foreground ,(doom-color 'magenta))
+    `(php-function-name :foreground ,(doom-lighten 'magenta 0.3))
+    ))
+#+end_src
 
 Change the default banner (need to add the ASCII banner at some point)
 
@@ -1134,13 +1256,12 @@ Tangle this into the packages.el file. Removes the need for it.
 
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! rainbow-mode)
-(package! graphql-mode)
 (package! which-key-posframe)
 #+END_SRC
 
 ** Rainbow Mode
 
-Colouring parentheses so I don't get confused by the scary lisp dialects.
+Shows colours as colours, like #fe132a
 
 #+BEGIN_SRC emacs-lisp
 (use-package! rainbow-mode
@@ -1148,13 +1269,6 @@ Colouring parentheses so I don't get confused by the scary lisp dialects.
     (prog-mode . rainbow-mode)
     (text-mode . rainbow-mode))
 #+END_SRC
-
-** Graphql-mode
-Used for displaying graphql queries nicely & sending.
-
-#+begin_src emacs-lisp
-(use-package! graphql-mode)
-#+end_src
 
 ** which-key-posframe
 The last piece of Exodia. Now I can posframe everything for vague satisfation.
@@ -1170,32 +1284,16 @@ The last piece of Exodia. Now I can posframe everything for vague satisfation.
             which-key-posframe-poshandler #'elken/posframe-poshandler)))
 #+end_src
 
-* Guix
-#+begin_src emacs-lisp
-(when (getenv "EMACSLOADPATH")
-  (mapc (lambda (p) (add-load-path! p)) (split-string (getenv "EMACSLOADPATH") ":")))
+** prescient
+Need to add this into company module when I've tested
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! company-prescient)
 #+end_src
 
-* MacOS
-Currently my primary platform, so we have to make sure everything works as expected.
-
-#+begin_src elisp
-(if (and (fboundp 'native-comp-available-p)
-         (native-comp-available-p))
-    (progn
-      (message "Native comp is available")
-      ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
-      ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
-      ;; Append to path to give priority to values from exec-path-from-shell-initialize.
-      (add-to-list 'exec-path (concat invocation-directory (file-name-as-directory "bin")) t)
-      (setenv "LIBRARY_PATH" (concat (getenv "LIBRARY_PATH")
-                                     (when (getenv "LIBRARY_PATH")
-                                       ":")
-                                     ;; This is where Homebrew puts libgccjit libraries.
-                                     (car (file-expand-wildcards
-                                           (expand-file-name (concat (shell-command-to-string "brew --prefix libgccjit") "/lib/gcc/*"))))))
-      ;; Only set after LIBRARY_PATH can find gcc libraries.
-      (setq comp-deferred-compilation t)
-      (setq comp-speed 3))
-  (message "Native comp is *not* available"))
+#+begin_src emacs-lisp
+(use-package! company-prescient
+  :config
+  (after! company
+    (company-prescient-mode)))
 #+end_src
