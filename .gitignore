@@ -20,3 +20,4 @@ custom.el
 /README.org
 
 .env*
+.DS_Store

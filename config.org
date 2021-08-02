@@ -21,7 +21,6 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[#faq][FAQ]]
 - [[#globals][Globals]]
   - [[#constants-and-variables][Constants and Variables]]
-  - [[#functions][Functions]]
   - [[#settings][Settings]]
     - [[#evil][Evil]]
     - [[#lispyville][Lispyville]]
@@ -32,12 +31,11 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[#eshell][EShell]]
       - [[#prompt][Prompt]]
       - [[#settings][Settings]]
-    - [[#exwm][EXWM]]
     - [[#user-setup][User setup]]
     - [[#server][Server]]
     - [[#vterm][vterm]]
       - [[#kill-buffer][Kill buffer]]
-      - [[#fix-c-backspace][Fix =c-backspace=]]
+      - [[#fix-c-backspace][Fix c-backspace]]
       - [[#functions][Functions]]
 - [[#keybindings][Keybindings]]
   - [[#defaults][Defaults]]
@@ -81,9 +79,6 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
 - [[#packages][Packages]]
-  - [[#packagesel][=packages.el=]]
-  - [[#rainbow-mode][Rainbow Mode]]
-  - [[#which-key-posframe][which-key-posframe]]
   - [[#prescient][prescient]]
 :END:
 
@@ -134,32 +129,6 @@ Subword mode is a good start because PHP uses a lot of CamelCase and it makes re
 
 #+begin_src elisp
 (global-subword-mode 1)
-#+end_src
-
-** Functions
-Global functions used throughout. Some are more complex than others.
-
-Posframes by default don't work in exwm, so let's fix that by making sure they're centered.
-
-Now that I've moved to vertico, I'm quite enjoying the window being at the bottom so this will likely only stay for exwm.
-
-#+begin_src emacs-lisp
-(defun elken/posframe-poshandler (info)
-  "Handler to place posframe in the correct area in exwm."
-  (if (not (featurep 'exwm)) (posframe-poshandler-frame-center info)
-    (let* ((workarea (elt exwm-workspace--workareas exwm-workspace-current-index))
-           (x (aref workarea 0))
-           (y (aref workarea 1))
-
-           (fw (aref workarea 2))
-           (fh (aref workarea 3))
-
-           (pw (plist-get info :posframe-width))
-           (ph (plist-get info :posframe-height)))
-
-      (cons
-       (+ x (/ (- fw pw) 2))
-       (+ y (/ (- fh ph) 2))))))
 #+end_src
 
 ** Settings
@@ -272,30 +241,6 @@ We use eshell in a cross platform world, so we should prefer the lisp version of
 
 #+begin_src emacs-lisp
 (setq eshell-prefer-lisp-functions t)
-#+end_src
-
-*** EXWM
-
-Some config has to go here (so it's reloaded properly). Remove the posframe parent and ensure that it's properly centered in the workspace.
-
-Again, the relies on ivy which is no longer in use. If I ever go back to linux, this might be looked into but for now it's dead code
-
-#+begin_src emacs-lisp
-;; Make posframes work in exwm
-;; https://github.com/ch11ng/exwm/issues/550
-(after! (ivy-posframe exwm)
-  :config
-  (defun +ivy-posframe-display-exwm (str)
-    (ivy-posframe--display str #'elken/posframe-poshandler))
-  ;; force set frame-position on every posframe display
-  (advice-add 'posframe--set-frame-position :before
-              (lambda (&rest args)
-                (setq-local posframe--last-posframe-pixel-position nil)))
-  (setq ivy-posframe-display-functions-alist
-        '((t . +ivy-posframe-display-exwm))
-
-        ivy-posframe-parameters '((parent-frame nil)
-                                  (z-group . above))))
 #+end_src
 
 *** User setup
@@ -1151,9 +1096,8 @@ Trying out this eglot thing for a bit, let's see how it goes.
 Make sure it's loaded in php-mode
 
 #+begin_src emacs-lisp
-(when (featurep! :tools lsp +eglot)
-  (after! eglot
-    (add-hook 'php-mode-hook 'eglot-ensure)))
+(after! eglot
+  (add-hook 'php-mode-hook 'eglot-ensure))
 #+end_src
 
 Set some config needed for the server
@@ -1167,15 +1111,14 @@ Set some config needed for the server
 And set the server to be loaded
 
 #+begin_src emacs-lisp
-(when (featurep! :tools lsp +eglot)
-  (after! eglot
-    (defclass eglot-php (eglot-lsp-server) () :documentation "PHP's Intelephense")
-    (cl-defmethod eglot-initialization-options ((server eglot-php))
-      "Passes through required intelephense options"
-      `(:storagePath ,php-intelephense-storage-path
-        :licenceKey ,lsp-intelephense-licence-key
-        :clearCache t))
-    (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio"))))))
+(after! eglot
+  (defclass eglot-php (eglot-lsp-server) () :documentation "PHP's Intelephense")
+  (cl-defmethod eglot-initialization-options ((server eglot-php))
+    "Passes through required intelephense options"
+    `(:storagePath ,php-intelephense-storage-path
+      :licenceKey ,lsp-intelephense-licence-key
+      :clearCache t))
+  (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio")))))
 #+end_src
 
 * Graphical setup
@@ -1200,20 +1143,18 @@ Load my current flavour-of-the-month colour scheme.
 Along with a few face overrides (thought about merging upstream but it would have sparked a discussion, maybe later)
 
 #+begin_src emacs-lisp
-(when `(= ,doom-theme 'doom-nord)
-  (custom-set-faces!
-    `(php-class :foreground ,(doom-color 'blue))
-    `(php-php-tag :foreground ,(doom-color 'blue))
-    `(php-constant :foreground ,(doom-color 'violet))
-    `(php-magical-constant :foreground ,(doom-color 'orange))
-    `(php-operator :foreground ,(doom-color 'blue))
-    `(php-doc-$this :foreground ,(doom-color 'cyan))
-    `(php-object-op :foreground ,(doom-color 'cyan))
-    `(php-string-op :foreground ,(doom-color 'blue))
-    `(php-static-method-call :foreground ,(doom-color 'magenta))
-    `(php-method-call :foreground ,(doom-color 'magenta))
-    `(php-function-name :foreground ,(doom-lighten 'magenta 0.3))
-    ))
+(custom-theme-set-faces! 'doom-nord
+  `(php-class :foreground ,(doom-color 'blue))
+  `(php-php-tag :foreground ,(doom-color 'blue))
+  `(php-constant :foreground ,(doom-color 'violet))
+  `(php-magical-constant :foreground ,(doom-color 'orange))
+  `(php-operator :foreground ,(doom-color 'blue))
+  `(php-doc-$this :foreground ,(doom-color 'cyan))
+  `(php-object-op :foreground ,(doom-color 'cyan))
+  `(php-string-op :foreground ,(doom-color 'blue))
+  `(php-static-method-call :foreground ,(doom-color 'magenta))
+  `(php-method-call :foreground ,(doom-color 'magenta))
+  `(php-function-name :foreground ,(doom-lighten 'magenta 0.3)))
 #+end_src
 
 Change the default banner (need to add the ASCII banner at some point)
@@ -1251,39 +1192,6 @@ Add some transparency
 
 * Packages
 
-** =packages.el=
-Tangle this into the packages.el file. Removes the need for it.
-
-#+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! rainbow-mode)
-(package! which-key-posframe)
-#+END_SRC
-
-** Rainbow Mode
-
-Shows colours as colours, like #fe132a
-
-#+BEGIN_SRC emacs-lisp
-(use-package! rainbow-mode
-    :hook
-    (prog-mode . rainbow-mode)
-    (text-mode . rainbow-mode))
-#+END_SRC
-
-** which-key-posframe
-The last piece of Exodia. Now I can posframe everything for vague satisfation.
-
-#+begin_src emacs-lisp
-
-  (use-package! which-key-posframe
-    :config
-    (which-key-posframe-mode)
-    (after! exwm
-      (setq which-key-posframe-parameters '((parent-frame nil)
-                                            (z-group . above))
-            which-key-posframe-poshandler #'elken/posframe-poshandler)))
-#+end_src
-
 ** prescient
 Need to add this into company module when I've tested
 
@@ -1294,6 +1202,8 @@ Need to add this into company module when I've tested
 #+begin_src emacs-lisp
 (use-package! company-prescient
   :config
-  (after! company
-    (company-prescient-mode)))
+  :hook (company-mode . company-prescient-mode)
+  :hook (company-prescient-mode . prescient-persist-mode)
+  :config
+  (setq prescient-save-file (concat doom-cache-dir "prescient-save.el")))
 #+end_src
