@@ -21,3 +21,5 @@ custom.el
 
 .env*
 .DS_Store
+*.tex
+*.pdf
