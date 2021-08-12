@@ -1,4 +1,5 @@
 #+TITLE: Config
+#+LATEX_CLASS: chameleon
 #+CAPTION: Banner
 [[file:images/banner.png]]
 
@@ -1158,7 +1159,6 @@ This is done according to `org-latex-feature-implementations'"
     (if snippets-p header
       (concat header
               (org-latex-generate-features-preamble (org-latex-detect-features nil info--tmp))
-              (ox-chameleon-generate-colourings)
               "\n"))))
 #+end_src
 
@@ -1428,6 +1428,7 @@ Attempt to improve default PDF export by using the current theme
     (setq ox-chameleon--p (when (equal (plist-get info :latex-class)
                                        "chameleon")
                             (plist-put info :latex-class ox-chameleon-base-class)
+                            (setq engrave-faces-preset-styles (engrave-faces-generate-preset))
                             t))
     (funcall orig-fun info))
 
@@ -1545,7 +1546,7 @@ Attempt to improve default PDF export by using the current theme
                     (face-attribute 'org-code :foreground)
                     (face-attribute 'org-verbatim :foreground)
                     ;;
-                    (face-attribute 'default :background)
+                    (face-attribute 'org-block :background)
                     (doom-blend (face-attribute 'default :background)
                                 (face-attribute 'default :foreground)
                                 0.95))))))
