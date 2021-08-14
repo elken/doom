@@ -21,6 +21,8 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[FAQ][FAQ]]
 - [[Globals][Globals]]
   - [[Constants and Variables][Constants and Variables]]
+    - [[Subword-mode][Subword-mode]]
+    - [[Load env after reload][Load env after reload]]
   - [[Settings][Settings]]
     - [[Evil][Evil]]
     - [[Lispyville][Lispyville]]
@@ -42,6 +44,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
   - [[Search][Search]]
   - [[Dired][Dired]]
 - [[Graphical setup][Graphical setup]]
+  - [[Modeline][Modeline]]
   - [[Fonts][Fonts]]
   - [[Theme][Theme]]
   - [[Line Numbers][Line Numbers]]
@@ -125,10 +128,18 @@ None yet because luckily nobody else has seen this spaghetti junction
 ** Constants and Variables
 I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't think of one? Would have thought of one.
 
+*** Subword-mode
 Subword mode is a good start because PHP uses a lot of CamelCase and it makes refactoring slightly easier
 
 #+begin_src elisp
 (global-subword-mode 1)
+#+end_src
+
+*** Load env after reload
+Most of the time, reloading breaks. So, let's not break.
+
+#+begin_src emacs-lisp
+(add-hook! 'doom-after-reload-hook (doom-load-envvars-file (expand-file-name "env" doom-local-dir) t))
 #+end_src
 
 ** Settings
@@ -341,6 +352,19 @@ Dired should behave better with evil mappings
 #+end_src
 
 * Graphical setup
+** Modeline
+Default modeline is a tad cluttered, and because I don't use exwm anymore the
+modeline from that module isn't in use. So, it's duplicated here and tweaked.
+
+#+begin_src emacs-lisp
+(after! doom-modeline
+  (setq all-the-icons-scale-factor 1.1
+        doom-modeline-buffer-file-name-style 'relative-to-project
+        doom-modeline-vcs-max-length 20)
+  (doom-modeline-def-modeline 'main
+    '(bar workspace-name window-number modals persp-name buffer-info matches remote-host github debug)
+    '(vcs github mu4e grip gnus checker misc-info repl lsp " ")))
+#+end_src
 ** Fonts
 Configure the fonts across all used platforms (slightly different names).
 
