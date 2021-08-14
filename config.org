@@ -361,6 +361,7 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
   (setq all-the-icons-scale-factor 1.1
         doom-modeline-buffer-file-name-style 'relative-to-project
         doom-modeline-vcs-max-length 20)
+  (size-indication-mode -1)
   (doom-modeline-def-modeline 'main
     '(bar workspace-name window-number modals persp-name buffer-info matches remote-host github debug)
     '(vcs github mu4e grip gnus checker misc-info repl lsp " ")))
