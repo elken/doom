@@ -28,7 +28,6 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[Lispyville][Lispyville]]
     - [[Better defaults][Better defaults]]
     - [[Auth info][Auth info]]
-    - [[Modeline][Modeline]]
     - [[Magit][Magit]]
     - [[EShell][EShell]]
       - [[Prompt][Prompt]]
@@ -202,15 +201,6 @@ Also useful to store passwords for later use.
       (error "Password not found for %S" params))))
 #+end_src
 
-*** Modeline
-Some niceties for the modeline (further config can be found in [[file:modules/ui/exwm/config.el][EXWM Module]])
-
-#+begin_src emacs-lisp
-(after! doom-modeline
-  (setq doom-modeline-major-mode-icon t
-        doom-modeline-major-mode-color-icon t))
-#+end_src
-
 *** Magit
 Show gravatars where possible
 
@@ -359,8 +349,11 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
 #+begin_src emacs-lisp
 (after! doom-modeline
   (setq all-the-icons-scale-factor 1.1
+        doom-modeline-major-mode-icon (display-graphic-p)
+        doom-modeline-major-mode-color-icon (display-graphic-p)
         doom-modeline-buffer-file-name-style 'relative-to-project
-        doom-modeline-vcs-max-length 20)
+        doom-modeline-vcs-max-length 20
+        size-indication-mode nil)
   (size-indication-mode -1)
   (doom-modeline-def-modeline 'main
     '(bar workspace-name window-number modals persp-name buffer-info matches remote-host github debug)
