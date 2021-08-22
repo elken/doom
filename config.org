@@ -100,11 +100,13 @@ be commented to the best of /my/ ability.
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
   - [[#php][PHP]]
+    - [[#module-improvements][Module improvements]]
     - [[#intelephense][Intelephense]]
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
   - [[#laravel-mode][laravel-mode]]
   - [[#prescient][prescient]]
+  - [[#rainbow-identifiers][Rainbow Identifiers]]
 
 * Setup
 ** Workflow
@@ -510,9 +512,8 @@ for documentation and organisation.
 (use-package! org
   :defer t
   :hook (org-mode . org-indent-mode)
-  :hook (org-mode . visual-line-mode))
-
-(add-hook! org-mode #'elken/org-font-setup)
+  :hook (org-mode . visual-line-mode)
+  :hook (org-mode . elken/org-font-setup))
 #+end_src
 
 ** org-directory
@@ -1672,6 +1673,46 @@ And some more for projectile
 #+end_src
 
 ** PHP
+*** Module improvements
+Adding here until [[https://github.com/hlissner/doom-emacs/pull/5292][#5292]] is merged.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! composer)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! composer
+  :defer t
+  :init
+  (map! :after php-mode
+        :localleader
+        :map php-mode-map
+        :prefix ("c" . "composer")
+        "c" #'composer
+        "i" #'composer-install
+        "r" #'composer-require
+        "u" #'composer-update
+        "d" #'composer-dump-autoload
+        "s" #'composer-run-script
+        "v" #'composer-run-vendor-bin-command
+        "o" #'composer-find-json-file
+        "l" #'composer-view-lock-file))
+#+end_src
+
+#+begin_src emacs-lisp
+(defvar +php/default-docker-container "php-fpm"
+  "The default docker container to run commands in")
+
+(def-project-mode! +phpunit-docker-compose-mode
+  :modes '(php-mode docker-compose-mode)
+  :files (and "phpunit.xml" "docker-compose.yml")
+  :on-enter
+  (setq phpunit-args `("exec" ,+php/default-docker-container "php" "vendor/bin/phpunit")
+        phpunit-executable (executable-find "docker-compose")))
+
+(add-hook 'php-mode-hook #'rainbow-delimiters-mode)
+#+end_src
+
 *** Intelephense
 Because I'm a massive sellout who likes features
 
@@ -1680,6 +1721,7 @@ Because I'm a massive sellout who likes features
 #+end_src
 
 * Packages
+Place to put packages that don't have a guaranteed home yet.
 
 ** Disabled/unpin
 Packages to be unpinned or just completely disabled
@@ -1722,4 +1764,20 @@ Need to add this into company module when I've tested
   :hook (company-prescient-mode . prescient-persist-mode)
   :config
   (setq prescient-save-file (concat doom-cache-dir "prescient-save.el")))
+#+end_src
+
+** Rainbow Identifiers
+#+begin_src emacs-lisp :tangle packages.el
+(package! rainbow-identifiers)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! rainbow-identifiers
+  :hook (prog-mode . rainbow-identifiers-mode)
+  :hook (org-mode . (lambda () (rainbow-identifiers-mode -1)))
+  :config
+  (setq rainbow-identifiers-faces-to-override
+        '(php-variable-name
+          php-property-name
+          php-variable-sigil)))
 #+end_src
