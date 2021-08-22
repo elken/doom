@@ -478,6 +478,11 @@ Often jump back and forth between wanting this and not.
 
 #+begin_src emacs-lisp
 (after! centaur-tabs
+  (dolist (mode '(term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook
+                  magit-diff-mode-hook))
+    (add-hook mode 'centaur-tabs-local-mode))
   (defun centaur-tabs-buffer-groups ()
     "`centaur-tabs-buffer-groups' control buffers' group rules.
 
