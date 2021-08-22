@@ -55,6 +55,7 @@ be commented to the best of /my/ ability.
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
+  - [[#tabs][Tabs]]
 - [[#org-mode][Org Mode]]
   - [[#hook-setup][Hook setup]]
   - [[#org-directory][org-directory]]
@@ -96,9 +97,12 @@ be commented to the best of /my/ ability.
       - [[#chameleon][Chameleon]]
 - [[#languages][Languages]]
   - [[#lsp][LSP]]
+    - [[#improve-completions][Improve completions]]
+    - [[#ignore-directories][Ignore directories]]
   - [[#php][PHP]]
     - [[#intelephense][Intelephense]]
 - [[#packages-1][Packages]]
+  - [[#disabledunpin][Disabled/unpin]]
   - [[#laravel-mode][laravel-mode]]
   - [[#prescient][prescient]]
 
@@ -376,6 +380,7 @@ Inhibit the menu to improve things slightly
 
 #+begin_src emacs-lisp
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-footer)
 #+end_src
 
 ** Modeline
@@ -467,6 +472,34 @@ Add some transparency
   (add-to-list 'default-frame-alist '(alpha . 90)))
 #+end_src
 
+** Tabs
+Often jump back and forth between wanting this and not.
+
+#+begin_src emacs-lisp
+(after! centaur-tabs
+  (defun centaur-tabs-buffer-groups ()
+    "`centaur-tabs-buffer-groups' control buffers' group rules.
+
+    Group centaur-tabs with mode if buffer is derived from `eshell-mode'
+    `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+    All buffer name start with * will group to \"Emacs\".
+    Other buffer group by `centaur-tabs-get-group-name' with project name."
+    (list
+     (cond
+      ((or (string-equal "*" (substring (buffer-name) 0 1))
+           (memq major-mode '(magit-process-mode
+                              magit-status-mode
+                              magit-diff-mode
+                              magit-log-mode
+                              magit-file-mode
+                              magit-blob-mode
+                              magit-blame-mode)))
+       "Emacs")
+      ((derived-mode-p 'eshell-mode) "EShell")
+      ((derived-mode-p 'dired-mode) "Dired")
+      (t (centaur-tabs-get-group-name (current-buffer)))))))
+#+end_src
+
 * Org Mode
 ** Hook setup
 =org-mode= is a wonderful thing, and far too complex to bury in another section.
@@ -475,6 +508,7 @@ for documentation and organisation.
 
 #+begin_src emacs-lisp
 (use-package! org
+  :defer t
   :hook (org-mode . org-indent-mode)
   :hook (org-mode . visual-line-mode))
 
@@ -609,6 +643,7 @@ proper value.
 
 #+begin_src emacs-lisp
 (use-package! org-appear
+  :after org
   :hook (org-mode . org-appear-mode)
   :config
   (setq org-appear-autoemphasis t
@@ -627,6 +662,7 @@ Enable =variable-pitch-mode= to enable the more readable fonts where it makes se
 
 #+begin_src emacs-lisp
 (use-package! org-variable-pitch
+  :after org
   :hook (org-mode . variable-pitch-mode)
   :hook (after-init-hook . org-variable-pitch-setup))
 #+end_src
@@ -700,7 +736,8 @@ Testing out weblorg, might encourage me to finally finish my site revamp...
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! weblorg)
+(use-package! weblorg
+  :after org)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -755,6 +792,7 @@ Then we define a setup function
 
 #+BEGIN_SRC emacs-lisp
 (use-package! visual-fill-column
+  :after org
   :hook (org-mode . visual-fill-column-mode)
   :config
   (setq visual-fill-column-width 200
@@ -789,6 +827,7 @@ Useful wrapper package for creating more declarative templates
 
 #+begin_src emacs-lisp
 (use-package! doct
+  :defer t
   :commands (doct))
 #+end_src
 
@@ -1608,6 +1647,16 @@ Attempt to improve default PDF export by using the current theme
 Configuration for various programming languages.
 
 ** LSP
+*** Improve completions
+The default completions are quite bad
+
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (setq +lsp-company-backends
+        '(:separate company-capf company-yasnippet)))
+#+end_src
+
+*** Ignore directories
 Add some extra ignored directories for =+lsp=.
 
 #+begin_src emacs-lisp
@@ -1632,6 +1681,14 @@ Because I'm a massive sellout who likes features
 
 * Packages
 
+** Disabled/unpin
+Packages to be unpinned or just completely disabled
+
+#+begin_src emacs-lisp :tangle packages.el
+(unpin! doom-modeline)
+(disable-packages! company-dict)
+#+end_src
+
 ** laravel-mode
 Not yet fit for human consumption, but fit for mine because I'm +sub+ super-human
 
@@ -1643,6 +1700,7 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
 
 #+begin_src emacs-lisp
 (use-package! laravel-tinker
+  :after php-mode
   :init
   (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :ttl nil)
   (map! :localleader
@@ -1659,7 +1717,7 @@ Need to add this into company module when I've tested
 
 #+begin_src emacs-lisp
 (use-package! company-prescient
-  :config
+  :after company
   :hook (company-mode . company-prescient-mode)
   :hook (company-prescient-mode . prescient-persist-mode)
   :config
