@@ -5,92 +5,102 @@
 
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
 
-Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original; snippets from stackoverflow, modernemacs and a large amount of the fancy macros from [[https://github.com/daviwil][David Wilson]]. Everything else will be commented to the best of /my/ ability.
+Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most of it isn't particularly original; snippets
+from stackoverflow, modernemacs, [[https://github.com/daviwil][David Wilson]] and [[https://github.com/tecosaur][Tecosaur]]. Everything else will
+be commented to the best of /my/ ability.
 
-* Table of Contents
-:PROPERTIES:
-:TOC:      :include all :ignore this
-:END:
-:CONTENTS:
-- [[Setup][Setup]]
-  - [[Workflow][Workflow]]
-  - [[EXWM Setup][EXWM Setup]]
-    - [[modules/ui/exwm][modules/ui/exwm]]
-    - [[Session][Session]]
-    - [[start.sh / start-debug.sh][start.sh / start-debug.sh]]
-- [[FAQ][FAQ]]
-- [[Globals][Globals]]
-  - [[Constants and Variables][Constants and Variables]]
-    - [[Lexical binding][Lexical binding]]
-    - [[Subword-mode][Subword-mode]]
-    - [[Load env after reload][Load env after reload]]
-  - [[Settings][Settings]]
-    - [[Evil][Evil]]
-    - [[Lispyville][Lispyville]]
-    - [[Better defaults][Better defaults]]
-    - [[Auth info][Auth info]]
-    - [[Magit][Magit]]
-    - [[EShell][EShell]]
-      - [[Prompt][Prompt]]
-      - [[Settings][Settings]]
-    - [[User setup][User setup]]
-    - [[Server][Server]]
-    - [[vterm][vterm]]
-      - [[Kill buffer][Kill buffer]]
-      - [[Fix =c-backspace=][Fix c-backspace]]
-      - [[Functions][Functions]]
-- [[Keybindings][Keybindings]]
-  - [[Defaults][Defaults]]
-  - [[Search][Search]]
-  - [[Dired][Dired]]
-- [[Graphical setup][Graphical setup]]
-  - [[Modeline][Modeline]]
-  - [[Fonts][Fonts]]
-  - [[Theme][Theme]]
-  - [[Line Numbers][Line Numbers]]
-  - [[GUI/Frame][GUI/Frame]]
-- [[Org Mode][Org Mode]]
-  - [[Font setup][Font setup]]
-  - [[Characters][Characters]]
-  - [[Keywords][Keywords]]
-  - [[Agenda/Log][Agenda/Log]]
-  - [[Cycle][Cycle]]
-  - [[Folding][Folding]]
-  - [[Org-appear][Org-appear]]
-  - [[Indent & variable pitch][Indent & variable pitch]]
-  - [[Archive/Cleanup][Archive/Cleanup]]
-  - [[Show images][Show images]]
-  - [[Autoexecute tangled shell files][Autoexecute tangled shell files]]
-  - [[Weblog setup][Weblog setup]]
-  - [[Visual column mode][Visual column mode]]
-  - [[org-make-toc][org-make-toc]]
-  - [[Better snippets][Better snippets]]
-  - [[Roam][Roam]]
-  - [[Capture][Capture]]
-    - [[Prettify][Prettify]]
-    - [[Templates][Templates]]
-  - [[Export][Export]]
-    - [[LaTeX][LaTeX]]
-      - [[Conditional features][Conditional features]]
-      - [[Tectonic][Tectonic]]
-      - [[Classes][Classes]]
-      - [[Packages][Packages]]
-      - [[Pretty code blocks][Pretty code blocks]]
-      - [[Chameleon][Chameleon]]
-- [[Email][Email]]
-  - [[Sending email][Sending email]]
-  - [[Notifications][Notifications]]
-- [[Languages][Languages]]
-  - [[LSP][LSP]]
-  - [[Rust][Rust]]
-  - [[PHP][PHP]]
-    - [[Intelephense][Intelephense]]
-    - [[Eglot][Eglot]]
-- [[Packages][Packages]]
-  - [[laravel-mode][laravel-mode]]
-  - [[prescient][prescient]]
-:END:
-
+* Table of Contents :TOC_5_gh:noexport:
+- [[#setup][Setup]]
+  - [[#workflow][Workflow]]
+  - [[#exwm-setup][EXWM Setup]]
+    - [[#modulesuiexwm][modules/ui/exwm]]
+    - [[#session][Session]]
+    - [[#startsh--start-debugsh][start.sh / start-debug.sh]]
+- [[#faq][FAQ]]
+- [[#globals][Globals]]
+  - [[#constants-and-variables][Constants and Variables]]
+    - [[#lexical-binding][Lexical binding]]
+    - [[#performance-related][Performance-related]]
+    - [[#subword-mode][Subword-mode]]
+    - [[#auto-revert-mode][Auto-revert-mode]]
+    - [[#prevent-flickering][Prevent flickering]]
+    - [[#load-env-after-reload][Load env after reload]]
+    - [[#evil][Evil]]
+      - [[#splits][Splits]]
+      - [[#fine-undo][Fine undo]]
+    - [[#lispyville][Lispyville]]
+    - [[#default-scratch-mode][Default scratch mode]]
+    - [[#auth-info][Auth info]]
+    - [[#fetch-auth-source][fetch-auth-source]]
+    - [[#magit][Magit]]
+      - [[#gravatars][Gravatars]]
+      - [[#forge][Forge]]
+    - [[#eshell][EShell]]
+      - [[#prompt][Prompt]]
+      - [[#settings][Settings]]
+    - [[#user-setup][User setup]]
+    - [[#server][Server]]
+    - [[#vterm][vterm]]
+      - [[#kill-buffer][Kill buffer]]
+      - [[#fix-c-backspace][Fix =c-backspace=]]
+      - [[#functions][Functions]]
+- [[#keybindings][Keybindings]]
+  - [[#save][Save]]
+  - [[#search][Search]]
+  - [[#dired][Dired]]
+- [[#graphical-setup][Graphical setup]]
+  - [[#dashboard][Dashboard]]
+  - [[#modeline][Modeline]]
+  - [[#fonts][Fonts]]
+  - [[#theme][Theme]]
+  - [[#line-numbers][Line Numbers]]
+  - [[#guiframe][GUI/Frame]]
+- [[#org-mode][Org Mode]]
+  - [[#hook-setup][Hook setup]]
+  - [[#org-directory][org-directory]]
+  - [[#font-setup][Font setup]]
+  - [[#characters][Characters]]
+    - [[#headline-bullets][Headline bullets]]
+    - [[#item-bullets][Item bullets]]
+    - [[#dropdown-icon][Dropdown icon]]
+    - [[#remove-excess-emphasis-markers][Remove excess emphasis markers]]
+    - [[#show-real-entities-rather-than-utf8][Show real entities rather than UTF8]]
+  - [[#keywords][Keywords]]
+  - [[#agendalog][Agenda/Log]]
+    - [[#show-done-tasks-in-agenda][Show =DONE= tasks in agenda]]
+    - [[#timestamp-done-items][Timestamp done items]]
+    - [[#log-items-in-the-drawer][Log items in the drawer]]
+  - [[#cycle][Cycle]]
+  - [[#folding][Folding]]
+  - [[#org-appear][Org-appear]]
+  - [[#variable-pitch][Variable pitch]]
+  - [[#archivecleanup][Archive/Cleanup]]
+    - [[#archive-done-tasks][Archive =DONE= tasks]]
+    - [[#remove-kill-tasks][Remove =KILL= tasks]]
+  - [[#show-images][Show images]]
+  - [[#autoexecute-tangled-shell-files][Autoexecute tangled shell files]]
+  - [[#weblog-setup][Weblog setup]]
+  - [[#visual-column-mode][Visual column mode]]
+  - [[#better-snippets][Better snippets]]
+  - [[#roam][Roam]]
+  - [[#capture][Capture]]
+    - [[#prettify][Prettify]]
+    - [[#templates][Templates]]
+  - [[#export][Export]]
+    - [[#latex][LaTeX]]
+      - [[#conditional-features][Conditional features]]
+      - [[#tectonic][Tectonic]]
+      - [[#classes][Classes]]
+      - [[#packages][Packages]]
+      - [[#pretty-code-blocks][Pretty code blocks]]
+      - [[#chameleon][Chameleon]]
+- [[#languages][Languages]]
+  - [[#lsp][LSP]]
+  - [[#php][PHP]]
+    - [[#intelephense][Intelephense]]
+- [[#packages-1][Packages]]
+  - [[#laravel-mode][laravel-mode]]
+  - [[#prescient][prescient]]
 
 * Setup
 ** Workflow
@@ -127,7 +137,8 @@ The scripts responsible for starting up exwm in the right way, including env var
 None yet because luckily nobody else has seen this spaghetti junction
 * Globals
 ** Constants and Variables
-I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't think of one? Would have thought of one.
+I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't
+think of one? Would have thought of one.
 
 *** Lexical binding
 
@@ -135,11 +146,34 @@ I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't th
 ;;; -*- lexical-binding: t; -*-
 #+end_src
 
+*** Performance-related
+Minor tweaks to improve overall performance
+
+#+begin_src emacs-lisp
+(setq history-length 25)
+#+end_src
+
 *** Subword-mode
-Subword mode is a good start because PHP uses a lot of CamelCase and it makes refactoring slightly easier
+Subword mode is a good start because PHP uses a lot of CamelCase and it makes
+refactoring slightly easier
 
 #+begin_src elisp
 (global-subword-mode 1)
+#+end_src
+
+*** Auto-revert-mode
+Testing having auto-revert-mode on for text-mode buffers (should just be log
+files mostly)
+
+#+begin_src emacs-lisp
+(add-hook! 'text-mode (lambda () (auto-revert-mode 1)))
+#+end_src
+
+*** Prevent flickering
+Noticed some odd flickering here and there, apparently this should resolve it
+
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
 #+end_src
 
 *** Load env after reload
@@ -149,13 +183,21 @@ Most of the time, reloading breaks. So, let's not break.
 (add-hook! 'doom-after-reload-hook (doom-load-envvars-file (expand-file-name "env" doom-local-dir) t))
 #+end_src
 
-** Settings
 *** Evil
-I make a lot of splits, and it finally got annoying having to swap to them all the time. So, let's change that
+**** Splits
+I make a lot of splits, and it finally got annoying having to swap to them all
+the time. So, let's change that
 
 #+begin_src emacs-lisp
 (setq evil-split-window-below t
       evil-vsplit-window-right t)
+#+end_src
+
+**** Fine undo
+I don't need this because I, like all programmers, make 0 mistaeks.
+
+#+begin_src emacs-lisp
+(setq evil-want-fine-undo t)
 #+end_src
 
 *** Lispyville
@@ -173,29 +215,23 @@ This structured-editing thing is apparently really neat, so let's see how we go
           additional)))
 #+end_src
 
-*** Better defaults
+*** Default scratch mode
 Make the scratch buffer start in lisp mode
 
 #+begin_src emacs-lisp
 (setq doom-scratch-initial-major-mode 'lisp-interaction-mode)
 #+end_src
 
-Adjust the which-key delay because I always worry I broke something
-
-#+begin_src emacs-lisp
-(use-package! which-key
-  :init
-  (setq which-key-idle-delay 0.3))
-#+end_src
-
 *** Auth info
-Add plaintext authinfo file to the list of sources. I /know/ I should use a GPG file but I'll get around to it damn it.
+Add plaintext authinfo file to the list of sources. I /know/ I should use a GPG
+file but I'll get around to it damn it.
 
 #+begin_src emacs-lisp
 (add-to-list 'auth-sources "~/.authinfo")
 #+end_src
 
-Also useful to store passwords for later use.
+*** fetch-auth-source
+Useful function to retrieve passwords from auth-sources
 
 #+begin_src emacs-lisp
 (defun fetch-auth-source (&rest params)
@@ -210,12 +246,14 @@ Also useful to store passwords for later use.
 #+end_src
 
 *** Magit
+**** Gravatars
 Show gravatars where possible
 
 #+begin_src emacs-lisp
 (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
 #+end_src
 
+**** Forge
 Allow forge to create repos under my name
 
 #+begin_src emacs-lisp
@@ -224,13 +262,17 @@ Allow forge to create repos under my name
 
 *** EShell
 **** Prompt
-Eshell is a beautiful thing but ootb experience is a tad dated. Custom prompt based on a combination of the famous p10k and eshell-git-prompt. I only /really/ need the minimum out of a prompt:
+Eshell is a beautiful thing but ootb experience is a tad dated. Custom prompt
+based on a combination of the famous p10k and eshell-git-prompt. I only /really/
+need the minimum out of a prompt:
 
 + =cwd=; almost impossible to work without knowing the current working directory
 + =git= info; current branch, dirty/clean status, etc
-+ prompt number: useful for jumping up and down for fast history in a given session
++ prompt number: useful for jumping up and down for fast history in a given
+  session
 
-Can't get enough out of the default powerline theme, and removing a dependancy we're rolling our own prompt called =eshell-p10kline=
+Can't get enough out of the default powerline theme, and removing a dependancy
+we're rolling our own prompt called =eshell-p10kline=
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! eshell-p10k
@@ -246,44 +288,21 @@ Can't get enough out of the default powerline theme, and removing a dependancy w
 #+end_src
 
 **** Settings
-We use eshell in a cross platform world, so we should prefer the lisp version of things to ensure a more consistent experience.
+We use eshell in a cross platform world, so we should prefer the lisp version of
+things to ensure a more consistent experience.
 
 #+begin_src emacs-lisp
 (setq eshell-prefer-lisp-functions t)
 #+end_src
 
 *** User setup
-Use my name and emails for things like GPG, snippets, mail, magit, etc. Differs based on which OS I'm on.
+Use my name and emails for things like GPG, snippets, mail, magit, etc. Differs
+based on which OS I'm on.
 
 #+BEGIN_SRC emacs-lisp
 (setq user-full-name "Ellis Kenyő"
-      user-mail-address (if IS-MAC "ellis@coreblue.co.uk" "me@elken.dev"))
+      user-mail-address "me@elken.dev")
 #+END_SRC
-
-Email folders and setup. This might move to a new section if I start to use email seriously.
-
-#+begin_src emacs-lisp
-(if IS-MAC
-    (set-email-account! "gmail"
-                        '((mu4e-sent-folder       . "/gmail/Sent Mail")
-                          (mu4e-drafts-folder     . "/gmail/Drafts")
-                          (mu4e-trash-folder      . "/gmail/Trash")
-                          (mu4e-refile-folder     . "/gmail/All Mail")
-                          (smtpmail-smtp-user     . "ellis@coreblue.co.uk")
-                          (user-mail-address      . "ellis@coreblue.co.uk")) ;; only needed for mu < 1.4
-                        t)
-  (set-email-account! "mail.elken.dev"
-                      '((mu4e-sent-folder       . "/mailbox/Sent Mail")
-                        (mu4e-drafts-folder     . "/mailbox/Drafts")
-                        (mu4e-trash-folder      . "/mailbox/Trash")
-                        (mu4e-refile-folder     . "/mailbox/All Mail")
-                        (smtpmail-smtp-user     . "me@elken.dev")
-                        (user-mail-address      . "me@elken.dev") ;; only needed for mu < 1.4
-                        (mu4e-compose-signature . "Regards,\nelken"))
-                      t))
-
-(setq +mu4e-gmail-accounts '(("ellis@coreblue.co.uk" . "/gmail")))
-#+end_src
 
 *** Server
 Start a server (if not running already)
@@ -291,12 +310,13 @@ Start a server (if not running already)
 #+begin_src emacs-lisp
 (after! server
   (when (not (server-running-p))
-    (server-start)
-    (mu4e)))
+    (server-start)))
 #+end_src
 
 *** vterm
-Vterm clearly wins the terminal war. Also doesn't need much configuration out of the box, although the shell integration does. That currently exists in my [[https://github.com/elken/.files][dotfiles]]
+Vterm clearly wins the terminal war. Also doesn't need much configuration out of
+the box, although the shell integration does. That currently exists in my
+[[https://github.com/elken/.files][dotfiles]]
 
 **** Kill buffer
 If the process exits, kill the =vterm= buffer
@@ -306,7 +326,8 @@ If the process exits, kill the =vterm= buffer
 #+end_src
 
 **** Fix =c-backspace=
-I've picked this up in muscle memory now and I'm fed up with it not working. Not anymore!
+I've picked this up in muscle memory now and I'm fed up with it not working. Not
+anymore!
 
 #+begin_src emacs-lisp
 (after! vterm
@@ -326,7 +347,7 @@ Useful functions for the shell-side integration provided by vterm.
 * Keybindings
 It's not a custom config without some fancy keybinds
 
-** Defaults
+** Save
 Back to a simpler time...
 
 #+begin_src emacs-lisp
@@ -350,6 +371,13 @@ Dired should behave better with evil mappings
 #+end_src
 
 * Graphical setup
+** Dashboard
+Inhibit the menu to improve things slightly
+
+#+begin_src emacs-lisp
+(remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+#+end_src
+
 ** Modeline
 Default modeline is a tad cluttered, and because I don't use exwm anymore the
 modeline from that module isn't in use. So, it's duplicated here and tweaked.
@@ -367,6 +395,7 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
     '(bar workspace-name window-number modals persp-name buffer-info matches remote-host github debug)
     '(vcs github mu4e grip gnus checker misc-info repl lsp " ")))
 #+end_src
+
 ** Fonts
 Configure the fonts across all used platforms (slightly different names).
 
@@ -385,7 +414,8 @@ Load my current flavour-of-the-month colour scheme.
 (setq doom-theme 'doom-nord)
 #+END_SRC
 
-Along with a few face overrides (thought about merging upstream but it would have sparked a discussion, maybe later)
+Along with a few face overrides (thought about merging upstream but it would
+have sparked a discussion, maybe later)
 
 #+begin_src emacs-lisp
 (custom-theme-set-faces! 'doom-nord
@@ -409,7 +439,9 @@ Change the default banner (need to add the ASCII banner at some point)
 #+END_SRC
 
 ** Line Numbers
-Set the default line number format to be relative and disable line numbers for specific modes
+Set the default line number format to be relative and disable line numbers for
+specific modes
+
 #+BEGIN_SRC emacs-lisp
 (setq display-line-numbers-type 'relative)
 
@@ -436,12 +468,20 @@ Add some transparency
 #+end_src
 
 * Org Mode
-=org-mode= is a wonderful thing, and far too complex to bury in another section. The more I use it, the more I will add to this area but for now it's mostly used for documentation and organisation.
+** Hook setup
+=org-mode= is a wonderful thing, and far too complex to bury in another section.
+The more I use it, the more I will add to this area but for now it's mostly used
+for documentation and organisation.
 
 #+begin_src emacs-lisp
-(add-hook! org-mode #'(elken/org-mode-setup elken/org-font-setup))
+(use-package! org
+  :hook (org-mode . org-indent-mode)
+  :hook (org-mode . visual-line-mode))
+
+(add-hook! org-mode #'elken/org-font-setup)
 #+end_src
 
+** org-directory
 Let's set a sane default directory based on where I am
 
 #+begin_src emacs-lisp
@@ -449,7 +489,10 @@ Let's set a sane default directory based on where I am
 #+end_src
 
 ** Font setup
-Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where it makes sense to use the defined fixed width font.
+Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where
+it makes sense to use the defined fixed width font.
+
+Also need to investigate Overpass as a replacement for IBM Plex Sans.
 
 #+BEGIN_SRC emacs-lisp
 (defun elken/org-font-setup ()
@@ -478,13 +521,13 @@ Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where
 #+END_SRC
 
 ** Characters
-Simplify the headline bullets
+*** Headline bullets
 
 #+begin_src emacs-lisp
 (setq org-superstar-headline-bullets-list '("› "))
 #+end_src
 
-And the item bullets
+*** Item bullets
 
 #+begin_src emacs-lisp
 (setq org-superstar-item-bullet-alist '((?* . ?⋆)
@@ -492,26 +535,27 @@ And the item bullets
                                         (?- . ?•)))
 #+end_src
 
-Change the dropdown icon to be something /neater/
+*** Dropdown icon
 
 #+begin_src emacs-lisp
 (setq org-ellipsis " ▾")
 #+end_src
 
-And get rid of emphasis markers
+*** Remove excess emphasis markers
 
 #+begin_src emacs-lisp
 (setq org-hide-emphasis-markers t)
 #+end_src
 
-Show entities in a nicer format, rather than UTF8 characters
+*** Show real entities rather than UTF8
 
 #+begin_src emacs-lisp
 (setq org-pretty-entities t)
 #+end_src
 
 ** Keywords
-Default keywords are /far/ too minimal. This will need further tweaking as I start using org mode for organisation more.
+Default keywords are /far/ too minimal. This will need further tweaking as I start
+using org mode for organisation more.
 
 #+begin_src emacs-lisp
 (after! org
@@ -521,19 +565,19 @@ Default keywords are /far/ too minimal. This will need further tweaking as I sta
 #+end_src
 
 ** Agenda/Log
-Enable log-mode so we see =DONE= tasks and the like
+*** Show =DONE= tasks in agenda
 
 #+begin_src emacs-lisp
 (setq org-agenda-start-with-log-mode t)
 #+end_src
 
-Auto add a timestamp to =DONE= items
+*** Timestamp done items
 
 #+begin_src emacs-lisp
 (setq org-log-done 'time)
 #+end_src
 
-And log items in the drawer
+*** Log items in the drawer
 
 #+begin_src emacs-lisp
 (setq org-log-into-drawer t)
@@ -554,40 +598,38 @@ Default folding is very noisy, I /rarely/ need to see everything expanded
 #+end_src
 
 ** Org-appear
-Defines a minor mode to allow special forms such as /italics/, *bold*, _underline_ and =literal= to be editable when the cursor is over them, otherwise display the proper value.
+Defines a minor mode to allow special forms such as /italics/, *bold*, _underline_ and
+=literal= to be editable when the cursor is over them, otherwise display the
+proper value.
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! org-appear
   :recipe (:host github :repo "awth13/org-appear"))
 #+end_src
 
-
-Setup for =org-appear= mode
 #+begin_src emacs-lisp
-(setq org-appear-autoemphasis t
-      org-appear-autolinks t
-      org-appear-autosubmarkers t)
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autolinks t
+        org-appear-autosubmarkers t))
 #+end_src
 
-** Indent & variable pitch
-Add the package
+** Variable pitch
+Enable =variable-pitch-mode= to enable the more readable fonts where it makes sense
+
 #+begin_src emacs-lisp :tangle packages.el
 (package! org-variable-pitch
   :recipe (:host github
            :repo "cadadr/elisp"))
 #+end_src
 
-Enable =org-indent-mode= by default to properly indent everything automagically, =variable-pitch-mode= to enable the more readable fonts where it makes sense and =visual-line-mode= to add a "current line" selection.
-
-#+BEGIN_SRC emacs-lisp
-(defun elken/org-mode-setup ()
-  (org-make-toc-mode)
-  (org-indent-mode)
-  (variable-pitch-mode 1)
-  (visual-line-mode 1)
-  (org-variable-pitch-setup)
-  (org-appear-mode))
-#+END_SRC
+#+begin_src emacs-lisp
+(use-package! org-variable-pitch
+  :hook (org-mode . variable-pitch-mode)
+  :hook (after-init-hook . org-variable-pitch-setup))
+#+end_src
 
 ** Archive/Cleanup
 Adjust the format of archived org files (so they don't show up in orgzly)
@@ -596,6 +638,7 @@ Adjust the format of archived org files (so they don't show up in orgzly)
 (setq org-archive-location "archive/Archive_%s::")
 #+end_src
 
+*** Archive =DONE= tasks
 
 Enables archiving of tasks. Replaces the in-built version which only works for single tasks.
 
@@ -611,6 +654,8 @@ Enables archiving of tasks. Replaces the in-built version which only works for s
 
 (map! :map org-mode-map :desc "Archive tasks marked DONE" "C-c DEL a" #'elken/org-archive-done-tasks)
 #+END_SRC
+
+*** Remove =KILL= tasks
 
 Enables removal of killed tasks. I'm not /yet/ interested in tracking this long-term.
 
@@ -709,33 +754,12 @@ First we need the package
 Then we define a setup function
 
 #+BEGIN_SRC emacs-lisp
-(defun elken/org-mode-visual-fill ()
-  (setq visual-fill-column-width 200
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-#+END_SRC
-
-And add a hook to load it
-
-#+begin_src emacs-lisp
-(add-hook 'org-mode-hook #'elken/org-mode-visual-fill)
-#+end_src
-
-** org-make-toc
-There's still a few bugs with this, but it works fine on Github mostly.
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! org-make-toc)
-#+end_src
-
-And then load it
-
-#+begin_src emacs-lisp
-(use-package! org-make-toc
-  :after org
+(use-package! visual-fill-column
+  :hook (org-mode . visual-fill-column-mode)
   :config
-  (setq org-make-toc-link-type-fn #'org-make-toc--link-entry-org))
-#+end_src
+  (setq visual-fill-column-width 200
+        visual-fill-column-center-text t))
+#+END_SRC
 
 ** Better snippets
 Programmers are, by design, lazy
@@ -1580,42 +1604,6 @@ Attempt to improve default PDF export by using the current theme
                                 0.95))))))
 #+end_src
 
-* Email
-Currently handled through =mu4e=, works easy enough and I don't need too much out of email.
-
-Set the interval to a sensible timeout (10 minutes is plenty)
-#+begin_src emacs-lisp
-(setq mu4e-update-interval 300)
-#+end_src
-
-Improve performance as we only use gmail here.
-
-#+begin_src emacs-lisp
-;; don't need to run cleanup after indexing for gmail
-(setq mu4e-index-cleanup nil
-      ;; because gmail uses labels as folders we can use lazy check since
-      ;; messages don't really "move"
-      mu4e-index-lazy-check t)
-#+end_src
-
-** Sending email
-Handled via =msmtp=, mostly because teco said so. We don't question teco.
-
-#+begin_src emacs-lisp
-(setq sendmail-program "/opt/homebrew/bin/msmtp"
-        send-mail-function #'smtpmail-send-it
-        message-sendmail-f-is-evil t
-        message-sendmail-extra-arguments '("--read-envelope-from")
-        message-send-mail-function #'message-send-mail-with-sendmail)
-#+end_src
-
-** Notifications
-Notifications are quite nifty, especially if I'm as lazy as I am
-
-#+begin_src emacs-lisp
-(setq alert-default-style 'osx-notifier)
-#+end_src
-
 * Languages
 Configuration for various programming languages.
 
@@ -1634,59 +1622,12 @@ And some more for projectile
   (add-to-list 'projectile-globally-ignored-directories "vendor"))
 #+end_src
 
-The default completions are quite bad
-
-#+begin_src emacs-lisp
-(after! lsp-mode
-  (setq +lsp-company-backends
-        '(:separate company-capf company-yasnippet)))
-#+end_src
-
-** Rust
-Make =rls= the default
-
-#+begin_src emacs-lisp
-(after! rustic
-  (setq rustic-lsp-server 'rls))
-#+end_src
-
 ** PHP
 *** Intelephense
 Because I'm a massive sellout who likes features
 
 #+begin_src emacs-lisp
 (setq lsp-intelephense-licence-key (fetch-auth-source :user "intelephense"))
-#+end_src
-
-*** Eglot
-Trying out this eglot thing for a bit, let's see how it goes.
-
-Make sure it's loaded in php-mode
-
-#+begin_src emacs-lisp
-(after! eglot
-  (add-hook 'php-mode-hook 'eglot-ensure))
-#+end_src
-
-Set some config needed for the server
-
-#+begin_src emacs-lisp
-(when (featurep! :tools lsp +eglot)
-  (defvar php-intelephense-storage-path (expand-file-name "lsp-intelephense" doom-etc-dir))
-  (defvar php-intelephense-command (expand-file-name "lsp/npm/intelephense/bin/intelephense" doom-etc-dir)))
-#+end_src
-
-And set the server to be loaded
-
-#+begin_src emacs-lisp
-(after! eglot
-  (defclass eglot-php (eglot-lsp-server) () :documentation "PHP's Intelephense")
-  (cl-defmethod eglot-initialization-options ((server eglot-php))
-    "Passes through required intelephense options"
-    `(:storagePath ,php-intelephense-storage-path
-      :licenceKey ,lsp-intelephense-licence-key
-      :clearCache t))
-  (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio")))))
 #+end_src
 
 * Packages
@@ -1701,12 +1642,12 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! laravel-mode
-  :hook (+php-laravel-mode . laravel-mode)
+(use-package! laravel-tinker
   :init
-  (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :quit nil :ttl nil)
-  (map! :leader
-         :desc "Tinker REPL" "o r" #'laravel-mode-toggle-tinker))
+  (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :ttl nil)
+  (map! :localleader
+         :map php-mode-map
+         :desc "Toggle a project-local Tinker REPL" "o t" #'laravel-mode-tinker-toggle))
 #+end_src
 
 ** prescient
