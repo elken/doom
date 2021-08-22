@@ -97,6 +97,7 @@ be commented to the best of /my/ ability.
       - [[#chameleon][Chameleon]]
 - [[#languages][Languages]]
   - [[#lsp][LSP]]
+    - [[#ui][UI]]
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
   - [[#php][PHP]]
@@ -1652,6 +1653,13 @@ Attempt to improve default PDF export by using the current theme
 Configuration for various programming languages.
 
 ** LSP
+*** UI
+Testing how this looks/performs.
+
+#+begin_src emacs-lisp
+(setq lsp-lens-enable t)
+#+end_src
+
 *** Improve completions
 The default completions are quite bad
 
@@ -1732,7 +1740,6 @@ Packages to be unpinned or just completely disabled
 
 #+begin_src emacs-lisp :tangle packages.el
 (unpin! doom-modeline)
-(disable-packages! company-dict)
 #+end_src
 
 ** laravel-mode
@@ -1751,7 +1758,7 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
   (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :ttl nil)
   (map! :localleader
          :map php-mode-map
-         :desc "Toggle a project-local Tinker REPL" "o t" #'laravel-mode-tinker-toggle))
+         :desc "Toggle a project-local Tinker REPL" "o t" #'laravel-tinker-toggle))
 #+end_src
 
 ** prescient
