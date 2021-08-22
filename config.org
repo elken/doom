@@ -21,6 +21,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 - [[FAQ][FAQ]]
 - [[Globals][Globals]]
   - [[Constants and Variables][Constants and Variables]]
+    - [[Lexical binding][Lexical binding]]
     - [[Subword-mode][Subword-mode]]
     - [[Load env after reload][Load env after reload]]
   - [[Settings][Settings]]
@@ -86,6 +87,7 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
     - [[Intelephense][Intelephense]]
     - [[Eglot][Eglot]]
 - [[Packages][Packages]]
+  - [[laravel-mode][laravel-mode]]
   - [[prescient][prescient]]
 :END:
 
@@ -126,6 +128,12 @@ None yet because luckily nobody else has seen this spaghetti junction
 * Globals
 ** Constants and Variables
 I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't think of one? Would have thought of one.
+
+*** Lexical binding
+
+#+begin_src emacs-lisp
+;;; -*- lexical-binding: t; -*-
+#+end_src
 
 *** Subword-mode
 Subword mode is a good start because PHP uses a lot of CamelCase and it makes refactoring slightly easier
@@ -1682,6 +1690,24 @@ And set the server to be loaded
 #+end_src
 
 * Packages
+
+** laravel-mode
+Not yet fit for human consumption, but fit for mine because I'm +sub+ super-human
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! laravel-mode
+  :recipe (:local-repo "~/build/lisp/laravel-mode"
+           :build (:not compile)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! laravel-mode
+  :hook (+php-laravel-mode . laravel-mode)
+  :init
+  (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :quit nil :ttl nil)
+  (map! :leader
+         :desc "Tinker REPL" "o r" #'laravel-mode-toggle-tinker))
+#+end_src
 
 ** prescient
 Need to add this into company module when I've tested
