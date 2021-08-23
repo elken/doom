@@ -55,7 +55,6 @@ be commented to the best of /my/ ability.
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
-  - [[#tabs][Tabs]]
 - [[#org-mode][Org Mode]]
   - [[#hook-setup][Hook setup]]
   - [[#org-directory][org-directory]]
@@ -97,7 +96,6 @@ be commented to the best of /my/ ability.
       - [[#chameleon][Chameleon]]
 - [[#languages][Languages]]
   - [[#lsp][LSP]]
-    - [[#ui][UI]]
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
   - [[#php][PHP]]
@@ -108,6 +106,7 @@ be commented to the best of /my/ ability.
   - [[#laravel-mode][laravel-mode]]
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
+    - [[#fix-in-web-mode][Fix in web-mode]]
 
 * Setup
 ** Workflow
@@ -472,39 +471,6 @@ Add some transparency
 (after! exwm
   (set-frame-parameter (selected-frame) 'alpha 90)
   (add-to-list 'default-frame-alist '(alpha . 90)))
-#+end_src
-
-** Tabs
-Often jump back and forth between wanting this and not.
-
-#+begin_src emacs-lisp
-(after! centaur-tabs
-  (dolist (mode '(term-mode-hook
-                  shell-mode-hook
-                  eshell-mode-hook
-                  magit-diff-mode-hook))
-    (add-hook mode 'centaur-tabs-local-mode))
-  (defun centaur-tabs-buffer-groups ()
-    "`centaur-tabs-buffer-groups' control buffers' group rules.
-
-    Group centaur-tabs with mode if buffer is derived from `eshell-mode'
-    `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
-    All buffer name start with * will group to \"Emacs\".
-    Other buffer group by `centaur-tabs-get-group-name' with project name."
-    (list
-     (cond
-      ((or (string-equal "*" (substring (buffer-name) 0 1))
-           (memq major-mode '(magit-process-mode
-                              magit-status-mode
-                              magit-diff-mode
-                              magit-log-mode
-                              magit-file-mode
-                              magit-blob-mode
-                              magit-blame-mode)))
-       "Emacs")
-      ((derived-mode-p 'eshell-mode) "EShell")
-      ((derived-mode-p 'dired-mode) "Dired")
-      (t (centaur-tabs-get-group-name (current-buffer)))))))
 #+end_src
 
 * Org Mode
@@ -1653,13 +1619,6 @@ Attempt to improve default PDF export by using the current theme
 Configuration for various programming languages.
 
 ** LSP
-*** UI
-Testing how this looks/performs.
-
-#+begin_src emacs-lisp
-(setq lsp-lens-enable t)
-#+end_src
-
 *** Improve completions
 The default completions are quite bad
 
@@ -1778,17 +1737,23 @@ Need to add this into company module when I've tested
 #+end_src
 
 ** Rainbow Identifiers
+*** TODO Fix in web-mode
+Web-mode has normal text which should be ignored.
+
 #+begin_src emacs-lisp :tangle packages.el
 (package! rainbow-identifiers)
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package! rainbow-identifiers
-  :hook (prog-mode . rainbow-identifiers-mode)
-  :hook (org-mode . (lambda () (rainbow-identifiers-mode -1)))
+  :hook (php-mode . rainbow-identifiers-mode)
+  ;; :hook (org-mode . (lambda () (rainbow-identifiers-mode -1)))
+  ;; :hook (web-mode . (lambda () (rainbow-identifiers-mode -1)))
   :config
   (setq rainbow-identifiers-faces-to-override
         '(php-variable-name
           php-property-name
-          php-variable-sigil)))
+          php-variable-sigil
+          web-mode-variable-name-face)))
 #+end_src
+
