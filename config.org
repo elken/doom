@@ -392,10 +392,11 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
 #+begin_src emacs-lisp
 (after! doom-modeline
   (setq all-the-icons-scale-factor 1.1
+        auto-revert-check-vc-info t
         doom-modeline-major-mode-icon (display-graphic-p)
         doom-modeline-major-mode-color-icon (display-graphic-p)
         doom-modeline-buffer-file-name-style 'relative-to-project
-        doom-modeline-vcs-max-length 20)
+        doom-modeline-vcs-max-length 60)
   (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
   (doom-modeline-def-modeline 'main
     '(bar workspace-name window-number modals persp-name buffer-info matches remote-host github debug)
@@ -1304,7 +1305,7 @@ Add some packages (also very likely to change)
 Teco is the goto for this, so basically just ripping off him.
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! engrave-recipes
+(package! engrave-faces
   :recipe (:host github :repo "tecosaur/engrave-faces"))
 #+end_src
 
