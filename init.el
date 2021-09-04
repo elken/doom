@@ -197,7 +197,7 @@
        ;;irc               ; how neckbeards socialize
        ;;(rss +org)        ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
-       everywhere
+       ;; everywhere
 
        :config
        literate

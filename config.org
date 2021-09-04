@@ -28,12 +28,13 @@ be commented to the best of /my/ ability.
     - [[#evil][Evil]]
       - [[#splits][Splits]]
       - [[#fine-undo][Fine undo]]
+      - [[#global-substitute][Global substitute]]
+      - [[#ignore-visual-text-in-the-kill-ring][Ignore visual text in the kill ring]]
     - [[#lispyville][Lispyville]]
     - [[#default-scratch-mode][Default scratch mode]]
     - [[#auth-info][Auth info]]
     - [[#fetch-auth-source][fetch-auth-source]]
     - [[#magit][Magit]]
-      - [[#gravatars][Gravatars]]
       - [[#forge][Forge]]
     - [[#eshell][EShell]]
       - [[#prompt][Prompt]]
@@ -41,6 +42,7 @@ be commented to the best of /my/ ability.
     - [[#user-setup][User setup]]
     - [[#server][Server]]
     - [[#vterm][vterm]]
+      - [[#always-compile][Always compile]]
       - [[#kill-buffer][Kill buffer]]
       - [[#fix-c-backspace][Fix =c-backspace=]]
       - [[#functions][Functions]]
@@ -49,6 +51,7 @@ be commented to the best of /my/ ability.
   - [[#search][Search]]
   - [[#dired][Dired]]
 - [[#graphical-setup][Graphical setup]]
+  - [[#which-key][which-key]]
   - [[#marginalia][Marginalia]]
     - [[#files][Files]]
   - [[#info-pages][Info pages]]
@@ -209,6 +212,21 @@ I don't need this because I, like all programmers, make 0 mistaeks.
 (setq evil-want-fine-undo t)
 #+end_src
 
+**** Global substitute
+More often than not, I'd argue always, I want ~s/~ on my ex commands, so let's
+sort that out.
+
+#+begin_src emacs-lisp
+(setq evil-ex-substitute-global t)
+#+end_src
+
+**** Ignore visual text in the kill ring
+When we overwrite text in visual mode, say =vip=, don't add to the kill ring.
+
+#+begin_src emacs-lisp
+(setq evil-kill-on-visual-paste nil)
+#+end_src
+
 *** Lispyville
 This structured-editing thing is apparently really neat, so let's see how we go
 
@@ -255,13 +273,6 @@ Useful function to retrieve passwords from auth-sources
 #+end_src
 
 *** Magit
-**** Gravatars
-Show gravatars where possible
-
-#+begin_src emacs-lisp
-(setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
-#+end_src
-
 **** Forge
 Allow forge to create repos under my name
 
@@ -292,6 +303,8 @@ we're rolling our own prompt called =eshell-p10kline=
 (use-package! eshell-p10k
   :after eshell
   :config
+  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'prepend)
+  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'prepend)
   (setq eshell-prompt-function #'eshell-p10k-prompt-function
         eshell-prompt-regexp eshell-p10k-prompt-string))
 #+end_src
@@ -320,12 +333,33 @@ Start a server (if not running already)
 (require 'server)
 (when (not (server-running-p))
   (server-start))
+
+(defun greedily-do-daemon-setup ()
+  (require 'org)
+  (when (require 'mu4e nil t)
+    (setq mu4e-confirm-quit t)
+    (setq +mu4e-lock-greedy t)
+    (setq +mu4e-lock-relaxed t)
+    (+mu4e-lock-add-watcher)
+    (when (+mu4e-lock-available t)
+      (mu4e~start))))
+
+(when (daemonp)
+  (add-hook 'emacs-startup-hook #'greedily-do-daemon-setup)
+  (add-hook! 'server-after-make-frame-hook (switch-to-buffer +doom-dashboard-name)))
 #+end_src
 
 *** vterm
 Vterm clearly wins the terminal war. Also doesn't need much configuration out of
 the box, although the shell integration does. That currently exists in my
 [[https://github.com/elken/.files][dotfiles]]
+
+**** Always compile
+Fixes a weird bug with native-comp, and I don't use guix anymore.
+
+#+begin_src emacs-lisp
+(setq vterm-always-compile-module t)
+#+end_src
 
 **** Kill buffer
 If the process exits, kill the =vterm= buffer
@@ -380,6 +414,18 @@ Dired should behave better with evil mappings
 #+end_src
 
 * Graphical setup
+** which-key
+Remove some of the useless =evil-= prefixes from which-key commands.
+
+#+begin_src emacs-lisp
+(setq which-key-allow-multiple-replacements t)
+(after! which-key
+  (pushnew!
+   which-key-replacement-alist
+   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . "◂\\1"))
+   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "◃\\1"))))
+#+end_src
+
 ** Marginalia
 Marginalia is part of the Vertico stack, and is responsible for all the fancy
 faces and extra information.
@@ -477,7 +523,7 @@ Configure the fonts across all used platforms (slightly different names).
 #+BEGIN_SRC emacs-lisp
 (setq  doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 13)
        doom-variable-pitch-font (font-spec :family "Overpass" :size 13)
-       doom-unicode-font (font-spec :family "JuliaMono")
+       doom-unicode-font (font-spec :family "Iosevka Nerd Font Mono" :size 16)
        doom-emoji-fallback-font-families nil
        doom-symbol-fallback-font-families nil)
 #+END_SRC
@@ -1634,6 +1680,7 @@ Packages to be unpinned or just completely disabled
 
 #+begin_src emacs-lisp :tangle packages.el
 (unpin! doom-modeline)
+(disable-packages! evil-escape)
 #+end_src
 
 ** laravel-mode
