@@ -49,6 +49,9 @@ be commented to the best of /my/ ability.
   - [[#search][Search]]
   - [[#dired][Dired]]
 - [[#graphical-setup][Graphical setup]]
+  - [[#marginalia][Marginalia]]
+    - [[#files][Files]]
+  - [[#info-pages][Info pages]]
   - [[#dashboard][Dashboard]]
   - [[#modeline][Modeline]]
   - [[#fonts][Fonts]]
@@ -73,7 +76,7 @@ be commented to the best of /my/ ability.
   - [[#cycle][Cycle]]
   - [[#folding][Folding]]
   - [[#org-appear][Org-appear]]
-  - [[#variable-pitch][Variable pitch]]
+  - [[#mixed-pitch][Mixed pitch]]
   - [[#archivecleanup][Archive/Cleanup]]
     - [[#archive-done-tasks][Archive =DONE= tasks]]
     - [[#remove-kill-tasks][Remove =KILL= tasks]]
@@ -93,7 +96,7 @@ be commented to the best of /my/ ability.
       - [[#classes][Classes]]
       - [[#packages][Packages]]
       - [[#pretty-code-blocks][Pretty code blocks]]
-      - [[#chameleon][Chameleon]]
+      - [[#ox-chameleon][ox-chameleon]]
 - [[#languages][Languages]]
   - [[#lsp][LSP]]
     - [[#improve-completions][Improve completions]]
@@ -314,9 +317,9 @@ based on which OS I'm on.
 Start a server (if not running already)
 
 #+begin_src emacs-lisp
-(after! server
-  (when (not (server-running-p))
-    (server-start)))
+(require 'server)
+(when (not (server-running-p))
+  (server-start))
 #+end_src
 
 *** vterm
@@ -377,6 +380,71 @@ Dired should behave better with evil mappings
 #+end_src
 
 * Graphical setup
+** Marginalia
+Marginalia is part of the Vertico stack, and is responsible for all the fancy
+faces and extra information.
+*** Files
+The doom module out of the box includes a number of customizations, but the
+below from Teco gives a much better experience for files.
+
+#+begin_src emacs-lisp
+(after! marginalia
+
+  (setq marginalia-censor-variables nil)
+
+  (defun +marginalia-annotate-file-colorful (cand)
+    "Annotate file CAND with its size, modification time and other attrs.
+These annotations are skipped for remote paths."
+    (if (or (marginalia--remote-p cand)
+            (when-let (win (active-minibuffer-window))
+              (with-current-buffer (window-buffer win)
+                (marginalia--remote-p (minibuffer-contents-no-properties)))))
+        (marginalia--fields ("*Remote*" :face 'marginalia-documentation))
+      (when-let (attrs (file-attributes (substitute-in-file-name
+                                         (marginalia--full-candidate cand))
+                                        'integer))
+        (marginalia--fields
+         ((marginalia--file-owner attrs)
+          :width 12 :face 'marginalia-file-owner)
+         ((marginalia--file-modes attrs))
+         ((+marginalia-file-size-colorful (file-attribute-size attrs))
+          :width 7)
+         ((+marginalia--time-colorful (file-attribute-modification-time attrs))
+          :width 12)))))
+
+  (defun +marginalia--time-colorful (time)
+    (let* ((seconds (float-time (time-subtract (current-time) time)))
+           (color (doom-blend
+                   (face-attribute 'marginalia-date :foreground nil t)
+                   (face-attribute 'marginalia-documentation :foreground nil t)
+                   (/ 1.0 (log (+ 3 (/ (+ 1 seconds) 345600.0)))))))
+      ;; 1 - log(3 + 1/(days + 1)) % grey
+      (propertize (marginalia--time time) 'face (list :foreground color))))
+
+  (defun +marginalia-file-size-colorful (size)
+    (let* ((size-index (/ (log10 (+ 1 size)) 7.0))
+           (color (if (< size-index 10000000) ; 10m
+                      (doom-blend 'orange 'green size-index)
+                    (doom-blend 'red 'orange (- size-index 1)))))
+      (propertize (file-size-human-readable size) 'face (list :foreground color))))
+
+  (setcdr (assq 'file marginalia-annotator-registry) '(+marginalia-annotate-file-colorful builtin none)))
+#+end_src
+
+** Info pages
+Slightly improve the look and feel of Info pages, might actually encourage me to /read/ them.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! info-colors)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! info-colors
+  :after info
+  :commands (info-colors-fontify-node)
+  :hook (Info-selection . info-colors-fontify-node))
+#+end_src
+
 ** Dashboard
 Inhibit the menu to improve things slightly
 
@@ -408,7 +476,8 @@ Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
 (setq  doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 13)
-       doom-variable-pitch-font (font-spec :family "IBM Plex Sans" :size 13)
+       doom-variable-pitch-font (font-spec :family "Overpass" :size 13)
+       doom-unicode-font (font-spec :family "JuliaMono")
        doom-emoji-fallback-font-families nil
        doom-symbol-fallback-font-families nil)
 #+END_SRC
@@ -481,18 +550,21 @@ The more I use it, the more I will add to this area but for now it's mostly used
 for documentation and organisation.
 
 #+begin_src emacs-lisp
-(use-package! org
-  :defer t
-  :hook (org-mode . org-indent-mode)
-  :hook (org-mode . visual-line-mode)
-  :hook (org-mode . elken/org-font-setup))
+(defun elken/org-setup-hook ()
+  "Modes to enable on org-mode start"
+  (org-indent-mode)
+  (visual-line-mode 1)
+  (org-appear-mode)
+  (elken/org-font-setup))
+
+(add-hook! org-mode #'elken/org-setup-hook)
 #+end_src
 
 ** org-directory
 Let's set a sane default directory based on where I am
 
 #+begin_src emacs-lisp
-(setq org-directory (if IS-MAC "/Volumes/me@elken.dev/org" "~/org"))
+(setq org-directory "~/Nextcloud/org")
 #+end_src
 
 ** Font setup
@@ -624,20 +696,21 @@ proper value.
         org-appear-autosubmarkers t))
 #+end_src
 
-** Variable pitch
-Enable =variable-pitch-mode= to enable the more readable fonts where it makes sense
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! org-variable-pitch
-  :recipe (:host github
-           :repo "cadadr/elisp"))
-#+end_src
+** Mixed pitch
+Enable =mixed-pitch-mode= to enable the more readable fonts where it makes sense.
 
 #+begin_src emacs-lisp
-(use-package! org-variable-pitch
-  :after org
-  :hook (org-mode . variable-pitch-mode)
-  :hook (after-init-hook . org-variable-pitch-setup))
+(defvar elken/mixed-pitch-modes '(org-mode LaTeX-mode markdown-mode gfm-mode Info-mode)
+  "Only use `mixed-pitch-mode' for given modes.")
+
+(defun init-mixed-pitch-h ()
+  "Hook `mixed-pitch-mode' into each mode of `elken/mixed-pitch-modes'"
+  (when (memq major-mode elken/mixed-pitch-modes)
+    (mixed-pitch-mode 1))
+  (dolist (hook elken/mixed-pitch-modes)
+    (add-hook (intern (concat (symbol-name hook) "-hook")) #'mixed-pitch-mode)))
+
+(add-hook 'doom-init-ui-hook #'init-mixed-pitch-h)
 #+end_src
 
 ** Archive/Cleanup
@@ -958,47 +1031,48 @@ Sprinkle in some =doct= utility functions
 
 And we can now add some templates! This isn't even remotely set in stone, I wouldn't even describe them as set in /jelly/ really.
 #+begin_src emacs-lisp
-(setq org-capture-templates
-      (doct `(("Home" :keys "h"
-               :icon ("home" :set "octicon" :color "cyan")
-               :file "Home.org"
-               :prepend t
-               :headline "Inbox"
-               :template ("* TODO %?"
-                          "%i %a"))
-              ("Work" :keys "w"
-               :icon ("business" :set "material" :color "yellow")
-               :file "Work.org"
-               :prepend t
-               :headline "Inbox"
-               :template ("* TODO %?"
-                          "SCHEDULED: %^{Schedule:}t"
-                          "DEADLINE: %^{Deadline:}t"
-                          "%i %a"))
-              ("Note" :keys "n"
-               :icon ("sticky-note" :set "faicon" :color "yellow")
-               :file "Notes.org"
-               :template ("* *?"
-                          "%i %a"))
-              ("Project" :keys "p"
-               :icon ("repo" :set "octicon" :color "silver")
-               :prepend t
-               :type entry
-               :headline "Inbox"
-               :template ("* %{keyword} %?"
-                          "%i"
-                          "%a")
-               :file ""
-               :custom (:keyword "")
-               :children (("Task" :keys "t"
-                           :icon ("checklist" :set "octicon" :color "green")
-                           :keyword "TODO"
-                           :file +org-capture-project-todo-file)
-                          ("Note" :keys "n"
-                           :icon ("sticky-note" :set "faicon" :color "yellow")
-                           :keyword "%U"
-                           :file +org-capture-project-notes-file)))
-              )))
+(after! org-capture
+  (setq org-capture-templates
+        (doct `(("Home" :keys "h"
+                 :icon ("home" :set "octicon" :color "cyan")
+                 :file "Home.org"
+                 :prepend t
+                 :headline "Inbox"
+                 :template ("* TODO %?"
+                            "%i %a"))
+                ("Work" :keys "w"
+                 :icon ("business" :set "material" :color "yellow")
+                 :file "Work.org"
+                 :prepend t
+                 :headline "Inbox"
+                 :template ("* TODO %?"
+                            "SCHEDULED: %^{Schedule:}t"
+                            "DEADLINE: %^{Deadline:}t"
+                            "%i %a"))
+                ("Note" :keys "n"
+                 :icon ("sticky-note" :set "faicon" :color "yellow")
+                 :file "Notes.org"
+                 :template ("* *?"
+                            "%i %a"))
+                ("Project" :keys "p"
+                 :icon ("repo" :set "octicon" :color "silver")
+                 :prepend t
+                 :type entry
+                 :headline "Inbox"
+                 :template ("* %{keyword} %?"
+                            "%i"
+                            "%a")
+                 :file ""
+                 :custom (:keyword "")
+                 :children (("Task" :keys "t"
+                             :icon ("checklist" :set "octicon" :color "green")
+                             :keyword "TODO"
+                             :file +org-capture-project-todo-file)
+                            ("Note" :keys "n"
+                             :icon ("sticky-note" :set "faicon" :color "yellow")
+                             :keyword "%U"
+                             :file +org-capture-project-notes-file)))
+                ))))
 #+end_src
 
 ** Export
@@ -1230,7 +1304,7 @@ This is done according to `org-latex-feature-implementations'"
 Tectonic is the hot new thing, which also means I can get rid of my tex installation.
 
 #+begin_src emacs-lisp
-(setq-default org-latex-pdf-process '("tectonic --outdir=%o %f"))
+(setq-default org-latex-pdf-process '("tectonic -Z shell-escape --outdir=%o %f"))
 #+end_src
 
 **** Classes
@@ -1279,24 +1353,11 @@ Add some packages (also very likely to change)
 
 #+begin_src emacs-lisp
 (setq org-latex-default-packages-alist
-      `(("AUTO" "inputenc" t
-         ("pdflatex"))
-        ("T1" "fontenc" t
-         ("pdflatex"))
+      `(("AUTO" "inputenc" t ("pdflatex"))
+        ("T1" "fontenc" t ("pdflatex"))
         ("" "fontspec" t)
-        ("" "graphicx" t)
-        ("" "grffile" t)
-        ("" "longtable" nil)
-        ("" "wrapfig" nil)
-        ("" "rotating" nil)
-        ("normalem" "ulem" t)
-        ("" "amsmath" t)
-        ("" "textcomp" t)
-        ("" "amssymb" t)
-        ("" "capt-of" nil)
-        ("dvipsnames" "xcolor" nil)
-        ("colorlinks=true, linkcolor=Blue, citecolor=BrickRed, urlcolor=PineGreen" "hyperref" nil)
-    ("" "indentfirst" nil)
+        ("" "xcolor" nil)
+        ("" "hyperref" nil)
     "\\setmainfont[Ligatures=TeX]{IBM Plex Sans}"
     "\\setmonofont[Ligatures=TeX]{Iosevka Nerd Font Mono}"))
 #+end_src
@@ -1476,144 +1537,17 @@ Teco is the goto for this, so basically just ripping off him.
       output-block)))
 #+end_src
 
-**** Chameleon
-Attempt to improve default PDF export by using the current theme
+**** ox-chameleon
+Chameleons are cool, not having to touches faces is cooler (not the COVID kind)
 
-#+begin_src elisp
-(after! ox
-  (defvar ox-chameleon-base-class "cb-doc"
-    "The base class that chameleon builds on")
+#+begin_src emacs-lisp :tangle packages.el
+(package! ox-chameleon
+  :recipe (:host github :repo "tecosaur/ox-chameleon"))
+#+end_src
 
-  (defvar ox-chameleon--p nil
-    "Used to indicate whether the current export is trying to blend in. Set just before being accessed.")
-
-  (defadvice! ox-chameleon-org-latex-detect (orig-fun info)
-    :around #'org-export-install-filters
-    (setq ox-chameleon--p (when (equal (plist-get info :latex-class)
-                                       "chameleon")
-                            (plist-put info :latex-class ox-chameleon-base-class)
-                            (setq engrave-faces-preset-styles (engrave-faces-generate-preset))
-                            t))
-    (funcall orig-fun info))
-
-  (defadvice! ox-chameleon-org-latex-export (orig-fn info &optional template snippet?)
-    :around #'org-latex-make-preamble
-    (if ox-chameleon--p
-        (let ((engrave-faces-preset-styles (engrave-faces-generate-preset)))
-          (concat (funcall orig-fn info template snippet?)
-                  (ox-chameleon-generate-colourings)))
-      (funcall orig-fn info template snippet?)))
-
-  (defun ox-chameleon-generate-colourings ()
-    (apply #'format
-           "%% make document follow Emacs theme
-\\definecolor{bg}{HTML}{%s}
-\\definecolor{fg}{HTML}{%s}
-
-\\definecolor{red}{HTML}{%s}
-\\definecolor{orange}{HTML}{%s}
-\\definecolor{green}{HTML}{%s}
-\\definecolor{teal}{HTML}{%s}
-\\definecolor{yellow}{HTML}{%s}
-\\definecolor{blue}{HTML}{%s}
-\\definecolor{dark-blue}{HTML}{%s}
-\\definecolor{magenta}{HTML}{%s}
-\\definecolor{violet}{HTML}{%s}
-\\definecolor{cyan}{HTML}{%s}
-\\definecolor{dark-cyan}{HTML}{%s}
-
-\\definecolor{documentTitle}{HTML}{%s}
-\\definecolor{documentInfo}{HTML}{%s}
-\\definecolor{level1}{HTML}{%s}
-\\definecolor{level2}{HTML}{%s}
-\\definecolor{level3}{HTML}{%s}
-\\definecolor{level4}{HTML}{%s}
-\\definecolor{level5}{HTML}{%s}
-\\definecolor{level6}{HTML}{%s}
-\\definecolor{level7}{HTML}{%s}
-\\definecolor{level8}{HTML}{%s}
-
-\\definecolor{link}{HTML}{%s}
-\\definecolor{cite}{HTML}{%s}
-\\definecolor{itemlabel}{HTML}{%s}
-\\definecolor{code}{HTML}{%s}
-\\definecolor{verbatim}{HTML}{%s}
-
-\\definecolor{codebackground}{HTML}{%s}
-\\colorlet{EFD}{fg}
-\\definecolor{codeborder}{HTML}{%s}
-
-\\pagecolor{bg}
-\\color{fg}
-
-\\addtokomafont{title}{\\color{documentTitle}}
-\\addtokomafont{author}{\\color{documentInfo}}
-\\addtokomafont{date}{\\color{documentInfo}}
-\\addtokomafont{section}{\\color{level1}}
-\\newkomafont{sectionprefix}{\\color{level1}}
-\\addtokomafont{subsection}{\\color{level2}}
-\\newkomafont{subsectionprefix}{\\color{level2}}
-\\addtokomafont{subsubsection}{\\color{level3}}
-\\newkomafont{subsubsectionprefix}{\\color{level3}}
-\\addtokomafont{paragraph}{\\color{level4}}
-\\newkomafont{paragraphprefix}{\\color{level4}}
-\\addtokomafont{subparagraph}{\\color{level5}}
-\\newkomafont{subparagraphprefix}{\\color{level5}}
-
-\\renewcommand{\\labelitemi}{\\textcolor{itemlabel}{\\textbullet}}
-\\renewcommand{\\labelitemii}{\\textcolor{itemlabel}{\\normalfont\\bfseries \\textendash}}
-\\renewcommand{\\labelitemiii}{\\textcolor{itemlabel}{\\textasteriskcentered}}
-\\renewcommand{\\labelitemiv}{\\textcolor{itemlabel}{\\textperiodcentered}}
-
-\\renewcommand{\\labelenumi}{\\textcolor{itemlabel}{\\theenumi.}}
-\\renewcommand{\\labelenumii}{\\textcolor{itemlabel}{(\\theenumii)}}
-\\renewcommand{\\labelenumiii}{\\textcolor{itemlabel}{\\theenumiii.}}
-\\renewcommand{\\labelenumiv}{\\textcolor{itemlabel}{\\theenumiv.}}
-
-\\DeclareTextFontCommand{\\texttt}{\\color{code}\\ttfamily}
-\\makeatletter
-\\def\\verbatim@font{\\color{verbatim}\\normalfont\\ttfamily}
-\\makeatother
-%% end customisations
-"
-           (mapcar (doom-rpartial #'substring 1)
-                   (list
-                    (face-attribute 'solaire-default-face :background)
-                    (face-attribute 'default :foreground)
-                    ;;
-                    (doom-color 'red)
-                    (doom-color 'orange)
-                    (doom-color 'green)
-                    (doom-color 'teal)
-                    (doom-color 'yellow)
-                    (doom-color 'blue)
-                    (doom-color 'dark-blue)
-                    (doom-color 'magenta)
-                    (doom-color 'violet)
-                    (doom-color 'cyan)
-                    (doom-color 'dark-cyan)
-                    ;;
-                    (face-attribute 'org-document-title :foreground)
-                    (face-attribute 'org-document-info :foreground)
-                    (face-attribute 'outline-1 :foreground)
-                    (face-attribute 'outline-2 :foreground)
-                    (face-attribute 'outline-3 :foreground)
-                    (face-attribute 'outline-4 :foreground)
-                    (face-attribute 'outline-5 :foreground)
-                    (face-attribute 'outline-6 :foreground)
-                    (face-attribute 'outline-7 :foreground)
-                    (face-attribute 'outline-8 :foreground)
-                    ;;
-                    (face-attribute 'link :foreground)
-                    (doom-color 'yellow)
-                    (face-attribute 'org-list-dt :foreground)
-                    (face-attribute 'org-code :foreground)
-                    (face-attribute 'org-verbatim :foreground)
-                    ;;
-                    (face-attribute 'org-block :background)
-                    (doom-blend (face-attribute 'default :background)
-                                (face-attribute 'default :foreground)
-                                0.95))))))
+#+begin_src emacs-lisp
+(use-package! ox-chameleon
+  :after ox)
 #+end_src
 
 * Languages
