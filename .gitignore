@@ -23,3 +23,6 @@ custom.el
 .DS_Store
 *.tex
 *.pdf
+/autoloads.el
+/*.html
+/snippets/

@@ -1,6 +1,6 @@
-#+TITLE: Config
-#+LATEX_CLASS: chameleon
-#+CAPTION: Banner
+#+title: Config
+#+latex_class: chameleon
+#+caption: Banner
 [[file:images/banner.png]]
 
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
@@ -24,6 +24,7 @@ be commented to the best of /my/ ability.
     - [[#subword-mode][Subword-mode]]
     - [[#auto-revert-mode][Auto-revert-mode]]
     - [[#prevent-flickering][Prevent flickering]]
+    - [[#clear-snippets-before-loading][Clear snippets before loading]]
     - [[#load-env-after-reload][Load env after reload]]
     - [[#evil][Evil]]
       - [[#splits][Splits]]
@@ -65,6 +66,10 @@ be commented to the best of /my/ ability.
   - [[#hook-setup][Hook setup]]
   - [[#org-directory][org-directory]]
   - [[#font-setup][Font setup]]
+  - [[#heading-minimap][Heading minimap]]
+  - [[#tables][Tables]]
+  - [[#properties][Properties]]
+    - [[#allow-property-inheritance][Allow property inheritance]]
   - [[#characters][Characters]]
     - [[#headline-bullets][Headline bullets]]
     - [[#item-bullets][Item bullets]]
@@ -100,6 +105,8 @@ be commented to the best of /my/ ability.
       - [[#packages][Packages]]
       - [[#pretty-code-blocks][Pretty code blocks]]
       - [[#ox-chameleon][ox-chameleon]]
+    - [[#async][Async]]
+    - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
   - [[#lsp][LSP]]
     - [[#improve-completions][Improve completions]]
@@ -107,6 +114,14 @@ be commented to the best of /my/ ability.
   - [[#php][PHP]]
     - [[#module-improvements][Module improvements]]
     - [[#intelephense][Intelephense]]
+- [[#snippets][Snippets]]
+  - [[#org-mode-1][Org-mode]]
+    - [[#__][__]]
+  - [[#php-mode][PHP-Mode]]
+    - [[#function][function]]
+    - [[#php-1][php]]
+  - [[#php-laravel-mode][+php-laravel-mode]]
+    - [[#migration_up][migration_up]]
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
   - [[#laravel-mode][laravel-mode]]
@@ -186,6 +201,13 @@ Noticed some odd flickering here and there, apparently this should resolve it
 
 #+begin_src emacs-lisp
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
+#+end_src
+
+*** Clear snippets before loading
+Some attempt to make them reproducible.
+
+#+begin_src emacs-lisp
+(add-hook! 'org-babel-pre-tangle-hook (when (file-directory-p "snippets") (delete-directory "snippets" t (not (null delete-by-moving-to-trash)))))
 #+end_src
 
 *** Load env after reload
@@ -644,6 +666,47 @@ Also need to investigate Overpass as a replacement for IBM Plex Sans.
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+END_SRC
+
+** Heading minimap
+Outline structure of the org documents, apparently it has cool things for
+promoting from it.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-ol-tree
+  :recipe (:host github :repo "Townk/org-ol-tree"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! org-ol-tree
+  :commands org-ol-tree)
+
+(map! :map org-mode-map
+      :after org
+      :localleader
+      :desc "Outline" "O" #'org-ol-tree)
+#+end_src
+
+** Tables
+Improve tables by using unicode box characters intead of boring /ascii/.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-pretty-table
+  :recipe (:host github :repo "Fuco1/org-pretty-table"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! org-pretty-table
+  :after org
+  :hook (org-mode . org-pretty-table-mode))
+#+end_src
+
+** Properties
+*** Allow property inheritance
+This may be the solution to /so/ many weird issues with src blocks.
+
+#+begin_src emacs-lisp
+(setq org-use-property-inheritance t)
+#+end_src
 
 ** Characters
 *** Headline bullets
@@ -1596,6 +1659,20 @@ Chameleons are cool, not having to touches faces is cooler (not the COVID kind)
   :after ox)
 #+end_src
 
+*** Async
+Run export processes in a background ... process
+
+#+begin_src emacs-lisp
+(setq org-export-in-background t)
+#+end_src
+
+*** (sub|super)script characters
+Annoying having to gate these, so let's fix that
+
+#+begin_src emacs-lisp
+(setq org-export-with-sub-superscripts '{})
+#+end_src
+
 * Languages
 Configuration for various programming languages.
 
@@ -1670,6 +1747,70 @@ Because I'm a massive sellout who likes features
 
 #+begin_src emacs-lisp
 (setq lsp-intelephense-licence-key (fetch-auth-source :user "intelephense"))
+#+end_src
+
+* Snippets
+:PROPERTIES:
+:header-args:snippet: :mkdirp yes :tangle (expand-file-name (downcase (elt (org-get-outline-path t) (- (length (org-get-outline-path t)) 1))) (expand-file-name (downcase (elt (org-get-outline-path t) 1)) "snippets"))
+:END:
+I constantly find myself complaining I don't have snippets setup, and yet I
+always forget to set snippets up. [[https://www.youtube.com/watch?v=sc5iTNVEOAg][My own worst enemy]]? Probably. But who's
+keeping score...
+
+First let's define a useful helper for creating snippets based on the current
+heading.
+
+** Org-mode
+*** __
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: Org template
+# --
+#+title: ${1:`(s-titleized-words (replace-regexp-in-string "^[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9]-" "" (file-name-base (or buffer-file-name "new buffer"))))`}
+#+author: ${2:`(user-full-name)`}
+#+date: ${3:`(format-time-string "%Y-%m-%d")`}
+#+latex_class: chameleon
+
+$0
+#+end_src
+
+** PHP-Mode
+*** function
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: function
+# key: fu
+# uuid: fu
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+${1:$$(yas-auto-next (yas-completing-read "Visibility (public): " '("public" "private" "protected") nil nil nil nil "public"))} function ${2:name}($3)
+{
+    $0
+}
+#+end_src
+
+*** php
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: <?php
+# key: php
+# uuid: php
+# --
+<?php
+$0
+#+end_src
+
+** +php-laravel-mode
+*** migration_up
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: Laravel Migration method
+# key: mig
+# uuid: mig
+# --
+Schema::table('$1', function (Blueprint $table) {
+    `%`$0
+});
 #+end_src
 
 * Packages
