@@ -15,7 +15,8 @@
 ;;      directory (for easy access to its source code).
 
 ;; Loading before emacs
-(setq treemacs-git-mode 'deferred)
+(setq treemacs-git-mode 'deferred
+      doom-themes-treemacs-theme "doom-colors")
 
 ;; Make line endings work
 (setq evil-respect-visual-line-mode t)

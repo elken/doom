@@ -20,7 +20,6 @@ be commented to the best of /my/ ability.
 - [[#globals][Globals]]
   - [[#constants-and-variables][Constants and Variables]]
     - [[#lexical-binding][Lexical binding]]
-    - [[#performance-related][Performance-related]]
     - [[#subword-mode][Subword-mode]]
     - [[#auto-revert-mode][Auto-revert-mode]]
     - [[#prevent-flickering][Prevent flickering]]
@@ -124,6 +123,7 @@ be commented to the best of /my/ ability.
     - [[#php-1][php]]
   - [[#php-laravel-mode][+php-laravel-mode]]
     - [[#migration_up][migration_up]]
+    - [[#scope][scope]]
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
   - [[#laravel-mode][laravel-mode]]
@@ -173,13 +173,6 @@ think of one? Would have thought of one.
 
 #+begin_src emacs-lisp
 ;;; -*- lexical-binding: t; -*-
-#+end_src
-
-*** Performance-related
-Minor tweaks to improve overall performance
-
-#+begin_src emacs-lisp
-(setq history-length 25)
 #+end_src
 
 *** Subword-mode
@@ -1788,7 +1781,6 @@ And set the server to be loaded
   (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio")))))
 #+end_src
 
-
 * Snippets
 :PROPERTIES:
 :header-args:snippet: :mkdirp yes :tangle (expand-file-name (downcase (elt (org-get-outline-path t) (- (length (org-get-outline-path t)) 1))) (expand-file-name (downcase (elt (org-get-outline-path t) 1)) "snippets"))
@@ -1853,6 +1845,22 @@ Schema::table('$1', function (Blueprint $table) {
 });
 #+end_src
 
+*** scope
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: Sentry scope
+# key: scope
+# uuid: scope
+# --
+withScope(function (Scope $scope) use ($1) {
+    $scope->setContext('$2', [
+        $3
+    ]);
+
+    `%`$0
+});
+#+end_src
+
 * Packages
 Place to put packages that don't have a guaranteed home yet.
 
@@ -1898,7 +1906,8 @@ Need to add this into company module when I've tested
   :hook (company-mode . company-prescient-mode)
   :hook (company-prescient-mode . prescient-persist-mode)
   :config
-  (setq prescient-save-file (concat doom-cache-dir "prescient-save.el")))
+  (setq prescient-save-file (concat doom-cache-dir "prescient-save.el")
+        history-length 1000))
 #+end_src
 
 ** Rainbow Identifiers
@@ -1921,4 +1930,3 @@ Web-mode has normal text which should be ignored.
           php-variable-sigil
           web-mode-variable-name-face)))
 #+end_src
-
