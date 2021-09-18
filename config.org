@@ -130,6 +130,7 @@ be commented to the best of /my/ ability.
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
+  - [[#orgdiff][orgdiff]]
 
 * Setup
 ** Workflow
@@ -458,10 +459,10 @@ below from Teco gives a much better experience for files.
   (defun +marginalia-annotate-file-colorful (cand)
     "Annotate file CAND with its size, modification time and other attrs.
 These annotations are skipped for remote paths."
-    (if (or (marginalia--remote-p cand)
+    (if (or (file-remote-p cand)
             (when-let (win (active-minibuffer-window))
               (with-current-buffer (window-buffer win)
-                (marginalia--remote-p (minibuffer-contents-no-properties)))))
+                (file-remote-p (minibuffer-contents-no-properties)))))
         (marginalia--fields ("*Remote*" :face 'marginalia-documentation))
       (when-let (attrs (file-attributes (substitute-in-file-name
                                          (marginalia--full-candidate cand))
@@ -1868,9 +1869,6 @@ Place to put packages that don't have a guaranteed home yet.
 Packages to be unpinned or just completely disabled
 
 #+begin_src emacs-lisp :tangle packages.el
-(unpin! doom-modeline)
-(unpin! lsp-ui)
-(unpin! lsp-mode)
 (disable-packages! evil-escape)
 #+end_src
 
@@ -1929,4 +1927,11 @@ Web-mode has normal text which should be ignored.
           php-property-name
           php-variable-sigil
           web-mode-variable-name-face)))
+#+end_src
+
+** orgdiff
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-diff
+  :recipe (:host github :repo "tecosaur/orgdiff"))
 #+end_src
