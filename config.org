@@ -108,6 +108,7 @@ be commented to the best of /my/ ability.
     - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
   - [[#lsp][LSP]]
+    - [[#ignore-files-in-xref][Ignore files in xref]]
     - [[#ui-doc-in-a-webkit-frame][UI doc in a webkit frame]]
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
@@ -1672,6 +1673,31 @@ Annoying having to gate these, so let's fix that
 Configuration for various programming languages.
 
 ** LSP
+*** Ignore files in xref
+PHP is a dumb language (don't get me started...), as such we need extra files to
+get decent completion & documentation. 0% of the time will we want to use them
+as references, so we won't.
+
+#+begin_src emacs-lisp
+(defvar xref-ignored-files '("_ide_helper_models.php" "_ide_helper.php")
+  "List of files to be ignored by `xref'.")
+
+(defun xref-ignored-file-p (item)
+  "Return t if `item' should be ignored."
+  (seq-some (lambda (cand)
+              (string-suffix-p cand (oref (xref-item-location item) file))) xref-ignored-files))
+
+(defadvice! +lsp--ignored-locations-to-xref-items-a (items)
+  "Remove ignored files from list of xref-items."
+  :filter-return #'lsp--locations-to-xref-items
+  (cl-remove-if #'xref-ignored-file-p items))
+
+(defadvice! +lsp-ui-peek--ignored-locations-a (items)
+  "Remove ignored files from list of xref-items."
+  :filter-return #'lsp-ui-peek--get-references
+  (cl-remove-if #'xref-ignored-file-p items))
+#+end_src
+
 *** UI doc in a webkit frame
 Display documention in a webkit frame for fancy markdown rendering
 
