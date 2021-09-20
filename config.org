@@ -123,6 +123,7 @@ be commented to the best of /my/ ability.
     - [[#function][function]]
     - [[#php-1][php]]
   - [[#php-laravel-mode][+php-laravel-mode]]
+    - [[#__-1][__]]
     - [[#migration_up][migration_up]]
     - [[#scope][scope]]
 - [[#packages-1][Packages]]
@@ -1852,6 +1853,22 @@ $0
 #+end_src
 
 ** +php-laravel-mode
+*** __
+
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: PHP template
+# --
+<?php
+
+namespace `(s-titleized-words (file-name-directory (file-relative-name buffer-file-name (projectile-project-root))))`;
+
+class `(s-titleized-words (file-name-base buffer-file-name))`
+{
+    $0
+}
+#+end_src
+
 *** migration_up
 #+begin_src snippet
 # -*- mode: snippet -*-
