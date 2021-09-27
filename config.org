@@ -9,6 +9,8 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 from stackoverflow, modernemacs, [[https://github.com/daviwil][David Wilson]] and [[https://github.com/tecosaur][Tecosaur]]. Everything else will
 be commented to the best of /my/ ability.
 
+Most of this cobbled mess is now mine, and if you do intend to use any of it it would be nice if you mentioned me when doing so. It's just polite :)
+
 * Table of Contents :TOC_5_gh:noexport:
 - [[#setup][Setup]]
   - [[#workflow][Workflow]]
