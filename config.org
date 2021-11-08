@@ -9,7 +9,8 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 from stackoverflow, modernemacs, [[https://github.com/daviwil][David Wilson]] and [[https://github.com/tecosaur][Tecosaur]]. Everything else will
 be commented to the best of /my/ ability.
 
-Most of this cobbled mess is now mine, and if you do intend to use any of it it would be nice if you mentioned me when doing so. It's just polite :)
+Most of this cobbled mess is now mine, and if you do intend to use any of it it
+would be nice if you mentioned me when doing so. It's just polite :)
 
 * Table of Contents :TOC_5_gh:noexport:
 - [[#setup][Setup]]
@@ -109,13 +110,12 @@ Most of this cobbled mess is now mine, and if you do intend to use any of it it 
     - [[#async][Async]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
+  - [[#elisp][ELISP]]
   - [[#lsp][LSP]]
     - [[#ignore-files-in-xref][Ignore files in xref]]
-    - [[#ui-doc-in-a-webkit-frame][UI doc in a webkit frame]]
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
   - [[#php][PHP]]
-    - [[#module-improvements][Module improvements]]
     - [[#intelephense][Intelephense]]
     - [[#eglot][Eglot]]
 - [[#snippets][Snippets]]
@@ -134,7 +134,6 @@ Most of this cobbled mess is now mine, and if you do intend to use any of it it 
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
-  - [[#orgdiff][orgdiff]]
 
 * Setup
 ** Workflow
@@ -209,7 +208,12 @@ Some attempt to make them reproducible.
 #+begin_src emacs-lisp
 (add-hook! 'org-babel-pre-tangle-hook
   (when (file-directory-p "snippets")
-    (delete-directory "snippets" t (not (null delete-by-moving-to-trash)))))
+    (require 'async)
+    (async-start
+     (lambda ()
+       (delete-directory "snippets" t (not (null delete-by-moving-to-trash))))
+     (lambda (result)
+       (print! "Delete snippets dir got: " result)))))
 #+end_src
 
 *** Load env after reload
@@ -444,8 +448,8 @@ Remove some of the useless =evil-= prefixes from which-key commands.
 (after! which-key
   (pushnew!
    which-key-replacement-alist
-   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . "◂\\1"))
-   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "◃\\1"))))
+   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . " \\1"))
+   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . " \\1"))))
 #+end_src
 
 ** Marginalia
@@ -1651,6 +1655,67 @@ Chameleons are cool, not having to touches faces is cooler (not the COVID kind)
 #+end_src
 
 *** Async
+We can do better. Override the built-in tangling for something more async-y (borrowed from Tecosaur)
+
+#+begin_src emacs-lisp
+(defvar +literate-tangle--proc nil)
+(defvar +literate-tangle--proc-start-time nil)
+
+(defadvice! +literate-tangle-async-h ()
+  "A very simplified version of `+literate-tangle-h', but async."
+  :override #'+literate-tangle-h
+  (unless (getenv "__NOTANGLE")
+    (let ((default-directory doom-private-dir))
+      (when +literate-tangle--proc
+        (message "Killing outdated tangle process...")
+        (set-process-sentinel +literate-tangle--proc #'ignore)
+        (kill-process +literate-tangle--proc)
+        (sit-for 0.3)) ; ensure the message is seen for a bit
+      (setq +literate-tangle--proc-start-time (float-time)
+            +literate-tangle--proc
+            (start-process "tangle-config"
+                           (get-buffer-create " *tangle config*")
+                           "emacs" "--batch" "--eval"
+                           (format "(progn \
+(require 'ox) \
+(require 'ob-tangle) \
+(setq org-confirm-babel-evaluate nil \
+      org-inhibit-startup t \
+      org-mode-hook nil \
+      write-file-functions nil \
+      before-save-hook nil \
+      after-save-hook nil \
+      vc-handled-backends nil \
+      org-startup-folded nil \
+      org-startup-indented nil) \
+(org-babel-tangle-file \"%s\" \"%s\"))"
+                                   +literate-config-file
+                                   (expand-file-name (concat doom-module-config-file ".el")))))
+      (set-process-sentinel +literate-tangle--proc #'+literate-tangle--sentinel)
+      (run-at-time nil nil (lambda () (message "Tangling config.org"))) ; ensure shown after a save message
+      "Tangling config.org...")))
+
+(defun +literate-tangle--sentinel (process signal)
+  (cond
+   ((and (eq 'exit (process-status process))
+         (= 0 (process-exit-status process)))
+    (message "Tangled config.org sucessfully (took %.1fs)"
+             (- (float-time) +literate-tangle--proc-start-time))
+    (setq +literate-tangle--proc nil))
+   ((memq (process-status process) (list 'exit 'signal))
+    (+popup-buffer (get-buffer " *tangle config*"))
+    (message "Failed to tangle config.org (after %.1fs)"
+             (- (float-time) +literate-tangle--proc-start-time))
+    (setq +literate-tangle--proc nil))))
+
+(defun +literate-tangle-check-finished ()
+  (when (and (process-live-p +literate-tangle--proc)
+             (yes-or-no-p "Config is currently retangling, would you please wait a few seconds?"))
+    (switch-to-buffer " *tangle config*")
+    (signal 'quit nil)))
+(add-hook! 'kill-emacs-hook #'+literate-tangle-check-finished)
+#+end_src
+
 Run export processes in a background ... process
 
 #+begin_src emacs-lisp
@@ -1667,6 +1732,14 @@ Annoying having to gate these, so let's fix that
 * Languages
 Configuration for various programming languages.
 
+** ELISP
+/Finally/ get the completion in elisp working (not sure why it's been so bad for so long...)
+
+#+begin_src emacs-lisp
+(set-company-backend! 'emacs-lisp-mode
+  'company-capf 'company-yasnippet)
+#+end_src
+
 ** LSP
 *** Ignore files in xref
 PHP is a dumb language (don't get me started...), as such we need extra files to
@@ -1679,8 +1752,9 @@ as references, so we won't.
 
 (defun xref-ignored-file-p (item)
   "Return t if `item' should be ignored."
-  (seq-some (lambda (cand)
-              (string-suffix-p cand (oref (xref-item-location item) file))) xref-ignored-files))
+  (seq-some
+   (lambda (cand)
+     (string-suffix-p cand (oref (xref-item-location item) file))) xref-ignored-files))
 
 (defadvice! +lsp--ignored-locations-to-xref-items-a (items)
   "Remove ignored files from list of xref-items."
@@ -1693,20 +1767,12 @@ as references, so we won't.
   (cl-remove-if #'xref-ignored-file-p items))
 #+end_src
 
-*** UI doc in a webkit frame
-Display documention in a webkit frame for fancy markdown rendering
-
-#+begin_src emacs-lisp
-(setq lsp-ui-doc-use-webkit t)
-#+end_src
-
 *** Improve completions
 The default completions are quite bad
 
 #+begin_src emacs-lisp
-(after! lsp-mode
-  (setq +lsp-company-backends
-        '(:separate company-capf company-yasnippet)))
+(setq +lsp-company-backends
+      '(:separate company-capf company-yasnippet))
 #+end_src
 
 *** Ignore directories
@@ -1725,51 +1791,12 @@ And some more for projectile
 #+end_src
 
 ** PHP
-*** Module improvements
-Adding here until [[https://github.com/hlissner/doom-emacs/pull/5292][#5292]] is merged.
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! composer)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! composer
-  :defer t
-  :init
-  (map! :after php-mode
-        :localleader
-        :map php-mode-map
-        :prefix ("c" . "composer")
-        "c" #'composer
-        "i" #'composer-install
-        "r" #'composer-require
-        "u" #'composer-update
-        "d" #'composer-dump-autoload
-        "s" #'composer-run-script
-        "v" #'composer-run-vendor-bin-command
-        "o" #'composer-find-json-file
-        "l" #'composer-view-lock-file))
-#+end_src
-
-#+begin_src emacs-lisp
-(defvar +php/default-docker-container "php-fpm"
-  "The default docker container to run commands in")
-
-(def-project-mode! +phpunit-docker-compose-mode
-  :modes '(php-mode docker-compose-mode)
-  :files (and "phpunit.xml" "docker-compose.yml")
-  :on-enter
-  (setq phpunit-args `("exec" ,+php/default-docker-container "php" "vendor/bin/phpunit")
-        phpunit-executable (executable-find "docker-compose")))
-
-(add-hook 'php-mode-hook #'rainbow-delimiters-mode)
-#+end_src
-
 *** Intelephense
 Because I'm a massive sellout who likes features
 
 #+begin_src emacs-lisp
-(setq lsp-intelephense-licence-key (fetch-auth-source :user "intelephense"))
+(after! eglot
+  (setq lsp-intelephense-licence-key (fetch-auth-source :user "intelephense")))
 #+end_src
 
 *** Eglot
@@ -1964,11 +1991,4 @@ Web-mode has normal text which should be ignored.
           php-property-name
           php-variable-sigil
           web-mode-variable-name-face)))
-#+end_src
-
-** orgdiff
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! org-diff
-  :recipe (:host github :repo "tecosaur/orgdiff"))
 #+end_src
