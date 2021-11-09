@@ -6,6 +6,6 @@
 
 (when (and doom-interactive-p
            (not doom-reloading-p)
-	   IS-EXWM)
+           IS-EXWM)
   (require 'exwm)
   (exwm-enable))
