@@ -1,6 +1,10 @@
 #+title: Config
-#+latex_class: chameleon
+#+author: Ellis Kenyő
+#+property: header-args:emacs-lisp :tangle yes :comments link
+#+property: header-args :tangle no :results silent :eval no-export
 #+caption: Banner
+#+latex_class: chameleon
+
 [[file:images/banner.png]]
 
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
@@ -132,7 +136,6 @@ be commented to the best of /my/ ability.
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
-  - [[#orgdiff][orgdiff]]
 
 * Setup
 ** Workflow
@@ -182,7 +185,7 @@ think of one? Would have thought of one.
 Subword mode is a good start because PHP uses a lot of CamelCase and it makes
 refactoring slightly easier
 
-#+begin_src elisp
+#+begin_src emacs-lisp
 (global-subword-mode 1)
 #+end_src
 
@@ -625,10 +628,8 @@ Let's set a sane default directory based on where I am
 #+end_src
 
 ** Font setup
-Font setup to prettify the fonts. Uses IBM Plex Sans in most places except where
+Font setup to prettify the fonts. Uses Overpass in most places except where
 it makes sense to use the defined fixed width font.
-
-Also need to investigate Overpass as a replacement for IBM Plex Sans.
 
 #+BEGIN_SRC emacs-lisp
 (defun elken/org-font-setup ()
@@ -643,7 +644,7 @@ Also need to investigate Overpass as a replacement for IBM Plex Sans.
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "IBM Plex Sans" :weight 'regular :height (cdr face)))
+    (set-face-attribute (car face) nil :font "Overpass" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-tag nil :foreground nil :inherit '(shadow fixed-pitch) :weight 'bold)
@@ -1177,49 +1178,8 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
 *** LaTeX
 A necessary evil. I hate it, it hates me, but it makes my PDF documents look nice.
 
-**** Conditional features
-
-#+begin_src emacs-lisp
-(defvar org-latex-italic-quotes t
-  "Make \"quote\" environments italic.")
-(defvar org-latex-par-sep t
-  "Vertically seperate paragraphs, and remove indentation.")
-
-(defvar org-latex-conditional-features
-  '(("\\[\\[\\(?:file\\|https?\\):\\(?:[^]]\\|\\\\\\]\\)+?\\.\\(?:eps\\|pdf\\|png\\|jpeg\\|jpg\\|jbig2\\)\\]\\]" . image)
-    ("\\[\\[\\(?:file\\|https?\\):\\(?:[^]]+?\\|\\\\\\]\\)\\.svg\\]\\]" . svg)
-    ("^[ \t]*|" . table)
-    ("cref:\\|\\cref{\\|\\[\\[[^\\]]+\\]\\]" . cleveref)
-    ("[;\\\\]?\\b[A-Z][A-Z]+s?[^A-Za-z]" . acronym)
-    ("\\+[^ ].*[^ ]\\+\\|_[^ ].*[^ ]_\\|\\\\uu?line\\|\\\\uwave\\|\\\\sout\\|\\\\xout\\|\\\\dashuline\\|\\dotuline\\|\\markoverwith" . underline)
-    (":float wrap" . float-wrap)
-    (":float sideways" . rotate)
-    ("^[ \t]*#\\+caption:\\|\\\\caption" . caption)
-    ("\\[\\[xkcd:" . (image caption))
-    ((and org-latex-italic-quotes "^[ \t]*#\\+begin_quote\\|\\\\begin{quote}") . italic-quotes)
-    (org-latex-par-sep . par-sep)
-    ("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\|[A-Za-z]+[.)]\\) \\[[ -X]\\]" . checkbox)
-    ("^[ \t]*#\\+begin_warning\\|\\\\begin{warning}" . box-warning)
-    ("^[ \t]*#\\+begin_info\\|\\\\begin{info}"       . box-info)
-    ("^[ \t]*#\\+begin_success\\|\\\\begin{success}" . box-success)
-    ("^[ \t]*#\\+begin_error\\|\\\\begin{error}"     . box-error))
-  "Org feature tests and associated LaTeX feature flags.
-
-Alist where the car is a test for the presense of the feature,
-and the cdr is either a single feature symbol or list of feature symbols.
-
-When a string, it is used as a regex search in the buffer.
-The feature is registered as present when there is a match.
-
-The car can also be a
-- symbol, the value of which is fetched
-- function, which is called with info as an argument
-- list, which is `eval'uated
-
-If the symbol, function, or list produces a string: that is used as a regex
-search in the buffer. Otherwise any non-nil return value will indicate the
-existance of the feature.")
-#+end_src
+**** Preambles
+Various preamble setups to improve the overall look of several items
 
 #+begin_src emacs-lisp
 (defvar org-latex-caption-preamble "
@@ -1258,7 +1218,50 @@ existance of the feature.")
   "Preamble that provides a macro for custom boxes.")
 #+end_src
 
+**** Conditional features
+Don't always need everything in LaTeX, so only add it what we need when we need it.
+
 #+begin_src emacs-lisp
+(defvar org-latex-italic-quotes t
+  "Make \"quote\" environments italic.")
+(defvar org-latex-par-sep t
+  "Vertically seperate paragraphs, and remove indentation.")
+
+(defvar org-latex-conditional-features
+  '(("\\[\\[\\(?:file\\|https?\\):\\(?:[^]]\\|\\\\\\]\\)+?\\.\\(?:eps\\|pdf\\|png\\|jpeg\\|jpg\\|jbig2\\)\\]\\]" . image)
+    ("\\[\\[\\(?:file\\|https?\\):\\(?:[^]]+?\\|\\\\\\]\\)\\.svg\\]\\]\\|\\\\includesvg" . svg)
+    ("^[ \t]*|" . table)
+    ("cref:\\|\\cref{\\|\\[\\[[^\\]]+\\]\\]" . cleveref)
+    ("[;\\\\]?\\b[A-Z][A-Z]+s?[^A-Za-z]" . acronym)
+    ("\\+[^ ].*[^ ]\\+\\|_[^ ].*[^ ]_\\|\\\\uu?line\\|\\\\uwave\\|\\\\sout\\|\\\\xout\\|\\\\dashuline\\|\\dotuline\\|\\markoverwith" . underline)
+    (":float wrap" . float-wrap)
+    (":float sideways" . rotate)
+    ("^[ \t]*#\\+caption:\\|\\\\caption" . caption)
+    ("\\[\\[xkcd:" . (image caption))
+    ((and org-latex-italic-quotes "^[ \t]*#\\+begin_quote\\|\\\\begin{quote}") . italic-quotes)
+    (org-latex-par-sep . par-sep)
+    ("^[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\|[A-Za-z]+[.)]\\) \\[[ -X]\\]" . checkbox)
+    ("^[ \t]*#\\+begin_warning\\|\\\\begin{warning}" . box-warning)
+    ("^[ \t]*#\\+begin_info\\|\\\\begin{info}"       . box-info)
+    ("^[ \t]*#\\+begin_success\\|\\\\begin{success}" . box-success)
+    ("^[ \t]*#\\+begin_error\\|\\\\begin{error}"     . box-error))
+  "Org feature tests and associated LaTeX feature flags.
+
+Alist where the car is a test for the presense of the feature,
+and the cdr is either a single feature symbol or list of feature symbols.
+
+When a string, it is used as a regex search in the buffer.
+The feature is registered as present when there is a match.
+
+The car can also be a
+- symbol, the value of which is fetched
+- function, which is called with info as an argument
+- list, which is `eval'uated
+
+If the symbol, function, or list produces a string: that is used as a regex
+search in the buffer. Otherwise any non-nil return value will indicate the
+existance of the feature.")
+
 (defvar org-latex-feature-implementations
   '((image         :snippet "\\usepackage{graphicx}" :order 2)
     (svg           :snippet "\\usepackage{svg}" :order 2)
@@ -1303,6 +1306,8 @@ following keys:
 Features that start with ! will be eagerly loaded, i.e. without being detected.")
 #+end_src
 
+First, we need to detect which features we actually need
+
 #+begin_src emacs-lisp
 (defun org-latex-detect-features (&optional buffer info)
   "List features from `org-latex-conditional-features' detected in BUFFER."
@@ -1324,6 +1329,8 @@ Features that start with ! will be eagerly loaded, i.e. without being detected."
                    (if (listp (cdr construct-feature)) (cdr construct-feature) (list (cdr construct-feature)))))
                org-latex-conditional-features)))))
 #+end_src
+
+Then we need to expand them and sort them according to the above definitions
 
 #+begin_src emacs-lisp
 (defun org-latex-expand-features (features)
@@ -1359,6 +1366,8 @@ Features that start with ! will be eagerly loaded, i.e. without being detected."
               t nil))))
 #+end_src
 
+Finally, we can create the preamble to be inserted
+
 #+begin_src emacs-lisp
 (defun org-latex-generate-features-preamble (features)
   "Generate the LaTeX preamble content required to provide FEATURES.
@@ -1380,6 +1389,8 @@ This is done according to `org-latex-feature-implementations'"
                 "")
      "% end features\n")))
 #+end_src
+
+Last step, some advice to hook in all of the above to work
 
 #+begin_src emacs-lisp
 (defvar info--tmp nil)
@@ -1423,7 +1434,7 @@ And some saner default for them
 
 #+begin_src emacs-lisp
 (after! ox-latex
-  (setq org-latex-default-class "cb-doc"
+  (setq org-latex-default-class "chameleon"
         org-latex-tables-booktabs t
         org-latex-hyperref-template "\\colorlet{greenyblue}{blue!70!green}
 \\colorlet{blueygreen}{blue!40!green}
@@ -1455,9 +1466,7 @@ Add some packages (also very likely to change)
         ("T1" "fontenc" t ("pdflatex"))
         ("" "fontspec" t)
         ("" "xcolor" nil)
-        ("" "hyperref" nil)
-    "\\setmainfont[Ligatures=TeX]{IBM Plex Sans}"
-    "\\setmonofont[Ligatures=TeX]{Iosevka Nerd Font Mono}"))
+        ("" "hyperref" nil)))
 #+end_src
 
 **** Pretty code blocks
@@ -1665,6 +1674,17 @@ Annoying having to gate these, so let's fix that
 * Languages
 Configuration for various programming languages.
 
+** Eglot
+*** Resolve an issue between flymake version ([[https://github.com/hlissner/doom-emacs/pull/5645][#5645]])
+Should be removed after it's merged, but for now it's needed.
+
+#+begin_src emacs-lisp
+(after! (flymake)
+  (when (and
+         (not (fboundp 'flymake--diag-buffer))
+         (fboundp 'flymake--diag-locus))
+    (defalias 'flymake--diag-buffer 'flymake--diag-locus)))
+#+end_src
 ** LSP
 *** Ignore files in xref
 PHP is a dumb language (don't get me started...), as such we need extra files to
@@ -1691,20 +1711,13 @@ as references, so we won't.
   (cl-remove-if #'xref-ignored-file-p items))
 #+end_src
 
-*** UI doc in a webkit frame
-Display documention in a webkit frame for fancy markdown rendering
-
-#+begin_src emacs-lisp
-(setq lsp-ui-doc-use-webkit t)
-#+end_src
-
 *** Improve completions
 The default completions are quite bad
 
 #+begin_src emacs-lisp
 (after! lsp-mode
   (setq +lsp-company-backends
-        '(:separate company-capf company-yasnippet)))
+        '(:separate company-capf company-yasnippet company-dabbrev)))
 #+end_src
 
 *** Ignore directories
@@ -1723,46 +1736,6 @@ And some more for projectile
 #+end_src
 
 ** PHP
-*** Module improvements
-Adding here until [[https://github.com/hlissner/doom-emacs/pull/5292][#5292]] is merged.
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! composer)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! composer
-  :defer t
-  :init
-  (map! :after php-mode
-        :localleader
-        :map php-mode-map
-        :prefix ("c" . "composer")
-        "c" #'composer
-        "i" #'composer-install
-        "r" #'composer-require
-        "u" #'composer-update
-        "d" #'composer-dump-autoload
-        "s" #'composer-run-script
-        "v" #'composer-run-vendor-bin-command
-        "o" #'composer-find-json-file
-        "l" #'composer-view-lock-file))
-#+end_src
-
-#+begin_src emacs-lisp
-(defvar +php/default-docker-container "php-fpm"
-  "The default docker container to run commands in")
-
-(def-project-mode! +phpunit-docker-compose-mode
-  :modes '(php-mode docker-compose-mode)
-  :files (and "phpunit.xml" "docker-compose.yml")
-  :on-enter
-  (setq phpunit-args `("exec" ,+php/default-docker-container "php" "vendor/bin/phpunit")
-        phpunit-executable (executable-find "docker-compose")))
-
-(add-hook 'php-mode-hook #'rainbow-delimiters-mode)
-#+end_src
-
 *** Intelephense
 Because I'm a massive sellout who likes features
 
@@ -1905,6 +1878,7 @@ Packages to be unpinned or just completely disabled
 
 #+begin_src emacs-lisp :tangle packages.el
 (disable-packages! evil-escape)
+(package! xref :pin "a82f459b37b31546bf274388baf8aca79e9c30d9")
 #+end_src
 
 ** laravel-mode
@@ -1962,11 +1936,4 @@ Web-mode has normal text which should be ignored.
           php-property-name
           php-variable-sigil
           web-mode-variable-name-face)))
-#+end_src
-
-** orgdiff
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! org-diff
-  :recipe (:host github :repo "tecosaur/orgdiff"))
 #+end_src
