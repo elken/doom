@@ -1,9 +1,9 @@
 ;;; ui/exwm/config.el -*- lexical-binding: t; -*-
 
 ;; Make the launcher only show app names
-(use-package! counsel
-  :custom
-  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only))
+;;(use-package! counsel
+;;  :custom
+;;  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only))
 
 (defun elken/playerctl-format (function format)
   "Invoke playerctl for FUNCTION using FORMAT to present output"
@@ -58,23 +58,24 @@
                   (exwm-floating-toggle-floating)
                   (exwm-layout-toggle-mode-line)))
     ("spotify" (exwm-workspace-move-window (elken/exwm-get-index 4)))
+    ("steam" (exwm-workspace-move-window (elken/exwm-get-index 5)))
     ("firefox" (exwm-workspace-move-window (elken/exwm-get-index 2)))))
 
 (defun elken/exwm-init-hook ()
   "Various init processes for exwm"
   ;; Daemon applications
-  (elken/run-in-background "pasystray")
-  (elken/run-in-background "megasync")
   (elken/run-in-background "nm-applet")
 
   ;; Startup applications
   (elken/run-application "spotify")
   (elken/run-application "discord")
   (elken/run-application "firefox")
+  (elken/run-application "steam")
 
   ;; Default emacs behaviours
   ;; TODO Take this out of emacs
-  (mu4e t))
+  ;; (mu4e t)
+  )
 
 (defvar elken/process-alist '())
 
@@ -92,7 +93,7 @@
             :action #'elken/kill-process--action
             :caller 'elken/kill-process))
 
-(after! (exwm doom-modeline)
+(after! (doom-modeline exwm)
   (setq all-the-icons-scale-factor 1.1)
   (use-package! doom-modeline-now-playing
     :config
@@ -174,7 +175,7 @@
   (setq exwm-workspace-number 5)
 
   ;; Define workspace setup for monitors
-  (setq exwm-randr-workspace-monitor-plist `(,(elken/exwm-get-index 2) "DP-0" ,(elken/exwm-get-index 3) "DP-0"))
+  ;; (setq exwm-randr-workspace-monitor-plist `(,(elken/exwm-get-index 2) "DP-0" ,(elken/exwm-get-index 3) "DP-0"))
 
   (setq exwm-workspace-index-map
         (lambda (index) (number-to-string (+ 1 index))))
@@ -212,7 +213,8 @@
   ;; Setup screen layout
   (require 'exwm-randr)
   (exwm-randr-enable)
-  (start-process-shell-command "xrandr" nil "xrandr --output HDMI-0 --primary --mode 2560x1440 --pos 0x1080 --output DP-0 --mode 2560x1080 --pos 0x0")
+  ;; TODO Move this to a script
+  (start-process-shell-command "xrandr" nil "xrandr --output HDMI-0 --primary --mode 2560x1440")
 
   ;; Set the wallpaper
   (elken/set-wallpaper (expand-file-name "images/background.png" doom-private-dir))
@@ -231,7 +233,8 @@
 
   (setq exwm-input-global-keys
         '(
-          ([?\s- ] . counsel-linux-app)
+          ;; TODO Create a vertico version of this
+          ;; ([?\s- ] . counsel-linux-app)
           ([?\s-r] . exwm-reset)
           ([s-left] . windmove-left)
           ([s-right] . windmove-right)
