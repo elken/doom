@@ -68,7 +68,7 @@
        fold                             ; (nigh) universal code folding
        format                           ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
-       lispy ; vim for lisp, for people who don't like vim
+       ;; lispy ; vim for lisp, for people who don't like vim
        ;; multiple-cursors  ; editing in many places at once
        ;;objed             ; text object editing for the innocent
        ;;parinfer          ; turn lisp into python, sort of
@@ -113,6 +113,7 @@
        rgb        ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects
        ;;terraform         ; infrastructure as code
+       tree-sitter
        ;;tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
 
@@ -127,13 +128,16 @@
        common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
-       ;; (csharp +lsp)            ; unity, .NET, and mono shenanigans
+       (csharp +lsp
+               +sharper
+               +tree-sitter)            ; unity, .NET, and mono shenanigans
        data                     ; config/data formats
        (dart +lsp
              +flutter)   ; paint ui and not much else
-       ;;elixir            ; erlang done right
+       (elixir +lsp
+               +tree-sitter)            ; erlang done right
        ;;elm               ; care for a cup of TEA?
-       emacs-lisp                       ; drown in parentheses
+       (emacs-lisp +tree-sitter)                       ; drown in parentheses
        ;;erlang            ; an elegant language for a more civilized age
        ;;ess               ; emacs speaks statistics
        ;;faust             ; dsp, but you get to keep your soul
@@ -146,7 +150,8 @@
        ;;idris             ; a language you can depend on
        (json +lsp)              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
-       (javascript +lsp)    ; all(hope(abandon(ye(who(enter(here))))))
+       (javascript +lsp
+                   +tree-sitter)    ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
        ;;kotlin            ; a better, slicker Java(Script)
        ;;latex             ; writing papers in Emacs has never been so fun
@@ -164,7 +169,8 @@
             +pandoc
             +present
             +pretty)    ; organize your plain life in plain text
-       (php +lsp)       ; perl's insecure younger brother
+       (php +lsp
+            +tree-sitter)       ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
        ;;python            ; beautiful is better than ugly
@@ -173,7 +179,9 @@
        ;;raku              ; the artist formerly known as perl6
        rest                             ; Emacs as a REST client
        ;;rst               ; ReST in peace
-       ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+       (ruby +lsp
+             +tree-sitter
+             +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
        ;; (rust +lsp)          ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        scheme ; a fully conniving family of lisps
@@ -188,8 +196,8 @@
        (yaml +lsp)              ; JSON, but readable
 
        :email
-       (mu4e +gmail
-             +org)
+       ;; (mu4e +gmail
+       ;;       +org)
        ;;notmuch
        ;;(wanderlust +gmail)
 

@@ -27,6 +27,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
 - [[#globals][Globals]]
   - [[#constants-and-variables][Constants and Variables]]
     - [[#lexical-binding][Lexical binding]]
+    - [[#default-projectile-path][Default projectile path]]
     - [[#subword-mode][Subword-mode]]
     - [[#auto-revert-mode][Auto-revert-mode]]
     - [[#prevent-flickering][Prevent flickering]]
@@ -117,12 +118,14 @@ would be nice if you mentioned me when doing so. It's just polite :)
 - [[#languages][Languages]]
   - [[#eglot][Eglot]]
     - [[#resolve-an-issue-between-flymake-version-5645][Resolve an issue between flymake version (#5645)]]
+  - [[#c][C#]]
   - [[#elisp][ELISP]]
   - [[#lsp][LSP]]
     - [[#ignore-files-in-xref][Ignore files in xref]]
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
   - [[#php][PHP]]
+    - [[#web-mode-setup][Web-mode setup]]
     - [[#intelephense][Intelephense]]
     - [[#eglot-1][Eglot]]
 - [[#snippets][Snippets]]
@@ -138,6 +141,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
   - [[#laravel-mode][laravel-mode]]
+  - [[#embark-magit][embark-magit]]
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
@@ -184,6 +188,14 @@ think of one? Would have thought of one.
 
 #+begin_src emacs-lisp
 ;;; -*- lexical-binding: t; -*-
+#+end_src
+
+*** Default projectile path
+I stick to the same convention for projects on every OS, so it makes sense to
+tell projectile about it.
+
+#+begin_src emacs-lisp
+(setq projectile-project-search-path '("~/build"))
 #+end_src
 
 *** Subword-mode
@@ -1756,6 +1768,21 @@ Should be removed after it's merged, but for now it's needed.
          (fboundp 'flymake--diag-locus))
     (defalias 'flymake--diag-buffer 'flymake--diag-locus)))
 #+end_src
+** C#
+Projectile doesn't recognise these projects properly, so we have to fix that
+
+#+begin_src emacs-lisp
+(after! projectile
+  (defun projectile-dotnet-project-p ()
+    "Check if a project contains a *.sln file at the project root, or either
+a .csproj or .fsproj file at either the project root or within src/*/."
+    (or (projectile-verify-file-wildcard "?*.sln")
+        (projectile-verify-file-wildcard "?*.csproj")
+        (projectile-verify-file-wildcard "src/*/?*.csproj")
+        (projectile-verify-file-wildcard "?*.fsproj")
+        (projectile-verify-file-wildcard "src/*/?*.fsproj"))))
+#+end_src
+
 ** ELISP
 /Finally/ get the completion in elisp working (not sure why it's been so bad for so long...)
 
@@ -1816,6 +1843,11 @@ And some more for projectile
 #+end_src
 
 ** PHP
+*** Web-mode setup
+#+begin_src emacs-lisp
+(after! web-mode
+  (pushnew! web-mode-engines-alist '(("blade"  . "\\.blade\\."))))
+#+end_src
 *** Intelephense
 Because I'm a massive sellout who likes features
 
@@ -1967,7 +1999,7 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! laravel-mode
-  :recipe (:local-repo "~/build/lisp/laravel-mode"
+  :recipe (:local-repo "~/build/elisp/laravel-mode"
            :build (:not compile)))
 #+end_src
 
@@ -1979,6 +2011,20 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
   (map! :localleader
          :map php-mode-map
          :desc "Toggle a project-local Tinker REPL" "o t" #'laravel-tinker-toggle))
+#+end_src
+
+** embark-magit
+Embark additions to improve magit
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! embark-magit
+  :recipe (:local-repo "~/build/elisp/embark-magit"
+           :build (:not compile)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! embark-magit
+  :after embark)
 #+end_src
 
 ** prescient
