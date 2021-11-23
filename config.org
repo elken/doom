@@ -550,7 +550,7 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
         doom-modeline-vcs-max-length 60)
   (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
   (doom-modeline-def-modeline 'main
-    '(bar workspace-name window-number modals persp-name buffer-info matches remote-host github debug)
+    '(bar modals workspace-name window-number persp-name buffer-info matches remote-host github debug)
     '(vcs github mu4e grip gnus checker misc-info repl lsp " ")))
 #+end_src
 
