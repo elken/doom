@@ -26,3 +26,4 @@ custom.el
 /autoloads.el
 /*.html
 /snippets/
+/lisp/
