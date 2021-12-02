@@ -110,6 +110,8 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#conditional-features][Conditional features]]
       - [[#tectonic][Tectonic]]
       - [[#classes][Classes]]
+        - [[#base][Base]]
+        - [[#chameleon][chameleon]]
       - [[#packages][Packages]]
       - [[#pretty-code-blocks][Pretty code blocks]]
       - [[#ox-chameleon][ox-chameleon]]
@@ -1440,12 +1442,36 @@ Tectonic is the hot new thing, which also means I can get rid of my tex installa
 #+end_src
 
 **** Classes
+***** Base
+Simple base header shared by all defines classes
+
+#+name: base-template
+#+begin_src latex
+\\documentclass{scrartcl}
+[PACKAGES]
+[DEFAULT-PACKAGES]
+[EXTRA]
+\\setmainfont[Ligatures=TeX]{Overpass}
+\\setmonofont[Ligatures=TeX]{Iosevka Nerd Font Mono}
+#+end_src
+
+***** chameleon
+Template for chameleon documents.
+
+#+name: chameleon-template
+#+begin_src latex :noweb yes
+% Using chameleon
+<<base-template>>
+#+end_src
+
 Now for some class setup (likely to change over time)
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb no-export
 (after! ox-latex
   (add-to-list 'org-latex-classes
-               '("cb-doc" "\\documentclass{scrartcl}"
+               '("chameleon" "
+<<chameleon-template>>
+"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
