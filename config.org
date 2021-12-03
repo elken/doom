@@ -2221,13 +2221,13 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
 Embark additions to improve magit
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! embark-magit
-  :recipe (:local-repo "~/build/elisp/embark-magit"
+(package! embark-vc
+  :recipe (:local-repo "~/build/elisp/embark-vc"
            :build (:not compile)))
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! embark-magit
+(use-package! embark-vc
   :after embark)
 #+end_src
 
