@@ -94,6 +94,7 @@
 
 (after! (exwm doom-modeline)
   (setq all-the-icons-scale-factor 1.1)
+  (use-package! doom-modeline-exwm)
   (use-package! doom-modeline-now-playing
     :config
     (doom-modeline-now-playing-timer))
@@ -106,36 +107,6 @@
                            :face face :v-adjust -0.05))
      (doom-modeline-spc)
      (doom-modeline--buffer-name)))
-  (doom-modeline-def-segment exwm-workspaces
-    (exwm-workspace--update-switch-history)
-    (concat
-     (doom-modeline-spc)
-     (elt (let* ((num (exwm-workspace--count))
-                 (sequence (number-sequence 0 (1- num)))
-                 (not-empty (make-vector num nil)))
-            (dolist (i exwm--id-buffer-alist)
-              (with-current-buffer (cdr i)
-                (when exwm--frame
-                  (setf (aref not-empty
-                              (exwm-workspace--position exwm--frame))
-                        t))))
-            (mapcar
-             (lambda (i)
-               (mapconcat
-                (lambda (j)
-                  (format (if (= i j) "[%s]" " %s ")
-                          (propertize
-                           (apply exwm-workspace-index-map (list j))
-                           'face
-                           (cond ((frame-parameter (elt exwm-workspace--list j)
-                                                   'exwm-urgency)
-                                  '(:inherit warning :weight bold))
-                                 ((= i j) '(:inherit underline :weight bold))
-                                 ((aref not-empty j) '(:inherit success :weight bold))
-                                 (t `((:foreground ,(face-foreground 'mode-line-inactive))))))))
-                sequence ""))
-             sequence))
-          (exwm-workspace--position (selected-frame)))))
   (setf (alist-get 'exwm-mode all-the-icons-mode-icon-alist)
         '(all-the-icons-octicon "browser" :v-adjust -0.05))
   (doom-modeline-def-modeline 'exwm
