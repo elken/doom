@@ -132,10 +132,10 @@
                +sharper
                +tree-sitter)            ; unity, .NET, and mono shenanigans
        data                     ; config/data formats
-       (dart +lsp
-             +flutter)   ; paint ui and not much else
-       (elixir +lsp
-               +tree-sitter)            ; erlang done right
+       ;;(dart +lsp
+       ;;      +flutter)   ; paint ui and not much else
+       ;;(elixir +lsp
+       ;;        +tree-sitter)            ; erlang done right
        ;;elm               ; care for a cup of TEA?
        (emacs-lisp +tree-sitter)                       ; drown in parentheses
        ;;erlang            ; an elegant language for a more civilized age
@@ -169,8 +169,8 @@
             +pandoc
             +present
             +pretty)    ; organize your plain life in plain text
-       (php +lsp
-            +tree-sitter)       ; perl's insecure younger brother
+       ;;(php +lsp
+       ;;     +tree-sitter)       ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
        ;;python            ; beautiful is better than ugly
@@ -179,9 +179,9 @@
        ;;raku              ; the artist formerly known as perl6
        rest                             ; Emacs as a REST client
        ;;rst               ; ReST in peace
-       (ruby +lsp
-             +tree-sitter
-             +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+       ;;(ruby +lsp
+       ;;      +tree-sitter
+       ;;      +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
        ;; (rust +lsp)          ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        scheme ; a fully conniving family of lisps

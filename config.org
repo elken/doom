@@ -143,11 +143,11 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#scope][scope]]
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
-  - [[#laravel-mode][laravel-mode]]
   - [[#embark-magit][embark-magit]]
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
+- [[#local-settings][Local settings]]
 
 * Setup
 ** Workflow
@@ -1197,6 +1197,11 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                              :keyword "%U"
                              :file +org-capture-project-notes-file)))
                 ))))
+(after! org-roam
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?" :target
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
+           :unnarrowed t))))
 #+end_src
 
 ** Export
@@ -2198,25 +2203,6 @@ Packages to be unpinned or just completely disabled
 (package! xref :pin "a82f459b37b31546bf274388baf8aca79e9c30d9")
 #+end_src
 
-** laravel-mode
-Not yet fit for human consumption, but fit for mine because I'm +sub+ super-human
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! laravel-mode
-  :recipe (:local-repo "~/build/elisp/laravel-mode"
-           :build (:not compile)))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! laravel-tinker
-  :after php-mode
-  :init
-  (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :ttl nil)
-  (map! :localleader
-         :map php-mode-map
-         :desc "Toggle a project-local Tinker REPL" "o t" #'laravel-tinker-toggle))
-#+end_src
-
 ** embark-magit
 Embark additions to improve magit
 
@@ -2267,4 +2253,12 @@ Web-mode has normal text which should be ignored.
           php-property-name
           php-variable-sigil
           web-mode-variable-name-face)))
+#+end_src
+
+* Local settings
+Needed some way to manage settings for a local machine, so let's be lazy with it
+
+#+begin_src emacs-lisp
+(when (file-exists-p! "config-local.el" doom-private-dir)
+  (load! "config-local.el" doom-private-dir))
 #+end_src

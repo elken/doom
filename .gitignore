@@ -27,3 +27,5 @@ custom.el
 /*.html
 /snippets/
 /lisp/
+
+config-local.el
