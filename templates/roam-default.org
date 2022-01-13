@@ -1,0 +1,7 @@
+#+title: ${title}
+#+author: Ellis Kenyő
+#+created: %U
+#+last_modified: <2022-01-13 16:16>
+#+latex_class: chameleon
+
+%?

@@ -98,12 +98,12 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#show-images][Show images]]
   - [[#autoexecute-tangled-shell-files][Autoexecute tangled shell files]]
   - [[#weblog-setup][Weblog setup]]
-  - [[#visual-column-mode][Visual column mode]]
   - [[#better-snippets][Better snippets]]
   - [[#roam][Roam]]
+    - [[#templates][Templates]]
   - [[#capture][Capture]]
     - [[#prettify][Prettify]]
-    - [[#templates][Templates]]
+    - [[#templates-1][Templates]]
   - [[#export][Export]]
     - [[#latex][LaTeX]]
       - [[#preambles][Preambles]]
@@ -885,6 +885,12 @@ Show images inline by default
 (setq org-startup-with-inline-images t)
 #+END_SRC
 
+But also, adjust them to an appropriate size. This should be adjusted to handle better resolutions.
+
+#+begin_src emacs-lisp
+(setq org-image-actual-width 600)
+#+end_src
+
 ** Autoexecute tangled shell files
 Make tangled shell files executable (I trust myself, ish...)
 
@@ -946,28 +952,10 @@ Can pass the position as POS if already computed."
       (let* ((now (format-time-string "<%Y-%m-%d %H:%M>")))
         (insert now)))))
 
-(add-hook! 'before-save-hook (when (derived-mode-p 'org-mode) (elken/set-time-property "DATE_UPDATED")))
+(add-hook! 'before-save-hook (when (derived-mode-p 'org-mode)
+                               (elken/set-time-property "LAST_MODIFIED")
+                               (elken/set-time-property "DATE_UPDATED")))
 #+end_src
-
-** Visual column mode
-Enable =visual-fill-column-mode= to center an org document for nicer editing.
-
-First we need the package
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! visual-fill-column)
-#+end_src
-
-Then we define a setup function
-
-#+BEGIN_SRC emacs-lisp
-(use-package! visual-fill-column
-  :after org
-  :hook (org-mode . visual-fill-column-mode)
-  :config
-  (setq visual-fill-column-width 200
-        visual-fill-column-center-text t))
-#+END_SRC
 
 ** Better snippets
 Programmers are, by design, lazy
@@ -985,6 +973,16 @@ Let's jump on the bandwagon and start taking useful notes.
 
 #+begin_src emacs-lisp
 (setq org-roam-directory (expand-file-name "roam" org-directory))
+#+end_src
+
+*** Templates
+#+begin_src emacs-lisp
+(after! org-roam
+  (setq org-roam-capture-templates
+        `(("d" "default" plain
+           (file ,(expand-file-name "templates/roam-default.org" doom-private-dir))
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "")
+           :unnarrowed t))))
 #+end_src
 
 ** Capture
@@ -1197,11 +1195,7 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                              :keyword "%U"
                              :file +org-capture-project-notes-file)))
                 ))))
-(after! org-roam
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?" :target
-           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+created: %U\n#+last_modified: %U\n\n")
-           :unnarrowed t))))
+
 #+end_src
 
 ** Export
