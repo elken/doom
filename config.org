@@ -147,6 +147,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
+  - [[#cucumber][Cucumber]]
 - [[#local-settings][Local settings]]
 
 * Setup
@@ -2194,6 +2195,7 @@ Packages to be unpinned or just completely disabled
 
 #+begin_src emacs-lisp :tangle packages.el
 (disable-packages! evil-escape)
+(unpin! vterm)
 (package! xref :pin "a82f459b37b31546bf274388baf8aca79e9c30d9")
 #+end_src
 
@@ -2247,6 +2249,18 @@ Web-mode has normal text which should be ignored.
           php-property-name
           php-variable-sigil
           web-mode-variable-name-face)))
+#+end_src
+
+** Cucumber
+Needed for feature test files
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! feature-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! feature-mode
+  :mode "\\.feature$")
 #+end_src
 
 * Local settings
