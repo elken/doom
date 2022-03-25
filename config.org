@@ -65,6 +65,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#info-pages][Info pages]]
   - [[#dashboard][Dashboard]]
   - [[#modeline][Modeline]]
+    - [[#time--date][Time & date]]
   - [[#fonts][Fonts]]
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
@@ -149,6 +150,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#fix-in-web-mode][Fix in web-mode]]
   - [[#cucumber][Cucumber]]
 - [[#local-settings][Local settings]]
+- [[#spelling][Spelling]]
 
 * Setup
 ** Workflow
@@ -544,8 +546,15 @@ Inhibit the menu to improve things slightly
 Default modeline is a tad cluttered, and because I don't use exwm anymore the
 modeline from that module isn't in use. So, it's duplicated here and tweaked.
 
+#+begin_src emacs-lisp :tangle packages.el
+;; (package! doom-modeline-now-playing)
+#+end_src
+
 #+begin_src emacs-lisp
 (after! doom-modeline
+  ;; (use-package! doom-modeline-now-playing
+  ;;   :config
+  ;;   (doom-modeline-now-playing-timer))
   (setq all-the-icons-scale-factor 1.1
         auto-revert-check-vc-info t
         doom-modeline-major-mode-icon (display-graphic-p)
@@ -556,6 +565,17 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
   (doom-modeline-def-modeline 'main
     '(bar modals workspace-name window-number persp-name buffer-info matches remote-host github debug)
     '(vcs github mu4e grip gnus checker misc-info repl lsp " ")))
+#+end_src
+
+*** Time & date
+On MacOS I'm quite enjoying a bar-less setup by hiding them but I still need to know date & time at a glance, so /only/ show it then.
+
+#+begin_src emacs-lisp
+(when (and IS-MAC
+           (string= (string-trim (shell-command-to-string "defaults read -globalDomain _HIHideMenuBar")) "1"))
+  (setq display-time-format " [ %H:%M %d/%m/%y]"
+        display-time-default-load-average nil)
+  (display-time-mode 1))
 #+end_src
 
 ** Fonts
@@ -2204,8 +2224,7 @@ Embark additions to improve magit
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! embark-vc
-  :recipe (:local-repo "~/build/elisp/embark-vc"
-           :build (:not compile)))
+  :recipe (:host github :repo "elken/embark-vc"))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -2269,4 +2288,13 @@ Needed some way to manage settings for a local machine, so let's be lazy with it
 #+begin_src emacs-lisp
 (when (file-exists-p! "config-local.el" doom-private-dir)
   (load! "config-local.el" doom-private-dir))
+#+end_src
+
+* Spelling
+
+#+begin_src emacs-lisp
+(setq ispell-program-name "aspell"
+      ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
+      ispell-dictionary "en"
+      ispell-personal-dictionary (expand-file-name ".dict" doom-private-dir))
 #+end_src

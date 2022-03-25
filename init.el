@@ -91,19 +91,19 @@
 
        :checkers
        syntax       ; tasing you for every semicolon you forget
-       ;; (spell +flyspell) ; tasing you for misspelling mispelling
+       (:if (executable-find "aspell") spell +aspell) ; tasing you for misspelling mispelling
        ;; grammar           ; tasing grammar mistake every you make
 
        :tools
        ;;ansible
        (debugger +lsp)       ; FIXME stepping through code, to help you add bugs
-       ;;direnv
+       direnv
        docker
        editorconfig      ; let someone else argue about tabs vs spaces
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)       ; run code, run (also, repls)
        gist              ; interacting with github gists
-       lookup           ; navigate your code and its documentation
+       (lookup +docsets)           ; navigate your code and its documentation
        (lsp +peek)
        (magit +forge)           ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
@@ -161,7 +161,7 @@
        ;;lua               ; one-based indices? one-based indices
        (markdown +grip)          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
-       ;; nix                              ; I hereby declare "nix geht mehr!"
+       nix                              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org +dragndrop
             +hugo
@@ -169,8 +169,8 @@
             +pandoc
             +present
             +pretty)    ; organize your plain life in plain text
-       ;;(php +lsp
-       ;;     +tree-sitter)       ; perl's insecure younger brother
+       (php +lsp
+           +tree-sitter)       ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
        ;;python            ; beautiful is better than ugly
