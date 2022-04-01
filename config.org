@@ -64,8 +64,8 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#files][Files]]
   - [[#info-pages][Info pages]]
   - [[#dashboard][Dashboard]]
+  - [[#tab-bar-mode][Tab-bar-mode]]
   - [[#modeline][Modeline]]
-    - [[#time--date][Time & date]]
   - [[#fonts][Fonts]]
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
@@ -125,6 +125,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#c][C#]]
   - [[#elisp][ELISP]]
   - [[#lsp][LSP]]
+    - [[#use-my-local-version][Use my local version]]
     - [[#ignore-files-in-xref][Ignore files in xref]]
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
@@ -543,6 +544,19 @@ Inhibit the menu to improve things slightly
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-footer)
 #+end_src
 
+** Tab-bar-mode
+Acting as a global modeline (of sorts), this could end up being quite useful but
+for now this is just testing.
+
+#+begin_src emacs-lisp
+(customize-set-variable 'tab-bar-format '(tab-bar-format-global))
+(customize-set-variable 'tab-bar-mode t)
+(when tab-bar-mode
+  (setq display-time-format " [ %H:%M %d/%m/%y]"
+        display-time-default-load-average nil)
+  (display-time-mode 1))
+#+end_src
+
 ** Modeline
 Default modeline is a tad cluttered, and because I don't use exwm anymore the
 modeline from that module isn't in use. So, it's duplicated here and tweaked.
@@ -566,17 +580,6 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
   (doom-modeline-def-modeline 'main
     '(bar modals workspace-name window-number persp-name buffer-info matches remote-host github debug)
     '(vcs github mu4e grip gnus checker misc-info repl lsp " ")))
-#+end_src
-
-*** Time & date
-On MacOS I'm quite enjoying a bar-less setup by hiding them but I still need to know date & time at a glance, so /only/ show it then.
-
-#+begin_src emacs-lisp
-(when (and IS-MAC
-           (string= (string-trim (shell-command-to-string "defaults read -globalDomain _HIHideMenuBar")) "1"))
-  (setq display-time-format " [ %H:%M %d/%m/%y]"
-        display-time-default-load-average nil)
-  (display-time-mode 1))
 #+end_src
 
 ** Fonts
@@ -1848,6 +1851,14 @@ a .csproj or .fsproj file at either the project root or within src/*/."
 #+end_src
 
 ** LSP
+*** Use my local version
+Most of the time, I'm going to prefer my local version of lsp-mode.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! lsp-mode
+  :recipe (:local-repo "~/build/lsp-mode"))
+#+end_src
+
 *** Ignore files in xref
 PHP is a dumb language (don't get me started...), as such we need extra files to
 get decent completion & documentation. 0% of the time will we want to use them
@@ -2129,6 +2140,11 @@ TBD
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! slack)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! slack
+  :commands (slack-start))
 #+end_src
 
 * Local settings

@@ -2,9 +2,9 @@
 
 ;; Copyright (C) Ellis Kenyo
 
-;; Author: your name here
-;; Keywords: literate programming, reproducible research
+;; Author: Ellis Kenyo <me@elken.dev>
 ;; Homepage: https://orgmode.org
+;; Package-Requires: ((emacs "26.1") (fsharp-mode "1.10"))
 ;; Version: 0.01
 
 ;;; License:
@@ -43,7 +43,7 @@
 ;;
 ;; #+begin_src fsharp
 
-;; test
+;; printfn "Hello, world!"
 
 ;; #+end_src
 
@@ -58,7 +58,7 @@
 (defvar org-babel-default-header-args:fsharp '())
 
 (defgroup ob-fsharp nil
-  "org-mode blocks for PHP."
+  "org-mode blocks for F#."
   :group 'org)
 
 (defcustom org-babel-fsharp-dotnet-command "dotnet"
@@ -66,22 +66,15 @@
   :group 'ob-fsharp
   :type 'string)
 
-;; This function expands the body of a source code block by doing things like
-;; prepending argument definitions to the body, it should be called by the
-;; `org-babel-execute:fsharp' function below. Variables get concatenated in
-;; the `mapconcat' form, therefore to change the formatting you can edit the
-;; `format' form.
-(defun org-babel-expand-body:fsharp (body params &optional processed-params)
-  "Expand BODY according to PARAMS, return the expanded body."
-  (require 'inf-fsharp nil t)
-  (let ((vars (org-babel--get-vars (or processed-params (org-babel-process-params params)))))
-    (concat
-     (mapconcat ;; define any variables
-      (lambda (pair)
-        (format "%s=%S"
-                (car pair) (org-babel-fsharp-var-to-fsharp (cdr pair))))
-      vars "\n")
-     "\n" body "\n")))
+(defcustom org-babel-fsharp-command-args '("fsi" "--readline-")
+  "Arguments to pass to `org-babel-fsharp-dotnet-command' to create an inferior F# process."
+  :group 'ob-fsharp
+  :type 'list)
+
+(defvar org-babel-fsharp-eoe-indicator "\"org-babel-fsharp-eoe\";;"
+  "String to indicate that evaluation has completed.")
+(defvar org-babel-fsharp-eoe-output "org-babel-fsharp-eoe"
+  "String to indicate that evaluation has completed.")
 
 ;; This is the main function which is called to evaluate a code
 ;; block.
@@ -105,63 +98,159 @@
 (defun org-babel-execute:fsharp (body params)
   "Execute a block of Fsharp code with org-babel.
 This function is called by `org-babel-execute-src-block'"
-  (message "executing Fsharp source code block")
   (let* ((processed-params (org-babel-process-params params))
-         ;; set the session if the value of the session keyword is not the
-         ;; string `none'
-         (session (unless (string= body "none")
-                   (org-babel-fsharp-initiate-session
-                    (cdr (assq :session processed-params)))))
-         ;; variables assigned for use in the block
-         (vars (org-babel--get-vars processed-params))
+         (session (org-babel-prep-session:fsharp
+                   (cdr (assq :session params)) params))
          (result-params (assq :result-params processed-params))
-         ;; either OUTPUT or VALUE which should behave as described above
-         (result-type (assq :result-type processed-params))
-         ;; expand the body with `org-babel-expand-body:fsharp'
-         (full-body (org-babel-expand-body:fsharp
-                     body params processed-params))
-         (script-file (org-babel-temp-file "fsharp-src-" ".fsx"))
-         (cmd (concat org-babel-fsharp-dotnet-command " fsi " script-file)))
-    (with-temp-file script-file
-      (insert full-body))
-    (org-babel-eval cmd "")
-    ;; actually execute the source-code block either in a session or
-    ;; possibly by dropping it to a temporary file and evaluating the
-    ;; file.
-    ;;
-    ;; for session based evaluation the functions defined in
-    ;; `org-babel-comint' will probably be helpful.
-    ;;
-    ;; for external evaluation the functions defined in
-    ;; `org-babel-eval' will probably be helpful.
-    ;;
-    ;; when forming a shell command, or a fragment of code in some
-    ;; other language, please preprocess any file names involved with
-    ;; the function `org-babel-process-file-name'. (See the way that
-    ;; function is used in the language files)
-    ))
+         (full-body (org-babel-expand-body:generic
+                     body params (org-babel-variable-assignments:fsharp params)))
+         (raw (org-babel-fsharp-parse-body session full-body)))
+    (string-match "val \\(.*\\): \\(.*\\) = \\(.*\\)" raw)
+
+    (let ((output (match-string 1 raw))
+          (type (match-string 2 raw))
+          (value (match-string 3 raw)))
+      (org-babel-reassemble-table
+       (org-babel-result-cond result-params
+         (cond
+          ((member "verbatim" result-params) raw)
+          ((member "output" result-params) output)
+          (t raw))
+         (if (and value type)
+             (org-babel-fsharp-parse-output value type)
+           raw))
+       (org-babel-pick-name
+        (cdr (assq :colname-names params)) (cdr (assq :colnames params)))
+       (org-babel-pick-name
+        (cdr (assq :rowname-names params)) (cdr (assq :rownames params)))))))
+
+(defun org-babel-fsharp-parse-body (session body)
+  "Trim the BODY of the output."
+  (let ((body (car
+               (let ((re (regexp-quote org-babel-fsharp-eoe-output)) out)
+                 (delq nil (mapcar (lambda (line)
+                                     (if out
+                                         (progn (setq out nil) line)
+                                       (when (string-match re line)
+                                         (progn (setq out t) nil))))
+                                   (mapcar #'org-trim (reverse (org-babel-comint-with-output
+                                                                   (session org-babel-fsharp-eoe-output nil body)
+                                                                 (insert
+                                                                  (concat
+                                                                   (org-babel-fsharp-trim-body body) "\n"
+                                                                   org-babel-fsharp-eoe-indicator))
+                                                                 (comint-send-input))))))))))
+    (when body
+      (org-trim (org-babel-fsharp-remove-vals body)))))
+
+(defun org-babel-fsharp-remove-vals (body)
+  "Given a BODY, remove all lines that are variable definitions, except 'it'
+  because that's usually our return value."
+  (with-temp-buffer
+    (insert body)
+    (goto-char (point-min))
+    (flush-lines "val [^it]:")
+    (flush-lines "val it: unit = ()")
+    (buffer-string)))
+
+(defun org-babel-fsharp-trim-body (body)
+  "Given a BODY, remove all comments as this breaks the script execution."
+  (org-babel-chomp
+   (with-temp-buffer
+     (fsharp-mode)
+     (insert body)
+     (comment-kill (count-lines (point-min) (point-max)))
+     (save-excursion
+       (goto-char (point-min))
+       (while (< (forward-line) 1)
+         (end-of-line)
+         (insert ";;")))
+     (buffer-string))))
+
+(defun org-babel-fsharp-elisp-to-fsharp (val)
+  "Return a string of fsharp code which evaluates to VAL."
+  (if (listp val)
+      (concat "[|" (mapconcat #'org-babel-fsharp-elisp-to-fsharp val "; ") "|]")
+    (format "%S" val)))
+
+(defun org-babel-fsharp-parse-output (value type)
+  "Parse VALUE of TYPE."
+  (cond
+   ((string= "string" type)
+    (org-babel-read value))
+   ((or (string= "int" type)
+        (string= "float" type))
+    (string-to-number value))
+   ((or (string-match "array" type)
+        (string-match "list" type)
+        (string-match "\\[\\]" type))
+    (org-babel-fsharp-read-array value))
+   ((or (string-match "Map" type)
+        (string-match "Set" type))
+    (org-babel-fsharp-read-map value))
+   (t (message "Unrecognized type %s" type) value)))
+
+(defun org-babel-fsharp-read-list (results)
+  "Convert RESULTS into an elisp table or string."
+  (org-babel-script-escape (replace-regexp-in-string ";" "," results)))
+
+(defun org-babel-fsharp-read-array (results)
+  "Convert RESULTS into an elisp table or string."
+  (org-babel-script-escape
+   (replace-regexp-in-string
+    "\\[|" "[" (replace-regexp-in-string
+                "|\\]" "]" (replace-regexp-in-string
+                            "; " "," results)))))
+
+(defun org-babel-fsharp-read-map (results)
+  "Convert RESULTS from a Map to an elisp alist."
+  (org-babel-script-escape
+   (replace-regexp-in-string
+    "\\(?:map\\|set\\) " ""
+    (replace-regexp-in-string
+     "\\[" "("
+     (replace-regexp-in-string
+      "\\]" ")"
+      (replace-regexp-in-string
+       "[;,]" "" results))))))
+
+(defun org-babel-variable-assignments:fsharp (params)
+  "Return list of F# statements assigning the block's variables."
+  (mapcar
+   (lambda (pair) (format "let %s = %s;;" (car pair)
+                     (org-babel-fsharp-elisp-to-fsharp (cdr pair))))
+   (org-babel--get-vars params)))
 
 ;; This function should be used to assign any variables in params in
 ;; the context of the session environment.
 (defun org-babel-prep-session:fsharp (session params)
   "Prepare SESSION according to the header arguments specified in PARAMS."
-  )
+  (let* ((session (org-babel-fsharp-initiate-session session))
+         (var-lines (org-babel-variable-assignments:fsharp params)))
+    (org-babel-comint-in-buffer session
+      (mapc (lambda (var)
+              (insert var)
+              (comint-send-input nil t)
+              (org-babel-comint-wait-for-output session))
+            var-lines))
+    session))
 
-(defun org-babel-fsharp-var-to-fsharp (var)
-  "Convert an elisp var into a string of fsharp source code
-specifying a var of the same value."
-  (format "%S" var))
-
-(defun org-babel-fsharp-table-or-string (results)
-  "If the results look like a table, then convert them into an
-Emacs-lisp table, otherwise return the results as a string."
-  )
-
-(defun org-babel-fsharp-initiate-session (&optional session)
-  "If there is not a current inferior-process-buffer in SESSION then create.
-Return the initialized session."
-  (unless (string= session "none")
-    ))
+(defun org-babel-fsharp-initiate-session (&optional session _params)
+  "Initiate a session named SESSION according to PARAMS"
+  (require 'inf-fsharp-mode)
+  (let* ((inferior-fsharp-buffer-subname (if (and (not (string= session "none"))
+                                                  (not (string= session "default"))
+                                                  (stringp session))
+                                             (format "inferior-fsharp-%s" session)
+                                           inferior-fsharp-buffer-subname))
+         (inferior-fsharp-buffer-name (concat "*" inferior-fsharp-buffer-subname "*")))
+    (save-window-excursion
+      (or (org-babel-comint-buffer-livep inferior-fsharp-buffer-name)
+          (progn
+            (fsharp-run-process-if-needed
+             (concat org-babel-fsharp-dotnet-command " " (mapconcat #'identity org-babel-fsharp-command-args " ")))
+            (set-marker comint-last-output-start (point))
+            (get-buffer (current-buffer)))))))
 
 (provide 'ob-fsharp)
 ;;; ob-fsharp.el ends here
