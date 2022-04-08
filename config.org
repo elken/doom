@@ -125,7 +125,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#c][C#]]
   - [[#elisp][ELISP]]
   - [[#lsp][LSP]]
-    - [[#use-my-local-version][Use my local version]]
     - [[#ignore-files-in-xref][Ignore files in xref]]
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
@@ -152,6 +151,9 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#cucumber][Cucumber]]
 - [[#spelling][Spelling]]
 - [[#slack][Slack]]
+- [[#reaper][Reaper]]
+- [[#jira][Jira]]
+  - [[#org-jira][org-jira]]
 - [[#local-settings][Local settings]]
 
 * Setup
@@ -549,6 +551,27 @@ Acting as a global modeline (of sorts), this could end up being quite useful but
 for now this is just testing.
 
 #+begin_src emacs-lisp
+(defun reaper-get-running-timer-duration ()
+  "Return duration of current running timer."
+  (reaper--hours-to-time
+   (reaper-with-buffer
+    (when reaper-running-timer
+      (let ((entry (assoc reaper-running-timer reaper-timeentries)))
+        (cdr (assoc :hours entry)))))))
+
+(defun reaper-running-timer ()
+  "Get a modeline-formatted version of the current harvest timer, if any."
+  (if-let ((note (reaper-get-running-timer-note))
+           (timer (reaper-get-running-timer-duration)))
+      (format " [ %s | %s] " note timer)))
+
+(defadvice! +reaper--nil-update-timer ()
+  "Set timeentries to nil first before we update so we get a full refresh."
+  :before 'reaper--update-timer
+  (reaper-with-buffer
+   (setq reaper-timeentries nil)))
+
+(add-to-list 'global-mode-string '(:eval (reaper-running-timer)))
 (customize-set-variable 'tab-bar-format '(tab-bar-format-global))
 (customize-set-variable 'tab-bar-mode t)
 (when tab-bar-mode
@@ -1851,14 +1874,6 @@ a .csproj or .fsproj file at either the project root or within src/*/."
 #+end_src
 
 ** LSP
-*** Use my local version
-Most of the time, I'm going to prefer my local version of lsp-mode.
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! lsp-mode
-  :recipe (:local-repo "~/build/lsp-mode"))
-#+end_src
-
 *** Ignore files in xref
 PHP is a dumb language (don't get me started...), as such we need extra files to
 get decent completion & documentation. 0% of the time will we want to use them
@@ -2060,7 +2075,7 @@ Packages to be unpinned or just completely disabled
 #+begin_src emacs-lisp :tangle packages.el
 (disable-packages! evil-escape)
 (unpin! vterm)
-(package! xref :pin "a82f459b37b31546bf274388baf8aca79e9c30d9")
+(unpin! lsp-mode)
 #+end_src
 
 ** embark-magit
@@ -2145,6 +2160,48 @@ TBD
 #+begin_src emacs-lisp
 (use-package! slack
   :commands (slack-start))
+#+end_src
+
+* Reaper
+Emacs client for Harvest, the time tracker we use at =$DAYJOB=. Over time, this
+will likely become more config than just a dump of macros.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! reaper)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! reaper
+   :init
+   (map! :leader :n :desc "Track time" "t t" #'reaper))
+#+end_src
+
+* Jira
+Config related to setting up Jira.
+
+** org-jira
+Used for accessing Jira tasks through org-mode. Jira's interface is /quite/ a mess
+so I'd rather not use it as much.
+
+You know what we love? =org-mode=.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-jira)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! org-jira
+  :init
+  (unless (file-directory-p
+           (expand-file-name ".org-jira"
+                             (or (getenv "XDG_CONFIG_HOME")
+                                 (getenv "HOME"))))
+    (make-directory (expand-file-name ".org-jira"
+                                      (or (getenv "XDG_CONFIG_HOME")
+                                          (getenv "HOME")))))
+  (setq org-jira-working-dir (expand-file-name ".org-jira"
+                                               (or (getenv "XDG_CONFIG_HOME")
+                                                   (getenv "HOME")))))
 #+end_src
 
 * Local settings
