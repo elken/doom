@@ -28,6 +28,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#constants-and-variables][Constants and Variables]]
     - [[#lexical-binding][Lexical binding]]
     - [[#default-projectile-path][Default projectile path]]
+    - [[#lookup-provider-urls][Lookup provider URLs]]
     - [[#subword-mode][Subword-mode]]
     - [[#auto-revert-mode][Auto-revert-mode]]
     - [[#prevent-flickering][Prevent flickering]]
@@ -124,7 +125,8 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#f][F#]]
   - [[#c][C#]]
   - [[#elisp][ELISP]]
-  - [[#lsp][LSP]]
+  - [[#lspdap][LSP/DAP]]
+    - [[#increase-variable-line-length][Increase variable line length]]
     - [[#ignore-files-in-xref][Ignore files in xref]]
     - [[#improve-completions][Improve completions]]
     - [[#ignore-directories][Ignore directories]]
@@ -145,6 +147,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
   - [[#embark-magit][embark-magit]]
+  - [[#laravel-mode][laravel-mode]]
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
@@ -152,8 +155,10 @@ would be nice if you mentioned me when doing so. It's just polite :)
 - [[#spelling][Spelling]]
 - [[#slack][Slack]]
 - [[#reaper][Reaper]]
+- [[#graphviz][Graphviz]]
 - [[#jira][Jira]]
   - [[#org-jira][org-jira]]
+- [[#translate][Translate]]
 - [[#local-settings][Local settings]]
 
 * Setup
@@ -206,6 +211,20 @@ tell projectile about it.
 
 #+begin_src emacs-lisp
 (setq projectile-project-search-path '("~/build"))
+#+end_src
+
+*** Lookup provider URLs
+Majority of the default lookup providers are useless (to me) so let's trim the fat, adjust the order and add in some of our own!
+
+#+begin_src emacs-lisp
+(setq +lookup-provider-url-alist
+      '(("Doom Emacs issues" "https://github.com/hlissner/doom-emacs/issues?q=is%%3Aissue+%s")
+        ("DuckDuckGo"        +lookup--online-backend-duckduckgo "https://duckduckgo.com/?q=%s")
+        ("StackOverflow"     "https://stackoverflow.com/search?q=%s")
+        ("Github"            "https://github.com/search?ref=simplesearch&q=%s")
+        ("Youtube"           "https://youtube.com/results?aq=f&oq=&search_query=%s")
+        ("MDN"               "https://developer.mozilla.org/en-US/search?q=%s")
+        ("Nixpkgs"           "https://search.nixos.org/packages?query=%s")))
 #+end_src
 
 *** Subword-mode
@@ -553,25 +572,47 @@ for now this is just testing.
 #+begin_src emacs-lisp
 (defun reaper-get-running-timer-duration ()
   "Return duration of current running timer."
-  (reaper--hours-to-time
-   (reaper-with-buffer
-    (when reaper-running-timer
+  (reaper-with-buffer
+   (when reaper-running-timer
+     (reaper--hours-to-time
       (let ((entry (assoc reaper-running-timer reaper-timeentries)))
         (cdr (assoc :hours entry)))))))
 
-(defun reaper-running-timer ()
-  "Get a modeline-formatted version of the current harvest timer, if any."
-  (if-let ((note (reaper-get-running-timer-note))
-           (timer (reaper-get-running-timer-duration)))
-      (format " [ %s | %s] " note timer)))
+(defun reaper-modeline-vanilla ()
+  "Return modeline string for vanilla emacs."
+  reaper-modeline--output)
 
-(defadvice! +reaper--nil-update-timer ()
-  "Set timeentries to nil first before we update so we get a full refresh."
-  :before 'reaper--update-timer
-  (reaper-with-buffer
-   (setq reaper-timeentries nil)))
+(defvar reaper-modeline--timer nil)
+(defun reaper-modeline-timer ()
+  "Start/stop the time for updating reaper doom-modeline segment."
+  (if (timerp reaper-modeline--timer)
+      (cancel-timer reaper-modeline--timer))
+  (setq reaper-modeline--timer
+        (run-with-timer
+         1
+         60
+         #'reaper-modeline--update)))
 
-(add-to-list 'global-mode-string '(:eval (reaper-running-timer)))
+(after! reaper
+  (reaper-modeline-timer))
+
+(defun reaper-modeline--update ()
+  "Update the status for the reaper modeline segment."
+  (async-start
+   `(lambda ()
+      ,(async-inject-variables "\\`\\(load-path\\|reaper-api-key\\|reaper-account-id\\)\\'")
+      (defalias 'reaper-get-running-timer-duration ,(symbol-function 'reaper-get-running-timer-duration))
+      (require 'reaper)
+      (reaper-with-buffer
+       (setq reaper-timeentries nil)
+       (reaper-refresh-entries))
+      (when-let ((note (reaper-get-running-timer-note))
+                 (timer (reaper-get-running-timer-duration)))
+        (format " [ %s | %s] " (string-trim note) timer)))
+   (lambda (result)
+     (setq reaper-modeline--output result))))
+
+(add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla)))
 (customize-set-variable 'tab-bar-format '(tab-bar-format-global))
 (customize-set-variable 'tab-bar-mode t)
 (when tab-bar-mode
@@ -1873,7 +1914,14 @@ a .csproj or .fsproj file at either the project root or within src/*/."
   'company-capf 'company-yasnippet)
 #+end_src
 
-** LSP
+** LSP/DAP
+*** Increase variable line length
+By default this is /way/ too short.
+
+#+begin_src emacs-lisp
+(setq dap-ui-variable-length 200)
+#+end_src
+
 *** Ignore files in xref
 PHP is a dumb language (don't get me started...), as such we need extra files to
 get decent completion & documentation. 0% of the time will we want to use them
@@ -2091,6 +2139,25 @@ Embark additions to improve magit
   :after embark)
 #+end_src
 
+** laravel-mode
+Not yet fit for human consumption, but fit for mine because I'm +sub+ super-human
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! laravel-mode
+  :recipe (:local-repo "~/build/elisp/laravel-mode"
+           :build (:not compile)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! laravel-tinker
+  :after php-mode
+  :init
+  (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :ttl nil)
+  (map! :localleader
+         :map php-mode-map
+         :desc "Toggle a project-local Tinker REPL" "o t" #'laravel-tinker-toggle))
+#+end_src
+
 ** prescient
 Need to add this into company module when I've tested
 
@@ -2176,6 +2243,19 @@ will likely become more config than just a dump of macros.
    (map! :leader :n :desc "Track time" "t t" #'reaper))
 #+end_src
 
+* Graphviz
+Some config to help with graphviz
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! graphviz-dot-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! graphviz-dot-mode
+  :init
+  (require 'company-graphviz-dot))
+#+end_src
+
 * Jira
 Config related to setting up Jira.
 
@@ -2192,16 +2272,33 @@ You know what we love? =org-mode=.
 #+begin_src emacs-lisp
 (use-package! org-jira
   :init
-  (unless (file-directory-p
-           (expand-file-name ".org-jira"
-                             (or (getenv "XDG_CONFIG_HOME")
-                                 (getenv "HOME"))))
-    (make-directory (expand-file-name ".org-jira"
-                                      (or (getenv "XDG_CONFIG_HOME")
-                                          (getenv "HOME")))))
-  (setq org-jira-working-dir (expand-file-name ".org-jira"
-                                               (or (getenv "XDG_CONFIG_HOME")
-                                                   (getenv "HOME")))))
+  (let ((dir (expand-file-name ".org-jira"
+                               (or (getenv "XDG_CONFIG_HOME")
+                                   (getenv "HOME")))))
+    (unless (file-directory-p dir)
+      (make-directory dir))
+    (setq org-jira-working-dir dir)))
+#+end_src
+
+* Translate
+I do a decent amount of copy/paste translating stuff for work, so let's make this /easier/.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! google-translate)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! google-translate
+  :config
+  (after! google-translate
+    (defun google-translate--search-tkk ()
+      "Search TKK."
+      (list 430675 2721866130))
+    (setf (alist-get "Kirirwanda" google-translate-supported-languages-alist) "rw")
+    (setq google-translate-output-destination 'kill-ring)
+    (setq google-translate-translation-directions-alist
+          '(("en" . "fr")
+            ("en" . "rw")))))
 #+end_src
 
 * Local settings
