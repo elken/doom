@@ -49,7 +49,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#prompt][Prompt]]
       - [[#settings][Settings]]
     - [[#user-setup][User setup]]
-    - [[#server][Server]]
     - [[#vterm][vterm]]
       - [[#always-compile][Always compile]]
       - [[#kill-buffer][Kill buffer]]
@@ -117,6 +116,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#packages][Packages]]
       - [[#pretty-code-blocks][Pretty code blocks]]
       - [[#ox-chameleon][ox-chameleon]]
+      - [[#beamer][Beamer]]
     - [[#async][Async]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
@@ -140,8 +140,10 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#php-mode][PHP-Mode]]
     - [[#function][function]]
     - [[#php-1][php]]
-  - [[#php-laravel-mode][+php-laravel-mode]]
+  - [[#kotlin-mode][kotlin-mode]]
     - [[#__-1][__]]
+  - [[#php-laravel-mode][+php-laravel-mode]]
+    - [[#__-2][__]]
     - [[#migration_up][migration_up]]
     - [[#scope][scope]]
 - [[#packages-1][Packages]]
@@ -399,29 +401,6 @@ based on which OS I'm on.
 (setq user-full-name "Ellis Kenyő"
       user-mail-address "me@elken.dev")
 #+END_SRC
-
-*** Server
-Start a server (if not running already)
-
-#+begin_src emacs-lisp
-(require 'server)
-(when (not (server-running-p))
-  (server-start))
-
-(defun greedily-do-daemon-setup ()
-  (require 'org)
-  (when (require 'mu4e nil t)
-    (setq mu4e-confirm-quit t)
-    (setq +mu4e-lock-greedy t)
-    (setq +mu4e-lock-relaxed t)
-    (+mu4e-lock-add-watcher)
-    (when (+mu4e-lock-available t)
-      (mu4e~start))))
-
-(when (daemonp)
-  (add-hook 'emacs-startup-hook #'greedily-do-daemon-setup)
-  (add-hook! 'server-after-make-frame-hook (switch-to-buffer +doom-dashboard-name)))
-#+end_src
 
 *** vterm
 Vterm clearly wins the terminal war. Also doesn't need much configuration out of
@@ -782,6 +761,7 @@ promoting from it.
 
 #+begin_src emacs-lisp
 (use-package! org-ol-tree
+  :after org
   :commands org-ol-tree)
 
 (map! :map org-mode-map
@@ -1786,12 +1766,38 @@ Chameleons are cool, not having to touches faces is cooler (not the COVID kind)
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! ox-chameleon
-  :recipe (:host github :repo "tecosaur/ox-chameleon"))
+  :recipe (:host github :repo "tecosaur/ox-chameleon")
+  :pin "34e7cbd3af6ede9dc1cbfbe156dcc48f4615553f")
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package! ox-chameleon
   :after ox)
+#+end_src
+
+**** Beamer
+Starting to look into beamer for creating presentations, seems like we need to +steal+ borrow more config from Tecosaur.
+
+Metropolis is a nice theme, with a tiny adjustment it might be the best.
+
+#+begin_src emacs-lisp
+(setq org-beamer-theme "[progressbar=foot]metropolis")
+#+end_src
+
+#+begin_src emacs-lisp :noweb yes
+(defun org-beamer-p (info)
+  (eq 'beamer (and (plist-get info :back-end)
+                   (org-export-backend-name (plist-get info :back-end)))))
+
+(add-to-list 'org-latex-conditional-features '(org-beamer-p . beamer) t)
+(add-to-list 'org-latex-feature-implementations '(beamer :requires .missing-koma :prevents (italic-quotes condensed-lists)) t)
+(add-to-list 'org-latex-feature-implementations '(.missing-koma :snippet "\\usepackage{scrextend}" :order 2) t)
+#+end_src
+
+And lastly, a small tweak to improve how sections are divided
+
+#+begin_src emacs-lisp
+(setq org-beamer-frame-level 2)
 #+end_src
 
 *** Async
@@ -1859,7 +1865,7 @@ We can do better. Override the built-in tangling for something more async-y (bor
 Run export processes in a background ... process
 
 #+begin_src emacs-lisp
-(setq org-export-in-background t)
+(setq org-export-in-background nil)
 #+end_src
 
 *** (sub|super)script characters
@@ -2067,6 +2073,21 @@ ${1:$$(yas-auto-next (yas-completing-read "Visibility (public): " '("public" "pr
 # --
 <?php
 $0
+#+end_src
+
+** kotlin-mode
+*** __
+
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: Kotlin template
+# --
+package `(mapconcat 'identity (cdr (member "kotlin" (split-string default-directory "/" t))) ".")`
+
+class `(s-join "" (mapcar 's-titleize (s-split-words (file-name-base buffer-file-name))))`
+{
+    $0
+}
 #+end_src
 
 ** +php-laravel-mode
@@ -2289,6 +2310,7 @@ I do a decent amount of copy/paste translating stuff for work, so let's make thi
 
 #+begin_src emacs-lisp
 (use-package! google-translate
+  :hook (doom-first-buffer-hook)
   :config
   (after! google-translate
     (defun google-translate--search-tkk ()
