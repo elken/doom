@@ -34,6 +34,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#prevent-flickering][Prevent flickering]]
     - [[#clear-snippets-before-loading][Clear snippets before loading]]
     - [[#load-env-after-reload][Load env after reload]]
+    - [[#bury-compile-buffer][Bury compile buffer]]
     - [[#evil][Evil]]
       - [[#splits][Splits]]
       - [[#fine-undo][Fine undo]]
@@ -142,6 +143,8 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#php-1][php]]
   - [[#kotlin-mode][kotlin-mode]]
     - [[#__-1][__]]
+  - [[#slack-message-compose-buffer-mode][slack-message-compose-buffer-mode]]
+    - [[#standup][standup]]
   - [[#php-laravel-mode][+php-laravel-mode]]
     - [[#__-2][__]]
     - [[#migration_up][migration_up]]
@@ -271,6 +274,28 @@ Most of the time, reloading breaks. So, let's not break.
 
 #+begin_src emacs-lisp
 (add-hook! 'doom-after-reload-hook (doom-load-envvars-file (expand-file-name "env" doom-local-dir) t))
+#+end_src
+
+*** Bury compile buffer
+Assuming the buffer finishes successfully, close after 1 second.
+
+#+begin_src emacs-lisp
+(defun bury-compile-buffer-if-successful (buffer string)
+  "Bury a compilation buffer if succeeded without warnings "
+  (when (and (eq major-mode 'comint-mode)
+             (string-match "finished" string)
+             (not
+              (with-current-buffer buffer
+                (search-forward "warning" nil t))))
+    (run-with-timer 1 nil
+                    (lambda (buf)
+                      (let ((window (get-buffer-window buf)))
+                        (when (and (window-live-p window)
+                                   (eq buf (window-buffer window)))
+                          (delete-window window))))
+                    buffer)))
+
+(add-hook 'compilation-finish-functions #'bury-compile-buffer-if-successful)
 #+end_src
 
 *** Evil
@@ -2019,7 +2044,7 @@ And set the server to be loaded
   (cl-defmethod eglot-initialization-options ((server eglot-php))
     "Passes through required intelephense options"
     `(:storagePath ,php-intelephense-storage-path
-      :licenceKey ,lsp-intelephense-licence-key
+      :licenceKey (when lsp-intelephense-license-key ,lsp-intelephense-licence-key)
       :clearCache t))
   (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio")))))
 #+end_src
@@ -2090,6 +2115,20 @@ class `(s-join "" (mapcar 's-titleize (s-split-words (file-name-base buffer-file
 }
 #+end_src
 
+** slack-message-compose-buffer-mode
+*** standup
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: Standup template
+# --
+*Standup*
+
+$1: $2
+`(format-time-string "%d/%m/%y" (current-time))`: $3
+
+*Blocked*: $4
+#+end_src
+
 ** +php-laravel-mode
 *** __
 
@@ -2145,6 +2184,7 @@ Packages to be unpinned or just completely disabled
 (disable-packages! evil-escape)
 (unpin! vterm)
 (unpin! lsp-mode)
+(unpin! lsp-dart)
 #+end_src
 
 ** embark-magit
@@ -2312,15 +2352,15 @@ I do a decent amount of copy/paste translating stuff for work, so let's make thi
 (use-package! google-translate
   :hook (doom-first-buffer-hook)
   :config
-  (after! google-translate
-    (defun google-translate--search-tkk ()
-      "Search TKK."
-      (list 430675 2721866130))
-    (setf (alist-get "Kirirwanda" google-translate-supported-languages-alist) "rw")
-    (setq google-translate-output-destination 'kill-ring)
-    (setq google-translate-translation-directions-alist
-          '(("en" . "fr")
-            ("en" . "rw")))))
+  (defun google-translate--search-tkk ()
+    "Search TKK."
+    (list 430675 2721866130))
+  (setf (alist-get "Kirirwanda" google-translate-supported-languages-alist) "rw")
+  (setq google-translate-output-destination 'kill-ring)
+  (setq google-translate-translation-directions-alist
+        '(("en" . "fr")
+          ("en" . "rw"))))
+#+end_src
 #+end_src
 
 * Local settings
