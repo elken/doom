@@ -59,6 +59,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#save][Save]]
   - [[#search][Search]]
   - [[#dired][Dired]]
+  - [[#journal][Journal]]
 - [[#graphical-setup][Graphical setup]]
   - [[#which-key][which-key]]
   - [[#marginalia][Marginalia]]
@@ -121,8 +122,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#async][Async]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
-  - [[#eglot][Eglot]]
-    - [[#resolve-an-issue-between-flymake-version-5645][Resolve an issue between flymake version (#5645)]]
   - [[#f][F#]]
   - [[#c][C#]]
   - [[#elisp][ELISP]]
@@ -134,7 +133,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#php][PHP]]
     - [[#web-mode-setup][Web-mode setup]]
     - [[#intelephense][Intelephense]]
-    - [[#eglot-1][Eglot]]
+    - [[#eglot][Eglot]]
 - [[#snippets][Snippets]]
   - [[#org-mode-1][Org-mode]]
     - [[#__][__]]
@@ -489,6 +488,17 @@ Dired should behave better with evil mappings
 (map! :map dired-mode-map
       :n "h" #'dired-up-directory
       :n "l" #'dired-find-alternate-file)
+#+end_src
+
+** Journal
+This is something I'm likely to use quite often, especially with an easy
+convenience binding
+
+#+begin_src emacs-lisp
+(after! org-journal
+  (setq org-journal-find-file #'find-file-other-window)
+
+  (map! :leader :desc "Open today's journal" "j" #'org-journal-open-current-journal-file))
 #+end_src
 
 * Graphical setup
@@ -1270,6 +1280,17 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                  :file "Notes.org"
                  :template ("* *?"
                             "%i %a"))
+                ("Journal" :keys "j"
+                 :icon ("calendar" :set "faicon" :color "pink")
+                 :type plain
+                 :function (lambda ()
+                             (org-journal-new-entry t)
+                             (unless (eq org-journal-file-type 'daily)
+                               (org-narrow-to-subtree))
+                             (goto-char (point-max)))
+                 :template "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?"
+                 :jump-to-captured t
+                 :immediate-finish t)
                 ("Project" :keys "p"
                  :icon ("repo" :set "octicon" :color "silver")
                  :prepend t
@@ -1902,18 +1923,6 @@ Annoying having to gate these, so let's fix that
 
 * Languages
 Configuration for various programming languages.
-
-** Eglot
-*** Resolve an issue between flymake version ([[https://github.com/hlissner/doom-emacs/pull/5645][#5645]])
-Should be removed after it's merged, but for now it's needed.
-
-#+begin_src emacs-lisp
-(after! (flymake)
-  (when (and
-         (not (fboundp 'flymake--diag-buffer))
-         (fboundp 'flymake--diag-locus))
-    (defalias 'flymake--diag-buffer 'flymake--diag-locus)))
-#+end_src
 
 ** F#
 Should probably become a package at some point, for now it's fine.
