@@ -141,7 +141,9 @@
        ;;erlang            ; an elegant language for a more civilized age
        ;;ess               ; emacs speaks statistics
        ;;faust             ; dsp, but you get to keep your soul
-       (fsharp +lsp)                           ; ML stands for Microsoft's Language
+       (fsharp
+        +tree-sitter
+        +lsp)                           ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        (graphql +lsp)      ; Give it a REST
        ;;gdscript          ; the language you waited for
@@ -159,7 +161,8 @@
        ;;lean
        ;;factor
        ;;ledger            ; an accounting system in Emacs
-       ;;lua               ; one-based indices? one-based indices
+       (lua +fennel
+            +lsp)               ; one-based indices? one-based indices
        (markdown +grip)          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
        nix                              ; I hereby declare "nix geht mehr!"

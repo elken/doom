@@ -150,7 +150,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#scope][scope]]
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
-  - [[#embark-magit][embark-magit]]
+  - [[#embark-vc][embark-vc]]
   - [[#laravel-mode][laravel-mode]]
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
@@ -2058,8 +2058,8 @@ Packages to be unpinned or just completely disabled
 (unpin! org)
 #+end_src
 
-** embark-magit
-Embark additions to improve magit
+** embark-vc
+Embark additions to improve various vc operations
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! embark-vc
