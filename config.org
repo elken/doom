@@ -654,25 +654,20 @@ for now this is just testing.
 Default modeline is a tad cluttered, and because I don't use exwm anymore the
 modeline from that module isn't in use. So, it's duplicated here and tweaked.
 
-#+begin_src emacs-lisp :tangle packages.el
-;; (package! doom-modeline-now-playing)
-#+end_src
-
 #+begin_src emacs-lisp
 (after! doom-modeline
-  ;; (use-package! doom-modeline-now-playing
-  ;;   :config
-  ;;   (doom-modeline-now-playing-timer))
   (setq all-the-icons-scale-factor 1.1
         auto-revert-check-vc-info t
         doom-modeline-major-mode-icon (display-graphic-p)
         doom-modeline-major-mode-color-icon (display-graphic-p)
         doom-modeline-buffer-file-name-style 'relative-to-project
+        doom-modeline-github t
+        doom-modeline-github-interval 60
         doom-modeline-vcs-max-length 60)
   (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
   (doom-modeline-def-modeline 'main
-    '(bar modals workspace-name window-number persp-name buffer-info matches remote-host github debug vcs)
-    '(mu4e grip gnus checker misc-info repl lsp " ")))
+    '(bar modals workspace-name window-number persp-name buffer-position selection-info buffer-info matches remote-host debug vcs matches)
+    '(github mu4e grip gnus checker misc-info repl lsp " ")))
 #+end_src
 
 ** Fonts
