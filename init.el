@@ -55,7 +55,8 @@
        ;;nav-flash         ; blink cursor line after big motions
        ;;neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
-       (popup +defaults) ; tame sudden yet inevitable temporary windows
+       (popup +all
+              +defaults) ; tame sudden yet inevitable temporary windows
        ;; tabs              ; a tab bar for Emacs
        (treemacs +lsp)          ; a project drawer, like neotree but cooler
        unicode           ; extended unicode support for various languages
@@ -177,7 +178,6 @@
             +noter
             +pandoc
             +present
-            +pretty
             +roam2)    ; organize your plain life in plain text
        (php +lsp
            +tree-sitter)       ; perl's insecure younger brother
@@ -195,7 +195,7 @@
        (rust +lsp)          ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        scheme ; a fully conniving family of lisps
-       sh     ; she sells {ba,z,fi}sh shells on the C xor
+       (sh +lsp)     ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity          ; do you need a blockchain? No.
        ;;swift             ; who asked for emoji variables?

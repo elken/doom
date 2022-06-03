@@ -4,6 +4,9 @@
 #+property: header-args :tangle no :results silent :eval no-export
 #+caption: Banner
 #+latex_class: chameleon
+#+html_content_class: chameleon
+#+html_head: <link rel='stylesheet' type='text/css' href='static/index.css' />
+#+html_head: <link rel='shortcut icon' type='image/png' href='https://raw.githubusercontent.com/eccentric-j/doom-icon/master/cute-doom/src/doom.iconset/icon_32x32.png'>
 
 [[file:images/banner.png]]
 
@@ -40,6 +43,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#fine-undo][Fine undo]]
       - [[#global-substitute][Global substitute]]
       - [[#ignore-visual-text-in-the-kill-ring][Ignore visual text in the kill ring]]
+      - [[#use-emacs-binds-in-insert-mode][Use emacs binds in insert mode]]
     - [[#lispyville][Lispyville]]
     - [[#default-scratch-mode][Default scratch mode]]
     - [[#auth-info][Auth info]]
@@ -77,12 +81,11 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#org-directory][org-directory]]
   - [[#font-setup][Font setup]]
   - [[#heading-minimap][Heading minimap]]
-  - [[#tables][Tables]]
+  - [[#prettify-org][Prettify org]]
+      - [[#org-modern][Org-modern]]
   - [[#properties][Properties]]
     - [[#allow-property-inheritance][Allow property inheritance]]
   - [[#characters][Characters]]
-    - [[#headline-bullets][Headline bullets]]
-    - [[#item-bullets][Item bullets]]
     - [[#dropdown-icon][Dropdown icon]]
     - [[#remove-excess-emphasis-markers][Remove excess emphasis markers]]
     - [[#show-real-entities-rather-than-utf8][Show real entities rather than UTF8]]
@@ -100,7 +103,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#remove-kill-tasks][Remove =KILL= tasks]]
   - [[#show-images][Show images]]
   - [[#autoexecute-tangled-shell-files][Autoexecute tangled shell files]]
-  - [[#weblog-setup][Weblog setup]]
+  - [[#variable-setup][Variable setup]]
   - [[#better-snippets][Better snippets]]
   - [[#roam][Roam]]
     - [[#templates][Templates]]
@@ -162,6 +165,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#org-jira][org-jira]]
 - [[#translate][Translate]]
 - [[#local-settings][Local settings]]
+- [[#test][Test]]
 
 * Setup
 ** Workflow
@@ -196,6 +200,7 @@ Over time and due to various issues, I have been migrating to a plain =exwm= ses
 The scripts responsible for starting up exwm in the right way, including env variables and picom.
 * FAQ
 None yet because luckily nobody else has seen this spaghetti junction
+
 * Globals
 ** Constants and Variables
 I could make a Bioshock Infinite joke here but I can't think of one. Wouldn't
@@ -327,6 +332,12 @@ When we overwrite text in visual mode, say =vip=, don't add to the kill ring.
 (setq evil-kill-on-visual-paste nil)
 #+end_src
 
+**** Use emacs binds in insert mode
+Some of them are quite useful, and I normally use them in the DE.
+
+#+begin_src emacs-lisp
+(setq evil-disable-insert-state-bindings t)
+#+end_src
 *** Lispyville
 This structured-editing thing is apparently really neat, so let's see how we go
 
@@ -606,25 +617,29 @@ for now this is just testing.
          #'reaper-modeline--update)))
 
 (after! reaper
-  (reaper-modeline-timer))
+  (when (and (not (string= "" reaper-api-key))
+             (not (string= "" reaper-account-id)))
+    (reaper-modeline-timer)
+    (add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla)))))
 
 (defun reaper-modeline--update ()
   "Update the status for the reaper modeline segment."
-  (async-start
-   `(lambda ()
-      ,(async-inject-variables "\\`\\(load-path\\|reaper-api-key\\|reaper-account-id\\)\\'")
-      (defalias 'reaper-get-running-timer-duration ,(symbol-function 'reaper-get-running-timer-duration))
-      (require 'reaper)
-      (reaper-with-buffer
-       (setq reaper-timeentries nil)
-       (reaper-refresh-entries))
-      (when-let ((note (reaper-get-running-timer-note))
-                 (timer (reaper-get-running-timer-duration)))
-        (format " [ %s | %s] " (string-trim note) timer)))
-   (lambda (result)
-     (setq reaper-modeline--output result))))
+  (when (and (not (string= "" reaper-api-key))
+             (not (string= "" reaper-account-id)))
+    (async-start
+     `(lambda ()
+        ,(async-inject-variables "\\`\\(load-path\\|reaper-api-key\\|reaper-account-id\\)\\'")
+        (defalias 'reaper-get-running-timer-duration ,(symbol-function 'reaper-get-running-timer-duration))
+        (require 'reaper)
+        (reaper-with-buffer
+         (setq reaper-timeentries nil)
+         (reaper-refresh-entries))
+        (when-let ((note (reaper-get-running-timer-note))
+                   (timer (reaper-get-running-timer-duration)))
+          (format " [ %s | %s] " (string-trim note) timer)))
+     (lambda (result)
+       (setq reaper-modeline--output result)))))
 
-(add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla)))
 (customize-set-variable 'tab-bar-format '(tab-bar-format-global))
 (customize-set-variable 'tab-bar-mode t)
 (when tab-bar-mode
@@ -637,25 +652,20 @@ for now this is just testing.
 Default modeline is a tad cluttered, and because I don't use exwm anymore the
 modeline from that module isn't in use. So, it's duplicated here and tweaked.
 
-#+begin_src emacs-lisp :tangle packages.el
-;; (package! doom-modeline-now-playing)
-#+end_src
-
 #+begin_src emacs-lisp
 (after! doom-modeline
-  ;; (use-package! doom-modeline-now-playing
-  ;;   :config
-  ;;   (doom-modeline-now-playing-timer))
   (setq all-the-icons-scale-factor 1.1
         auto-revert-check-vc-info t
         doom-modeline-major-mode-icon (display-graphic-p)
         doom-modeline-major-mode-color-icon (display-graphic-p)
         doom-modeline-buffer-file-name-style 'relative-to-project
+        doom-modeline-github t
+        doom-modeline-github-interval 60
         doom-modeline-vcs-max-length 60)
   (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
   (doom-modeline-def-modeline 'main
-    '(bar modals workspace-name window-number persp-name buffer-info matches remote-host github debug)
-    '(vcs github mu4e grip gnus checker misc-info repl lsp " ")))
+    '(bar modals workspace-name window-number persp-name buffer-position selection-info buffer-info matches remote-host debug vcs matches)
+    '(github mu4e grip gnus checker misc-info repl lsp " ")))
 #+end_src
 
 ** Fonts
@@ -664,6 +674,7 @@ Configure the fonts across all used platforms (slightly different names).
 #+BEGIN_SRC emacs-lisp
 (setq  doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 13)
        doom-variable-pitch-font (font-spec :family "Overpass" :size 13)
+       doom-unicode-font (font-spec :family "Iosevka Nerd Font Mono" :size 15)
        doom-emoji-fallback-font-families nil
        doom-symbol-fallback-font-families nil)
 #+END_SRC
@@ -741,7 +752,6 @@ for documentation and organisation.
   "Modes to enable on org-mode start"
   (org-indent-mode)
   (visual-line-mode 1)
-  (org-appear-mode)
   (elken/org-font-setup))
 
 (add-hook! org-mode #'elken/org-setup-hook)
@@ -761,8 +771,6 @@ it makes sense to use the defined fixed width font.
 #+BEGIN_SRC emacs-lisp
 (defun elken/org-font-setup ()
   ;; Set faces for heading levels
-  (font-lock-add-keywords 'org-mode
-                          '((":\\(@[^\:]+\\):" (1 'doom-modeline-bar-inactive))))
   (dolist (face '((org-level-1 . 1.2)
                   (org-level-2 . 1.1)
                   (org-level-3 . 1.05)
@@ -796,7 +804,9 @@ promoting from it.
 #+begin_src emacs-lisp
 (use-package! org-ol-tree
   :after org
-  :commands org-ol-tree)
+  :commands org-ol-tree
+  :config
+  (setq org-ol-tree-ui-window-position 'left))
 
 (map! :map org-mode-map
       :after org
@@ -804,18 +814,38 @@ promoting from it.
       :desc "Outline" "O" #'org-ol-tree)
 #+end_src
 
-** Tables
-Improve tables by using unicode box characters intead of boring /ascii/.
+** Prettify org
+**** Org-modern
+Minad is a treasure that must be kept alive at all costs. =org-modern= is actually
+quite a bit nicer than =org +pretty=, so we use that instead.
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! org-pretty-table
-  :recipe (:host github :repo "Fuco1/org-pretty-table"))
+(package! org-modern)
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! org-pretty-table
-  :after org
-  :hook (org-mode . org-pretty-table-mode))
+(use-package! org-modern
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq org-modern-star ["› "]
+        org-modern-list '((?* . ?⋆)
+                          (?+ . ?‣)
+                          (?- . ?•))
+        org-modern-block nil
+        org-modern-keyword nil
+        org-modern-todo-faces
+        '(("TODO" :inverse-video t :inherit org-todo)
+          ("PROJ" :inverse-video t :inherit +org-todo-project)
+          ("STORY" :inverse-video t :inherit +org-todo-project)
+          ("INPROG" :inverse-video t :inherit +org-todo-active)
+          ("[-]"  :inverse-video t :inherit +org-todo-active)
+          ("HOLD" :inverse-video t :inherit +org-todo-onhold)
+          ("WAIT" :inverse-video t :inherit +org-todo-onhold)
+          ("[?]"  :inverse-video t :inherit +org-todo-onhold)
+          ("KILL" :inverse-video t :inherit +org-todo-cancel)
+          ("NO"   :inverse-video t :inherit +org-todo-cancel)))
+  (custom-set-faces!
+    '(org-modern-label :width normal)))
 #+end_src
 
 ** Properties
@@ -827,20 +857,6 @@ This may be the solution to /so/ many weird issues with src blocks.
 #+end_src
 
 ** Characters
-*** Headline bullets
-
-#+begin_src emacs-lisp
-(setq org-superstar-headline-bullets-list '("› "))
-#+end_src
-
-*** Item bullets
-
-#+begin_src emacs-lisp
-(setq org-superstar-item-bullet-alist '((?* . ?⋆)
-                                        (?+ . ?‣)
-                                        (?- . ?•)))
-#+end_src
-
 *** Dropdown icon
 
 #+begin_src emacs-lisp
@@ -866,7 +882,7 @@ using org mode for organisation more.
 #+begin_src emacs-lisp
 (after! org
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "STORY(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
+        '((sequence "TODO(t)" "INPROG(i)" "PROJ(p)" "STORY(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
           (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))))
 #+end_src
 
@@ -1005,19 +1021,8 @@ Make tangled shell files executable (I trust myself, ish...)
 (add-hook 'org-babel-post-tangle-hook 'elken/make-tangled-shell-executable)
 #+end_src
 
-** Weblog setup
-Useful settings and functions for [[https://github.com/theiceshell/firn][firn]] and other blogging tools
-
-Testing out weblorg, might encourage me to finally finish my site revamp...
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! weblorg)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! weblorg
-  :after org)
-#+end_src
+** Variable setup
+Useful settings and functions for maintaining modified dates in org files
 
 #+begin_src emacs-lisp
 (setq enable-dir-local-variables t)
@@ -2246,4 +2251,10 @@ Needed some way to manage settings for a local machine, so let's be lazy with it
 #+begin_src emacs-lisp
 (when (file-exists-p! "config-local.el" doom-private-dir)
   (load! "config-local.el" doom-private-dir))
+#+end_src
+
+* Test
+#+begin_src diff
+- 5
++ 2
 #+end_src
