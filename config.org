@@ -113,8 +113,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#conditional-features][Conditional features]]
       - [[#tectonic][Tectonic]]
       - [[#classes][Classes]]
-        - [[#base][Base]]
-        - [[#chameleon][chameleon]]
       - [[#packages][Packages]]
       - [[#pretty-code-blocks][Pretty code blocks]]
       - [[#ox-chameleon][ox-chameleon]]
@@ -693,7 +691,8 @@ have sparked a discussion, maybe later)
   `(php-string-op :foreground ,(doom-color 'blue))
   `(php-static-method-call :foreground ,(doom-color 'magenta))
   `(php-method-call :foreground ,(doom-color 'magenta))
-  `(php-function-name :foreground ,(doom-lighten 'magenta 0.3)))
+  `(php-function-name :foreground ,(doom-lighten 'magenta 0.3))
+  `(corfu-default :family ,doom-font))
 #+end_src
 
 Change the default banner (need to add the ASCII banner at some point)
@@ -1555,8 +1554,7 @@ Tectonic is the hot new thing, which also means I can get rid of my tex installa
 (setq-default org-latex-pdf-process '("tectonic -Z shell-escape --outdir=%o %f"))
 #+end_src
 
-**** Classes
-***** Base
+**** TODO Classes
 Simple base header shared by all defines classes
 
 #+name: base-template
@@ -1569,13 +1567,23 @@ Simple base header shared by all defines classes
 \\setmonofont[Ligatures=TeX]{Iosevka Nerd Font Mono}
 #+end_src
 
-***** chameleon
-Template for chameleon documents.
-
 #+name: chameleon-template
 #+begin_src latex :noweb yes
 % Using chameleon
 <<base-template>>
+#+end_src
+
+#+name: work-template
+#+begin_src latex :noweb yes
+% Using work
+<<base-template>>
+\\usepackage{fontawesome5}
+\\usepackage{tcolorbox}
+\\usepackage{fancyhdr}
+\\usepackage{lastpage}
+\\pagestyle{fancy}
+\\fancyhead{}
+\\fancyhead[RO, LE]{}
 #+end_src
 
 Now for some class setup (likely to change over time)
@@ -2230,7 +2238,6 @@ I do a decent amount of copy/paste translating stuff for work, so let's make thi
   (setq google-translate-translation-directions-alist
         '(("en" . "fr")
           ("en" . "rw"))))
-#+end_src
 #+end_src
 
 * Local settings
