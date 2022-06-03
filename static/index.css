@@ -1,0 +1,36 @@
+:root {
+  --sidebar-width: 21em;
+  --body-width: 70vw;
+}
+
+body {
+  width: var(--body-width);
+  min-width: var(--body-width);
+  padding-left: var(--sidebar-width);
+  padding-right: 1em;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.content {
+  padding: 0 2em 30em;
+}
+
+#table-of-contents {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  width: 100%;
+  max-width: 40vw;
+  height: 100%;
+  object-fit: cover;
+}

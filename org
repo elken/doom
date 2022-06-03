@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+function build() {
+    emacs --script publish.el
+}
+
+function dev() {
+    mkdir -p out
+
+    npx live-server out &
+    build
+
+    while true; do
+        changes=()
+        while read -r -t 1 change; do
+            changes+=("$change")
+        done
+
+        if [[ "${#changes[@]}" -ne 0 ]]; then
+            for change in "${changes[@]}"; do
+                echo $change
+            done
+            build &
+        fi
+    done < <(inotifywait --monitor \
+        --recursive \
+        --event modify \
+        --event move \
+        --event create \
+        --event delete \
+        --event attrib \
+        --exclude "(/\..+)|(out)|(flycheck*)" \
+        --quiet \
+        .)
+}
+
+function main() {
+    trap 'exit' TERM INT
+    trap 'kill 0' EXIT
+
+    command="$1"
+    case $command in
+        "" | "-h" | "--help")
+            echo "Usage: org build|dev"
+            echo "  build: performs a one time build"
+            echo "  dev:   builds, starts a file server, and watches file changes to trigger rebuilds"
+            ;;
+        build)
+            echo "=> Starting a one off build..."
+            build
+            ;;
+        dev)
+            echo "=> Starting development..."
+            dev
+            ;;
+        *)
+            echo "Error: '$command' is not a supported command." >&2
+            echo "       Run '$0 --help' for a list of commands ." >&2
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
