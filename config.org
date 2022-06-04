@@ -832,7 +832,34 @@ quite a bit nicer than =org +pretty=, so we use that instead.
                           (?+ . ?‣)
                           (?- . ?•))
         org-modern-block nil
-        org-modern-keyword nil
+        org-modern-keyword
+        '((default . t)
+          ("title" . "𝙏")
+          ("subtitle" . "𝙩")
+          ("author" . "𝘼")
+          ("date" . "𝘿")
+          ("property" . "☸")
+          ("options" . "⌥")
+          ("startup" . "⏻")
+          ("macro" . "𝓜")
+          ("bibliography" . "")
+          ("print_bibliography" . "")
+          ("html_head" . "🅷")
+          ("html" . "🅗")
+          ("latex_class" . "🄻")
+          ("latex_header" . "🅻")
+          ("latex" . "🅛")
+          ("beamer_theme" . "🄱")
+          ("beamer_header" . "🅱")
+          ("beamer" . "🅑")
+          ("attr_latex" . "🄛")
+          ("attr_html" . "🄗")
+          ("attr_org" . "⒪")
+          ("name" . "⁍")
+          ("header" . "›")
+          ("caption" . "☰")
+          ("results:" . "🠶")
+          ("RESULTS" . "🠶"))
         org-modern-todo-faces
         '(("TODO" :inverse-video t :inherit org-todo)
           ("PROJ" :inverse-video t :inherit +org-todo-project)
@@ -1661,6 +1688,13 @@ Teco is the goto for this, so basically just ripping off him.
 #+end_src
 
 #+begin_src emacs-lisp
+(use-package! engrave-faces-html
+  :after ox-html
+  :config
+  (setq org-latex-listings 'engraved))
+#+end_src
+
+#+begin_src emacs-lisp
 (defvar-local org-export-has-code-p nil)
 
 (defadvice! org-export-expect-no-code (&rest _)
@@ -1686,8 +1720,7 @@ Chameleons are cool, not having to touches faces is cooler (not the COVID kind)
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! ox-chameleon
-  :recipe (:host github :repo "tecosaur/ox-chameleon")
-  :pin "34e7cbd3af6ede9dc1cbfbe156dcc48f4615553f")
+  :recipe (:host github :repo "tecosaur/ox-chameleon"))
 #+end_src
 
 #+begin_src emacs-lisp
