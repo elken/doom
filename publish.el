@@ -54,10 +54,14 @@
                  (rainbow-delimiters-depth-8-face :short "rd-8" :slug "rdh" :foreground "#A3BE8C")
                  (rainbow-delimiters-depth-9-face :short "rd-9" :slug "rdi" :foreground "#5D80AE"))))
 (require 'ox-publish)
-(add-hook 'htmlize-before-hook #'highlight-quoted--turn-on)
-(add-hook 'htmlize-before-hook #'highlight-numbers--turn-on)
-(add-hook 'htmlize-before-hook #'rainbow-delimiters-mode-enable)
+(require 'htmlize)
 (run-hooks 'doom-init-ui-hook)
+(add-hook 'htmlize-before-hook (lambda ()
+                                 (rainbow-delimiters-mode-enable)
+                                 (highlight-numbers--turn-on)
+                                 (highlight-quoted--turn-on)
+                                 (font-lock-flush)
+                                 (font-lock-ensure)))
 
 (defun +org-publish-rename (props)
   "Things to do after the project finishes."
@@ -83,9 +87,9 @@
       org-html-checkbox-type 'html
       org-html-html5-fancy t
       org-html-htmlize-output-type 'css
-      org-html-head-include-default-style t
+      org-html-head-include-default-style nil
       ;; org-html-style-default (dotdoom-load-file "head-styles.html")
-      org-html-head-include-scripts t
+      org-html-head-include-scripts nil
       ;; org-html-scripts (dotdoom-load-file "head-scripts.html")
       org-html-doctype "html5"
       org-html-home/up-format "%s\n%s\n")
