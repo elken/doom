@@ -703,7 +703,7 @@ have sparked a discussion, maybe later)
   `(php-static-method-call :foreground ,(doom-color 'magenta))
   `(php-method-call :foreground ,(doom-color 'magenta))
   `(php-function-name :foreground ,(doom-lighten 'magenta 0.3))
-  `(corfu-default :family ,doom-font))
+  `(corfu-default :inherit tooltip))
 #+end_src
 
 Change the default banner (need to add the ASCII banner at some point)
@@ -2101,7 +2101,8 @@ Packages to be unpinned or just completely disabled
 (unpin! vterm)
 (unpin! lsp-mode)
 (unpin! lsp-dart)
-(unpin! org)
+(package! org
+  :pin "5766ddd758f6c2b498ddf4fb79f20f01a09674cc")
 #+end_src
 
 ** embark-vc
@@ -2140,7 +2141,8 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
 Need to add this into company module when I've tested
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! company-prescient)
+(when (featurep! :completion company)
+  (package! company-prescient))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -2231,7 +2233,8 @@ Some config to help with graphviz
 #+begin_src emacs-lisp
 (use-package! graphviz-dot-mode
   :init
-  (require 'company-graphviz-dot))
+  (after! company
+    (require 'company-graphviz-dot)))
 #+end_src
 
 * Jira
