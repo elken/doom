@@ -78,10 +78,9 @@
   :after corfu
   :when (featurep! +icons)
   :custom
-  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  (kind-icon-default-face 'corfu-default)
   :config
   (setq kind-icon-use-icons t
-        kind-icon-default-face 'corfu-default
         svg-lib-icons-dir (expand-file-name "svg-lib" doom-cache-dir)
         kind-icon-mapping
         '((array "a" :icon "code-brackets" :face font-lock-variable-name-face)
@@ -135,3 +134,17 @@
   (add-to-list 'completion-at-point-functions #'cape-keyword t)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev t))
 
+
+(use-package! corfu-history
+  :after corfu
+  :hook (corfu-mode . (lambda ()
+                          (corfu-history-mode 1)
+                          (savehist-mode 1)
+                          (add-to-list 'savehist-additional-variables 'corfu-history))))
+
+
+(use-package! corfu-quick
+  :after corfu
+  :bind (:map corfu-map
+         ("M-q" . corfu-quick-complete)
+         ("C-q" . corfu-quick-insert)))
