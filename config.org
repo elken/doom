@@ -674,13 +674,12 @@ Configure the fonts across all used platforms (slightly different names).
 #+BEGIN_SRC emacs-lisp
 (setq  doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 13)
        doom-variable-pitch-font (font-spec :family "Overpass" :size 13)
-       doom-unicode-font (font-spec :family "Iosevka Nerd Font Mono" :size 15)
+       doom-unicode-font (font-spec :family "Iosevka Nerd Font Mono" :size 14)
        doom-emoji-fallback-font-families nil
        doom-symbol-fallback-font-families nil)
 #+END_SRC
 
 ** Theme
-
 Load my current flavour-of-the-month colour scheme.
 
 #+BEGIN_SRC emacs-lisp
@@ -703,7 +702,7 @@ have sparked a discussion, maybe later)
   `(php-static-method-call :foreground ,(doom-color 'magenta))
   `(php-method-call :foreground ,(doom-color 'magenta))
   `(php-function-name :foreground ,(doom-lighten 'magenta 0.3))
-  `(corfu-default :inherit tooltip))
+  `(corfu-default :background nil :inherit tooltip :extend t))
 #+end_src
 
 Change the default banner (need to add the ASCII banner at some point)
@@ -827,39 +826,40 @@ quite a bit nicer than =org +pretty=, so we use that instead.
 (use-package! org-modern
   :hook (org-mode . org-modern-mode)
   :config
+  (when (not IS-MAC)
+    (setq org-modern-keyword
+          '((default . t)
+            ("title" . "𝙏")
+            ("subtitle" . "𝙩")
+            ("author" . "𝘼")
+            ("date" . "𝘿")
+            ("property" . "☸")
+            ("options" . "⌥")
+            ("startup" . "⏻")
+            ("macro" . "𝓜")
+            ("bibliography" . "")
+            ("print_bibliography" . "")
+            ("html_head" . "🅷")
+            ("html" . "🅗")
+            ("latex_class" . "🄻")
+            ("latex_header" . "🅻")
+            ("latex" . "🅛")
+            ("beamer_theme" . "🄱")
+            ("beamer_header" . "🅱")
+            ("beamer" . "🅑")
+            ("attr_latex" . "🄛")
+            ("attr_html" . "🄗")
+            ("attr_org" . "⒪")
+            ("name" . "⁍")
+            ("header" . "›")
+            ("caption" . "☰")
+            ("results:" . "🠶")
+            ("RESULTS" . "🠶"))))
   (setq org-modern-star ["› "]
         org-modern-list '((?* . ?⋆)
                           (?+ . ?‣)
                           (?- . ?•))
         org-modern-block nil
-        org-modern-keyword
-        '((default . t)
-          ("title" . "𝙏")
-          ("subtitle" . "𝙩")
-          ("author" . "𝘼")
-          ("date" . "𝘿")
-          ("property" . "☸")
-          ("options" . "⌥")
-          ("startup" . "⏻")
-          ("macro" . "𝓜")
-          ("bibliography" . "")
-          ("print_bibliography" . "")
-          ("html_head" . "🅷")
-          ("html" . "🅗")
-          ("latex_class" . "🄻")
-          ("latex_header" . "🅻")
-          ("latex" . "🅛")
-          ("beamer_theme" . "🄱")
-          ("beamer_header" . "🅱")
-          ("beamer" . "🅑")
-          ("attr_latex" . "🄛")
-          ("attr_html" . "🄗")
-          ("attr_org" . "⒪")
-          ("name" . "⁍")
-          ("header" . "›")
-          ("caption" . "☰")
-          ("results:" . "🠶")
-          ("RESULTS" . "🠶"))
         org-modern-todo-faces
         '(("TODO" :inverse-video t :inherit org-todo)
           ("PROJ" :inverse-video t :inherit +org-todo-project)

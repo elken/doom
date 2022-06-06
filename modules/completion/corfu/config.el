@@ -34,9 +34,9 @@
                 (setq lsp-completion-provider :none))))
 
   ;; Set orderless filtering for LSP-mode completions
-(add-hook 'lsp-completion-mode-hook
-          (lambda ()
-            (setf (alist-get 'lsp-capf completion-category-defaults) '((styles . (orderless flex))))))
+  (add-hook 'lsp-completion-mode-hook
+            (lambda ()
+              (setf (alist-get 'lsp-capf completion-category-defaults) '((styles . (orderless flex))))))
   (after! evil
     (advice-add 'corfu--setup :after 'evil-normalize-keymaps)
     (advice-add 'corfu--teardown :after 'evil-normalize-keymaps)
@@ -138,9 +138,9 @@
 (use-package! corfu-history
   :after corfu
   :hook (corfu-mode . (lambda ()
-                          (corfu-history-mode 1)
-                          (savehist-mode 1)
-                          (add-to-list 'savehist-additional-variables 'corfu-history))))
+                        (corfu-history-mode 1)
+                        (savehist-mode 1)
+                        (add-to-list 'savehist-additional-variables 'corfu-history))))
 
 
 (use-package! corfu-quick
