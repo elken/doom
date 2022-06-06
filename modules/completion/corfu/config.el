@@ -58,6 +58,7 @@
          "C-k"     #'cape-dict
          "C-f"     #'cape-file)))
 
+
 (use-package! corfu-doc
   :hook (corfu-mode . corfu-doc-mode)
   :custom
@@ -67,12 +68,14 @@
          ("M-p" . corfu-doc-scroll-up)
          ("M-d" . corfu-doc-toggle)))
 
+
 (use-package! orderless
   :when (featurep! +orderless)
   :init
   (setq completion-styles '(orderless partial-completion)
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
+
 
 (use-package! kind-icon
   :after corfu
@@ -96,7 +99,7 @@
           (file "f" :icon "file" :face font-lock-string-face)
           (folder "d" :icon "folder" :face font-lock-doc-face)
           (function "f" :icon "sigma" :face font-lock-function-name-face)
-          (interface "if" :icon "video-output-component" :face font-lock-type-face)
+          (interface "if" :icon "video-input-component" :face font-lock-type-face)
           (keyword "kw" :icon "image-filter-center-focus" :face font-lock-keyword-face)
           (macro "mc" :icon "lambda" :face font-lock-keyword-face)
           (method "m" :icon "sigma" :face font-lock-function-name-face)
@@ -127,7 +130,6 @@
   (add-hook! 'latex-mode-hook (defun +corfu--latex-set-capfs ()
                                 (add-to-list 'completion-at-point-functions #'cape-tex)))
   (when (featurep! :checkers spell)
-    (setq cape-dict-file ispell-personal-dictionary)
     (add-to-list 'completion-at-point-functions #'cape-dict)
     (add-to-list 'completion-at-point-functions #'cape-ispell))
   (add-to-list 'completion-at-point-functions #'cape-file)

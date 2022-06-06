@@ -1931,7 +1931,7 @@ Because I'm a massive sellout who likes features
 
 #+begin_src emacs-lisp
 (after! eglot
-  (setq lsp-intelephense-licence-key (fetch-auth-source :user "intelephense")))
+  (setq lsp-intelephense-licence-key (or (ignore-errors (fetch-auth-source :user "intelephense") nil))))
 #+end_src
 
 *** Eglot
@@ -1960,7 +1960,7 @@ And set the server to be loaded
   (cl-defmethod eglot-initialization-options ((server eglot-php))
     "Passes through required intelephense options"
     `(:storagePath ,php-intelephense-storage-path
-      :licenceKey (when lsp-intelephense-license-key ,lsp-intelephense-licence-key)
+      :licenceKey ,lsp-intelephense-licence-key
       :clearCache t))
   (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio")))))
 #+end_src
@@ -2101,6 +2101,7 @@ Packages to be unpinned or just completely disabled
 (unpin! vterm)
 (unpin! lsp-mode)
 (unpin! lsp-dart)
+(unpin! eglot)
 (package! org
   :pin "5766ddd758f6c2b498ddf4fb79f20f01a09674cc")
 #+end_src
@@ -2194,7 +2195,8 @@ Needed for feature test files
 (setq ispell-program-name "aspell"
       ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
       ispell-dictionary "en"
-      ispell-personal-dictionary (expand-file-name ".dict" doom-private-dir))
+      ispell-personal-dictionary (expand-file-name ".dict" doom-private-dir)
+      cape-dict-file ispell-personal-dictionary)
 #+end_src
 
 * Slack
