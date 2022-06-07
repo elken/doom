@@ -2196,7 +2196,7 @@ Needed for feature test files
       ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
       ispell-dictionary "en"
       ispell-personal-dictionary (expand-file-name ".dict" doom-private-dir)
-      cape-dict-file ispell-personal-dictionary)
+      cape-dict-file (if (file-exists-p ispell-personal-dictionary) ispell-personal-dictionary cape-dict-file))
 #+end_src
 
 * Slack
