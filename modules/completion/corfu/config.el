@@ -37,26 +37,29 @@
   (add-hook 'lsp-completion-mode-hook
             (lambda ()
               (setf (alist-get 'lsp-capf completion-category-defaults) '((styles . (orderless flex))))))
+
+  (map! :map corfu-map
+        "C-SPC"    #'corfu-insert-separator
+        "C-n"      #'corfu-next
+        "C-p"      #'corfu-previous
+        (:prefix "C-x"
+         "C-k"     #'cape-dict
+         "C-f"     #'cape-file))
   (after! evil
     (advice-add 'corfu--setup :after 'evil-normalize-keymaps)
     (advice-add 'corfu--teardown :after 'evil-normalize-keymaps)
-    (evil-make-overriding-map corfu-map)
-    (add-hook 'evil-insert-state-exit-hook #'corfu-quit))
+    (evil-make-overriding-map corfu-map))
+
+  (defadvice! +corfu--org-return (orig) :around '+org/return
+    (if (and (featurep! :completion corfu)
+             corfu-mode
+             (>= corfu--index 0))
+        (corfu-insert)
+      (funcall orig)))
 
   (unless (display-graphic-p)
     (corfu-doc-terminal-mode)
-    (corfu-terminal-mode))
-  (map! :map corfu-map
-        "C-SPC"    #'corfu-insert-separator
-        "TAB"      #'corfu-next
-        [tab]      #'corfu-next
-        "C-n"      #'corfu-next
-        "C-p"      #'corfu-previous
-        "S-TAB"    #'corfu-previous
-        [backtab]  #'corfu-previous
-        (:prefix "C-x"
-         "C-k"     #'cape-dict
-         "C-f"     #'cape-file)))
+    (corfu-terminal-mode)))
 
 
 (use-package! corfu-doc
@@ -150,3 +153,12 @@
   :bind (:map corfu-map
          ("M-q" . corfu-quick-complete)
          ("C-q" . corfu-quick-insert)))
+
+
+;; TODO This doesn't _quite_ work
+(use-package! evil-collection-corfu
+  :when (featurep! :editor evil +everywhere)
+  :defer t
+  :init (setq evil-collection-corfu-key-themes '(default magic-return))
+  :config
+  (evil-collection-corfu-setup))

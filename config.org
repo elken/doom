@@ -2102,6 +2102,7 @@ Packages to be unpinned or just completely disabled
 (unpin! lsp-mode)
 (unpin! lsp-dart)
 (unpin! eglot)
+(unpin! evil-collection)
 (package! org
   :pin "5766ddd758f6c2b498ddf4fb79f20f01a09674cc")
 #+end_src
@@ -2195,8 +2196,10 @@ Needed for feature test files
 (setq ispell-program-name "aspell"
       ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
       ispell-dictionary "en"
-      ispell-personal-dictionary (expand-file-name ".dict" doom-private-dir)
-      cape-dict-file (if (file-exists-p ispell-personal-dictionary) ispell-personal-dictionary cape-dict-file))
+      ispell-personal-dictionary (expand-file-name ".dict" doom-private-dir))
+
+(after! cape
+  (setq cape-dict-file (if (file-exists-p ispell-personal-dictionary) ispell-personal-dictionary cape-dict-file)))
 #+end_src
 
 * Slack
