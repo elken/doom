@@ -165,7 +165,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#org-jira][org-jira]]
 - [[#translate][Translate]]
 - [[#local-settings][Local settings]]
-- [[#test][Test]]
 
 * Setup
 ** Workflow
@@ -2101,10 +2100,8 @@ Packages to be unpinned or just completely disabled
 (unpin! vterm)
 (unpin! lsp-mode)
 (unpin! lsp-dart)
-(unpin! eglot)
-(unpin! evil-collection)
-(package! org
-  :pin "5766ddd758f6c2b498ddf4fb79f20f01a09674cc")
+(when (featurep! :completion corfu)
+  (unpin! evil-collection))
 #+end_src
 
 ** embark-vc
@@ -2167,7 +2164,7 @@ Web-mode has normal text which should be ignored.
 
 #+begin_src emacs-lisp
 (use-package! rainbow-identifiers
-  :hook (php-mode . rainbow-identifiers-mode)
+  ;; :hook (php-mode . rainbow-identifiers-mode)
   ;; :hook (org-mode . (lambda () (rainbow-identifiers-mode -1)))
   ;; :hook (web-mode . (lambda () (rainbow-identifiers-mode -1)))
   :config
@@ -2292,10 +2289,4 @@ Needed some way to manage settings for a local machine, so let's be lazy with it
 #+begin_src emacs-lisp
 (when (file-exists-p! "config-local.el" doom-private-dir)
   (load! "config-local.el" doom-private-dir))
-#+end_src
-
-* Test
-#+begin_src diff
-- 5
-+ 2
 #+end_src
