@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function build() {
-    emacs --script publish.el
+    doom publish
 }
 
 function dev() {
