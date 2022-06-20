@@ -31,7 +31,8 @@
 
        (corfu +icons
               +orderless)
-       (vertico +icons)
+       (vertico +childframe
+                +icons)
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;(ivy +childframe
