@@ -3,17 +3,14 @@
 (use-package! corfu
   :custom
   (corfu-separator ?\s)
-  (corfu-preview-current t)
   (corfu-auto t)
+  (corfu-auto-delay 0.0)
   (corfu-on-exact-match nil)
   (corfu-quit-no-match t)
   (corfu-cycle t)
-  (corfu-scroll-margin 4)
   (corfu-auto-prefix 2)
   (completion-cycle-threshold 1)
   (tab-always-indent 'complete)
-  (corfu-min-width 80)
-  (corfu-max-width corfu-min-width)
   :hook
   (doom-first-buffer . global-corfu-mode)
   :config
