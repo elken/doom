@@ -31,8 +31,7 @@
 
        (corfu +icons
               +orderless)
-       (vertico +childframe
-                +icons)
+       (vertico +icons)
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;(ivy +childframe
@@ -179,6 +178,7 @@
             +noter
             +pandoc
             +present
+            +pretty
             +roam2)    ; organize your plain life in plain text
        (php +lsp
            +tree-sitter)       ; perl's insecure younger brother

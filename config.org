@@ -81,14 +81,13 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#org-directory][org-directory]]
   - [[#font-setup][Font setup]]
   - [[#heading-minimap][Heading minimap]]
-  - [[#prettify-org][Prettify org]]
-      - [[#org-modern][Org-modern]]
   - [[#properties][Properties]]
     - [[#allow-property-inheritance][Allow property inheritance]]
   - [[#characters][Characters]]
+    - [[#org-bars][org-bars]]
+    - [[#headline-bullets][Headline bullets]]
+    - [[#item-bullets][Item bullets]]
     - [[#dropdown-icon][Dropdown icon]]
-    - [[#remove-excess-emphasis-markers][Remove excess emphasis markers]]
-    - [[#show-real-entities-rather-than-utf8][Show real entities rather than UTF8]]
   - [[#keywords][Keywords]]
   - [[#agendalog][Agenda/Log]]
     - [[#show-done-tasks-in-agenda][Show =DONE= tasks in agenda]]
@@ -750,6 +749,7 @@ for documentation and organisation.
   "Modes to enable on org-mode start"
   (org-indent-mode)
   (visual-line-mode 1)
+  (+org-pretty-mode)
   (elken/org-font-setup))
 
 (add-hook! org-mode #'elken/org-setup-hook)
@@ -812,68 +812,6 @@ promoting from it.
       :desc "Outline" "O" #'org-ol-tree)
 #+end_src
 
-** Prettify org
-**** Org-modern
-Minad is a treasure that must be kept alive at all costs. =org-modern= is actually
-quite a bit nicer than =org +pretty=, so we use that instead.
-
-#+begin_src emacs-lisp :tangle packages.el
-(package! org-modern)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! org-modern
-  :hook (org-mode . org-modern-mode)
-  :config
-  (when (not IS-MAC)
-    (setq org-modern-keyword
-          '((default . t)
-            ("title" . "𝙏")
-            ("subtitle" . "𝙩")
-            ("author" . "𝘼")
-            ("date" . "𝘿")
-            ("property" . "☸")
-            ("options" . "⌥")
-            ("startup" . "⏻")
-            ("macro" . "𝓜")
-            ("bibliography" . "")
-            ("print_bibliography" . "")
-            ("html_head" . "🅷")
-            ("html" . "🅗")
-            ("latex_class" . "🄻")
-            ("latex_header" . "🅻")
-            ("latex" . "🅛")
-            ("beamer_theme" . "🄱")
-            ("beamer_header" . "🅱")
-            ("beamer" . "🅑")
-            ("attr_latex" . "🄛")
-            ("attr_html" . "🄗")
-            ("attr_org" . "⒪")
-            ("name" . "⁍")
-            ("header" . "›")
-            ("caption" . "☰")
-            ("results:" . "🠶")
-            ("RESULTS" . "🠶"))))
-  (setq org-modern-star ["› "]
-        org-modern-list '((?* . ?⋆)
-                          (?+ . ?‣)
-                          (?- . ?•))
-        org-modern-block nil
-        org-modern-todo-faces
-        '(("TODO" :inverse-video t :inherit org-todo)
-          ("PROJ" :inverse-video t :inherit +org-todo-project)
-          ("STORY" :inverse-video t :inherit +org-todo-project)
-          ("INPROG" :inverse-video t :inherit +org-todo-active)
-          ("[-]"  :inverse-video t :inherit +org-todo-active)
-          ("HOLD" :inverse-video t :inherit +org-todo-onhold)
-          ("WAIT" :inverse-video t :inherit +org-todo-onhold)
-          ("[?]"  :inverse-video t :inherit +org-todo-onhold)
-          ("KILL" :inverse-video t :inherit +org-todo-cancel)
-          ("NO"   :inverse-video t :inherit +org-todo-cancel)))
-  (custom-set-faces!
-    '(org-modern-label :width normal)))
-#+end_src
-
 ** Properties
 *** Allow property inheritance
 This may be the solution to /so/ many weird issues with src blocks.
@@ -883,22 +821,51 @@ This may be the solution to /so/ many weird issues with src blocks.
 #+end_src
 
 ** Characters
+Tried out org-modern recently, it is /very/ nice but also detracts away from some
+of the org markup and makes editing it too hard, so back to =(:lang org +pretty)=
+we go.
+
+*** org-bars
+Indent guides meets org-mode, these are /surprisingly/ nice.
+
+Though, they don't work with variable pitch fonts :(
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-bars
+  :recipe (:host github :repo "tonyaldon/org-bars"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! org-bars
+  :when (and (display-graphic-p)
+             nil)
+  :hook (org-mode . org-bars-mode)
+  :init
+  (setq org-bars-extra-pixels-height 10))
+#+end_src
+
+*** Headline bullets
+I don't feel the need for fancy characters to discern depth, I found this on
+someone else's config and I actually quite like the minimal look.
+
+#+begin_src emacs-lisp
+(setq org-superstar-headline-bullets-list '("› "))
+#+end_src
+
+*** Item bullets
+Barely any adjustment here, just make them look a /bit/ nicer.
+
+#+begin_src emacs-lisp
+(setq org-superstar-item-bullet-alist '((?* . ?⋆)
+                                        (?+ . ?‣)
+                                        (?- . ?•)))
+#+end_src
+
 *** Dropdown icon
+When a drawer is collapsed, show a nice dropdown arrow.
 
 #+begin_src emacs-lisp
 (setq org-ellipsis " ▾")
-#+end_src
-
-*** Remove excess emphasis markers
-
-#+begin_src emacs-lisp
-(setq org-hide-emphasis-markers t)
-#+end_src
-
-*** Show real entities rather than UTF8
-
-#+begin_src emacs-lisp
-(setq org-pretty-entities t)
 #+end_src
 
 ** Keywords
