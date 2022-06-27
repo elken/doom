@@ -2006,8 +2006,7 @@ Packages to be unpinned or just completely disabled
 Embark additions to improve various vc operations
 
 #+begin_src emacs-lisp :tangle packages.el
-(package! embark-vc
-  :recipe (:host github :repo "elken/embark-vc"))
+(package! embark-vc)
 #+end_src
 
 #+begin_src emacs-lisp
