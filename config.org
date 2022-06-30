@@ -465,6 +465,10 @@ Useful functions for the shell-side integration provided by vterm.
 
 #+begin_src emacs-lisp
 (after! vterm
+  (setf (alist-get "woman" vterm-eval-cmds nil nil #'equal)
+        '((lambda (topic)
+            (message topic)
+            (woman topic))))
   (setf (alist-get "magit-status" vterm-eval-cmds nil nil #'equal)
         '((lambda (path)
             (magit-status path)))))
