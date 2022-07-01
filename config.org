@@ -680,14 +680,14 @@ Configure the fonts across all used platforms (slightly different names).
 Load my current flavour-of-the-month colour scheme.
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-theme 'doom-nord)
+(setq doom-theme (if IS-MAC 'doom-rouge 'doom-nord))
 #+END_SRC
 
 Along with a few face overrides (thought about merging upstream but it would
 have sparked a discussion, maybe later)
 
 #+begin_src emacs-lisp
-(custom-theme-set-faces! 'doom-nord
+(custom-theme-set-faces!
   `(php-class :foreground ,(doom-color 'blue))
   `(php-php-tag :foreground ,(doom-color 'blue))
   `(php-constant :foreground ,(doom-color 'violet))
@@ -2097,7 +2097,7 @@ Needed for feature test files
 #+end_src
 
 * Slack
-TBD
+Includes a couple of niceties locally, these /may/ end up in a module one day.
 
 #+begin_src emacs-lisp :tangle packages.el
 (package! slack)

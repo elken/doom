@@ -21,6 +21,9 @@
 ;; Make line endings work
 (setq evil-respect-visual-line-mode t)
 
+;; LSP prefers plists
+(setenv "LSP_USE_PLISTS" "1")
+
 (doom! :input
        ;;chinese
        ;;japanese
