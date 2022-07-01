@@ -465,6 +465,10 @@ Useful functions for the shell-side integration provided by vterm.
 
 #+begin_src emacs-lisp
 (after! vterm
+  (setf (alist-get "woman" vterm-eval-cmds nil nil #'equal)
+        '((lambda (topic)
+            (message topic)
+            (woman topic))))
   (setf (alist-get "magit-status" vterm-eval-cmds nil nil #'equal)
         '((lambda (path)
             (magit-status path)))))
@@ -680,7 +684,7 @@ Configure the fonts across all used platforms (slightly different names).
 Load my current flavour-of-the-month colour scheme.
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-theme (if IS-MAC 'doom-rouge 'doom-nord))
+(setq doom-theme 'doom-nord)
 #+END_SRC
 
 Along with a few face overrides (thought about merging upstream but it would
@@ -2090,7 +2094,7 @@ Needed for feature test files
 (setq ispell-program-name "aspell"
       ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
       ispell-dictionary "en"
-      ispell-personal-dictionary (expand-file-name ".dict" doom-private-dir))
+      ispell-personal-dictionary "~/Nextcloud/dict")
 
 (after! cape
   (setq cape-dict-file (if (file-exists-p ispell-personal-dictionary) ispell-personal-dictionary cape-dict-file)))
