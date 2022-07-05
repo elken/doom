@@ -59,6 +59,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#kill-buffer][Kill buffer]]
       - [[#fix-c-backspace][Fix =c-backspace=]]
       - [[#functions][Functions]]
+      - [[#multi-vterm][Multi-vterm]]
 - [[#keybindings][Keybindings]]
   - [[#save][Save]]
   - [[#search][Search]]
@@ -472,6 +473,16 @@ Useful functions for the shell-side integration provided by vterm.
   (setf (alist-get "magit-status" vterm-eval-cmds nil nil #'equal)
         '((lambda (path)
             (magit-status path)))))
+#+end_src
+
+**** Multi-vterm
+#+begin_src emacs-lisp :tangle packages.el
+(package! multi-vterm)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! multi-vterm
+  :after vterm)
 #+end_src
 
 * Keybindings
