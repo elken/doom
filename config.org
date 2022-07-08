@@ -77,6 +77,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
 - [[#org-mode][Org Mode]]
+  - [[#fill-column][fill-column]]
   - [[#hook-setup][Hook setup]]
   - [[#org-directory][org-directory]]
   - [[#font-setup][Font setup]]
@@ -742,6 +743,21 @@ Add some transparency
 #+end_src
 
 * Org Mode
+** fill-column
+Keep the content centered on the page when writing org documents
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! visual-fill-column)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! visual-fill-column
+  :custom
+  (visual-fill-column-width 300)
+  (visual-fill-column-center-text t)
+  :hook (org-mode . visual-fill-column-mode))
+#+end_src
+
 ** Hook setup
 =org-mode= is a wonderful thing, and far too complex to bury in another section.
 The more I use it, the more I will add to this area but for now it's mostly used
