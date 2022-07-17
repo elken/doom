@@ -123,6 +123,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#beamer][Beamer]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
+  - [[#rust][Rust]]
   - [[#f][F#]]
   - [[#c][C#]]
   - [[#elisp][ELISP]]
@@ -703,7 +704,31 @@ Along with a few face overrides (thought about merging upstream but it would
 have sparked a discussion, maybe later)
 
 #+begin_src emacs-lisp
-(custom-theme-set-faces!
+(custom-theme-set-faces! 'doom-nord
+  `(tree-sitter-hl-face:constructor :foreground ,(doom-color 'blue))
+  `(tree-sitter-hl-face:number :foreground ,(doom-color 'magenta))
+  `(tree-sitter-hl-face:attribute :foreground ,(doom-color 'magenta))
+  `(tree-sitter-hl-face:variable :foreground ,(doom-color 'base7) :weight bold)
+  `(tree-sitter-hl-face:variable.builtin :foreground ,(doom-color 'base7) :weight bold)
+  `(tree-sitter-hl-face:constant.builtin :foreground ,(doom-color 'magenta) :weight bold)
+  `(tree-sitter-hl-face:constant :foreground ,(doom-color 'teal) :weight bold)
+  `(tree-sitter-hl-face:function.macro :foreground ,(doom-color 'teal))
+  `(tree-sitter-hl-face:label :foreground ,(doom-color 'magenta))
+  `(tree-sitter-hl-face:operator :foreground ,(doom-color 'blue))
+  `(tree-sitter-hl-face:variable.parameter :foreground ,(doom-color 'dark-blue))
+  `(tree-sitter-hl-face:punctuation.delimiter :foreground ,(doom-color 'cyan))
+  `(tree-sitter-hl-face:punctuation.bracket :foreground ,(doom-color 'cyan))
+  `(tree-sitter-hl-face:punctuation.special :foreground ,(doom-color 'cyan))
+  `(tree-sitter-hl-face:type :foreground ,(doom-color 'blue))
+  `(tree-sitter-hl-face:type.builtin :foreground ,(doom-color 'blue))
+  `(tree-sitter-hl-face:tag :foreground ,(doom-color 'base7))
+  `(tree-sitter-hl-face:string :foreground ,(doom-color 'green))
+  `(tree-sitter-hl-face:comment :foreground ,(doom-color 'base6))
+  `(tree-sitter-hl-face:function :foreground ,(doom-color 'cyan))
+  `(tree-sitter-hl-face:method :foreground ,(doom-color 'teal))
+  `(tree-sitter-hl-face:function.builtin :foreground ,(doom-color 'cyan))
+  `(tree-sitter-hl-face:property :foreground ,(doom-color 'dark-blue))
+  `(tree-sitter-hl-face:keyword :foreground ,(doom-color 'blue))
   `(php-class :foreground ,(doom-color 'blue))
   `(php-php-tag :foreground ,(doom-color 'blue))
   `(php-constant :foreground ,(doom-color 'violet))
@@ -715,7 +740,7 @@ have sparked a discussion, maybe later)
   `(php-static-method-call :foreground ,(doom-color 'magenta))
   `(php-method-call :foreground ,(doom-color 'magenta))
   `(php-function-name :foreground ,(doom-lighten 'magenta 0.3))
-  `(corfu-default :background nil :inherit tooltip :extend t))
+  `(corfu-default :font "Iosevka Nerd Font Mono" :background "#272C36" :foreground "#ECEFF4"))
 #+end_src
 
 Change the default banner (need to add the ASCII banner at some point)
@@ -1758,6 +1783,15 @@ Annoying having to gate these, so let's fix that
 
 * Languages
 Configuration for various programming languages.
+
+** Rust
+Rust is the hot new thing, guess I better jump on the bandwagon if I want to stay cool.
+
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (setq lsp-rust-analyzer-display-parameter-hints t
+        lsp-rust-analyzer-server-display-inlay-hints t))
+#+end_src
 
 ** F#
 Should probably become a package at some point, for now it's fine.
