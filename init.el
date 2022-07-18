@@ -10,7 +10,7 @@
 ;; NOTE Move your cursor over a module's name (or its flags) and press 'K' (or
 ;;      'C-c c k' for non-vim users) to view its documentation. This works on
 ;;      flags as well (those symbols that start with a plus).
-;
+;;
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
 
@@ -140,7 +140,7 @@
                +tree-sitter)            ; unity, .NET, and mono shenanigans
        data                     ; config/data formats
        (dart +lsp
-            +flutter)   ; paint ui and not much else
+             +flutter)   ; paint ui and not much else
        ;;(elixir +lsp
        ;;        +tree-sitter)            ; erlang done right
        ;;elm               ; care for a cup of TEA?
@@ -184,7 +184,7 @@
             +pretty
             +roam2)    ; organize your plain life in plain text
        (php +lsp
-           +tree-sitter)       ; perl's insecure younger brother
+            +tree-sitter)       ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
        (python +lsp
