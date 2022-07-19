@@ -74,6 +74,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#tab-bar-mode][Tab-bar-mode]]
   - [[#modeline][Modeline]]
   - [[#fonts][Fonts]]
+      - [[#ligatures][Ligatures]]
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
@@ -686,12 +687,29 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
 Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
-(setq  doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 13)
+(setq  doom-font (font-spec :family "Iosevka Nerd Font" :size 13)
        doom-variable-pitch-font (font-spec :family "Overpass" :size 13)
-       doom-unicode-font (font-spec :family "Iosevka Nerd Font Mono" :size 14)
-       doom-emoji-fallback-font-families nil
-       doom-symbol-fallback-font-families nil)
+       doom-unicode-font (font-spec :family "Iosevka Nerd Font" :size 14)
+       doom-serif-font (font-spec :family "Overpass Mono" :weight 'light))
 #+END_SRC
+
+**** Ligatures
+Ligatures are a mess in programming languages, however they make org documents
+quite nice so let's just use them here until a good fix is found.
+
+#+begin_src emacs-lisp
+(setq-hook! org-mode
+  prettify-symbols-alist '(("#+end_quote" . "”")
+                           ("#+END_QUOTE" . "”")
+                           ("#+begin_quote" . "“")
+                           ("#+BEGIN_QUOTE" . "“")
+                           ("#+end_src" . "«")
+                           ("#+END_SRC" . "«")
+                           ("#+begin_src" . "»")
+                           ("#+BEGIN_SRC" . "»")
+                           ("#+name:" . "»")
+                           ("#+NAME:" . "»")))
+#+end_src
 
 ** Theme
 Load my current flavour-of-the-month colour scheme.
@@ -707,7 +725,7 @@ have sparked a discussion, maybe later)
 (custom-theme-set-faces! 'doom-nord
   `(tree-sitter-hl-face:constructor :foreground ,(doom-color 'blue))
   `(tree-sitter-hl-face:number :foreground ,(doom-color 'magenta))
-  `(tree-sitter-hl-face:attribute :foreground ,(doom-color 'magenta))
+  `(tree-sitter-hl-face:attribute :foreground ,(doom-color 'magenta) :weight bold)
   `(tree-sitter-hl-face:variable :foreground ,(doom-color 'base7) :weight bold)
   `(tree-sitter-hl-face:variable.builtin :foreground ,(doom-color 'base7) :weight bold)
   `(tree-sitter-hl-face:constant.builtin :foreground ,(doom-color 'magenta) :weight bold)
