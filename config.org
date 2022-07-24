@@ -471,11 +471,13 @@ Useful functions for the shell-side integration provided by vterm.
 (after! vterm
   (setf (alist-get "woman" vterm-eval-cmds nil nil #'equal)
         '((lambda (topic)
-            (message topic)
             (woman topic))))
   (setf (alist-get "magit-status" vterm-eval-cmds nil nil #'equal)
         '((lambda (path)
-            (magit-status path)))))
+            (magit-status path))))
+  (setf (alist-get "dired" vterm-eval-cmds nil nil #'equal)
+        '((lambda (dir)
+            (dired dir)))))
 #+end_src
 
 **** Multi-vterm
