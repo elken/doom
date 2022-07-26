@@ -2036,9 +2036,9 @@ $1: $2
 # --
 <?php
 
-namespace `(s-titleized-words (file-name-directory (file-relative-name buffer-file-name (projectile-project-root))))`;
+namespace `(substring (replace-regexp-in-string "/" (regexp-quote "\\") (s-titleize (file-name-directory (file-relative-name buffer-file-name (projectile-project-root))))) 0 -1)`;
 
-class `(s-titleized-words (file-name-base buffer-file-name))`
+class `(s-join "" (mapcar 's-titleize (s-split-words (file-name-base buffer-file-name))))`
 {
     $0
 }
