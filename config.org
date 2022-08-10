@@ -138,19 +138,22 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#intelephense][Intelephense]]
     - [[#eglot][Eglot]]
 - [[#snippets][Snippets]]
-  - [[#org-mode-1][Org-mode]]
-    - [[#__][__]]
-  - [[#php-mode][PHP-Mode]]
-    - [[#function][function]]
-    - [[#php-1][php]]
-  - [[#kotlin-mode][kotlin-mode]]
-    - [[#__-1][__]]
-  - [[#slack-message-compose-buffer-mode][slack-message-compose-buffer-mode]]
-    - [[#standup][standup]]
-  - [[#php-laravel-mode][+php-laravel-mode]]
-    - [[#__-2][__]]
-    - [[#migration_up][migration_up]]
-    - [[#scope][scope]]
+  - [[#cape][Cape]]
+  - [[#snippet-definitions][Snippet definitions]]
+    - [[#org-mode-1][Org-mode]]
+      - [[#__][__]]
+    - [[#php-mode][PHP-Mode]]
+      - [[#function][function]]
+      - [[#php-1][php]]
+    - [[#kotlin-mode][kotlin-mode]]
+      - [[#__-1][__]]
+    - [[#slack-message-compose-buffer-mode][slack-message-compose-buffer-mode]]
+      - [[#standup][standup]]
+    - [[#php-laravel-mode][+php-laravel-mode]]
+      - [[#yas-parentsel][.yas-parents.el]]
+      - [[#__-2][__]]
+      - [[#migration][migration]]
+      - [[#scope][scope]]
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
   - [[#embark-vc][embark-vc]]
@@ -1948,18 +1951,37 @@ And set the server to be loaded
 #+end_src
 
 * Snippets
-:PROPERTIES:
-:header-args:snippet: :mkdirp yes :tangle (expand-file-name (downcase (elt (org-get-outline-path t) (- (length (org-get-outline-path t)) 1))) (expand-file-name (downcase (elt (org-get-outline-path t) 1)) "snippets"))
-:END:
 I constantly find myself complaining I don't have snippets setup, and yet I
 always forget to set snippets up. [[https://www.youtube.com/watch?v=sc5iTNVEOAg][My own worst enemy]]? Probably. But who's
 keeping score...
 
-First let's define a useful helper for creating snippets based on the current
-heading.
+** Cape
+Capes are kinda cool
+#+begin_src emacs-lisp :tangle packages.el
+(package! company-mode)
+#+end_src
 
-** Org-mode
-*** __
+#+begin_src emacs-lisp
+(after! cape
+  (require 'company-yasnippet)
+  (defun +cape--setup-lsp-yasnippet ()
+    (company-mode -1)
+    (setq-local completion-at-point-functions
+                (list (cape-super-capf
+                       #'lsp-completion-at-point
+                       (cape-company-to-capf #'company-yasnippet)))))
+  (add-hook 'lsp-managed-mode-hook #'+cape--setup-lsp-yasnippet))
+#+end_src
+
+** Snippet definitions
+:PROPERTIES:
+:header-args:snippet: :mkdirp yes :tangle (expand-file-name (downcase (elt (org-get-outline-path t) (- (length (org-get-outline-path t)) 1))) (expand-file-name (downcase (elt (org-get-outline-path t) 1)) "snippets"))
+:END:
+
+A collection of snippets tangled using clever magic.
+
+*** Org-mode
+**** __
 #+begin_src snippet
 # -*- mode: snippet -*-
 # name: Org template
@@ -1972,8 +1994,8 @@ heading.
 $0
 #+end_src
 
-** PHP-Mode
-*** function
+*** PHP-Mode
+**** function
 #+begin_src snippet
 # -*- mode: snippet -*-
 # name: function
@@ -1987,7 +2009,7 @@ ${1:$$(yas-auto-next (yas-completing-read "Visibility (public): " '("public" "pr
 }
 #+end_src
 
-*** php
+**** php
 #+begin_src snippet
 # -*- mode: snippet -*-
 # name: <?php
@@ -1998,8 +2020,8 @@ ${1:$$(yas-auto-next (yas-completing-read "Visibility (public): " '("public" "pr
 $0
 #+end_src
 
-** kotlin-mode
-*** __
+*** kotlin-mode
+**** __
 
 #+begin_src snippet
 # -*- mode: snippet -*-
@@ -2013,8 +2035,8 @@ class `(s-join "" (mapcar 's-titleize (s-split-words (file-name-base buffer-file
 }
 #+end_src
 
-** slack-message-compose-buffer-mode
-*** standup
+*** slack-message-compose-buffer-mode
+**** standup
 #+begin_src snippet
 # -*- mode: snippet -*-
 # name: Standup template
@@ -2027,8 +2049,38 @@ $1: $2
 *Blocked*: $4
 #+end_src
 
-** +php-laravel-mode
-*** __
+*** +php-laravel-mode
+**** .yas-parents.el
+#+begin_src emacs-lisp
+
+(eval-when-compile (require 'subr-x))
+
+(defun string-split-words (string)
+  (split-string
+   (let ((case-fold-search nil))
+     (replace-regexp-in-string
+      "\\([[:lower:]]\\)\\([[:upper:]]\\)" "\\1 \\2"
+      (replace-regexp-in-string "\\([[:upper:]]\\)\\([[:upper:]][0-9[:lower:]]\\)" "\\1 \\2" string)))
+   "[^[:word:]0-9]+"
+   t))
+
+(defun +php-laravel-mode--get-namespace ()
+    "Get a formatted namespace for the current PHP file"
+    (substring
+        (replace-regexp-in-string "/" (regexp-quote "\\")
+            (thread-first
+                buffer-file-name
+                (file-relative-name (doom-project-root))
+                file-name-directory
+                capitalize))
+        0
+        -1))
+
+(defun +php-laravel-mode--get-class-name ()
+    "Get a formatted class name for the current PHP file"
+    (string-join (mapcar 'capitalize (string-split-words (file-name-base buffer-file-name)))))
+#+end_src
+**** __
 
 #+begin_src snippet
 # -*- mode: snippet -*-
@@ -2036,15 +2088,15 @@ $1: $2
 # --
 <?php
 
-namespace `(substring (replace-regexp-in-string "/" (regexp-quote "\\") (s-titleize (file-name-directory (file-relative-name buffer-file-name (projectile-project-root))))) 0 -1)`;
+namespace `(+php-laravel-mode--get-namespace)`;
 
-class `(s-join "" (mapcar 's-titleize (s-split-words (file-name-base buffer-file-name))))`
+class `(+php-laravel-mode--get-class-name)`
 {
     $0
 }
 #+end_src
 
-*** migration_up
+**** migration
 #+begin_src snippet
 # -*- mode: snippet -*-
 # name: Laravel Migration method
@@ -2056,7 +2108,7 @@ Schema::table('$1', function (Blueprint $table) {
 });
 #+end_src
 
-*** scope
+**** scope
 #+begin_src snippet
 # -*- mode: snippet -*-
 # name: Sentry scope
@@ -2083,6 +2135,7 @@ Packages to be unpinned or just completely disabled
 (unpin! vterm)
 (unpin! lsp-mode)
 (unpin! lsp-dart)
+(unpin! forge)
 (when (featurep! :completion corfu)
   (unpin! evil-collection))
 #+end_src
@@ -2127,13 +2180,14 @@ Need to add this into company module when I've tested
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! company-prescient
-  :after company
-  :hook (company-mode . company-prescient-mode)
-  :hook (company-prescient-mode . prescient-persist-mode)
-  :config
-  (setq prescient-save-file (concat doom-cache-dir "prescient-save.el")
-        history-length 1000))
+(when (featurep! :completion company)
+  (use-package! company-prescient
+    :after company
+    :hook (company-mode . company-prescient-mode)
+    :hook (company-prescient-mode . prescient-persist-mode)
+    :config
+    (setq prescient-save-file (concat doom-cache-dir "prescient-save.el")
+          history-length 1000)))
 #+end_src
 
 ** Rainbow Identifiers
