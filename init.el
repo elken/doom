@@ -21,6 +21,18 @@
 ;; Make line endings work
 (setq evil-respect-visual-line-mode t)
 
+;; LSP prefers plists
+(setenv "LSP_USE_PLISTS" "1")
+
+;; Testing for Henrik
+(setq native-comp-deferred-compilation t
+      straight-disable-native-compile t
+      native-comp-warning-on-missing-source nil
+      native-comp-async-report-warnings-errors 'silent)
+
+(unless noninteractive
+  (setq byte-compile-warnings nil))
+
 (doom! :input
        ;;chinese
        ;;japanese
