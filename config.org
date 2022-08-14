@@ -1978,19 +1978,20 @@ keeping score...
 ** Cape
 Capes are kinda cool
 #+begin_src emacs-lisp :tangle packages.el
-(package! company-mode)
+(package! cape-yasnippet
+  :recipe (:local-repo "~/build/elisp/cape-yasnippet"
+           :build (:not compile)))
 #+end_src
 
 #+begin_src emacs-lisp
-(after! cape
-  (require 'company-yasnippet)
-  (defun +cape--setup-lsp-yasnippet ()
-    (company-mode -1)
-    (setq-local completion-at-point-functions
-                (list (cape-super-capf
-                       #'lsp-completion-at-point
-                       (cape-company-to-capf #'company-yasnippet)))))
-  (add-hook 'lsp-managed-mode-hook #'+cape--setup-lsp-yasnippet))
+(use-package! cape-yasnippet
+  :after cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-yasnippet)
+  (after! lsp-mode
+    (add-hook 'lsp-managed-mode-hook #'cape-yasnippet--lsp))
+  (after! eglot
+    (add-hook 'eglot-managed-mode-hook #'cape-yasnippet--eglot)))
 #+end_src
 
 ** Snippet definitions
