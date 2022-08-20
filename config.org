@@ -126,7 +126,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
   - [[#rust][Rust]]
-  - [[#f][F#]]
   - [[#c][C#]]
   - [[#elisp][ELISP]]
   - [[#lspdap][LSP/DAP]]
@@ -1834,13 +1833,6 @@ Rust is the hot new thing, guess I better jump on the bandwagon if I want to sta
 (after! lsp-mode
   (setq lsp-rust-analyzer-display-parameter-hints t
         lsp-rust-analyzer-server-display-inlay-hints t))
-#+end_src
-
-** F#
-Should probably become a package at some point, for now it's fine.
-
-#+begin_src emacs-lisp
-(load! "lisp/ob-fsharp.el")
 #+end_src
 
 ** C#
