@@ -1,6 +1,7 @@
 #+title: Config
 #+author: Ellis Kenyő
 #+property: header-args:emacs-lisp :tangle yes :comments link
+#+property: header-args:elisp :tangle packages.el :comments link
 #+property: header-args :tangle no :results silent :eval no-export
 #+caption: Banner
 #+latex_class: chameleon
@@ -74,7 +75,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#tab-bar-mode][Tab-bar-mode]]
   - [[#modeline][Modeline]]
   - [[#fonts][Fonts]]
-      - [[#ligatures][Ligatures]]
+    - [[#ligatures][Ligatures]]
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
@@ -409,7 +410,7 @@ need the minimum out of a prompt:
 Can't get enough out of the default powerline theme, and removing a dependancy
 we're rolling our own prompt called =eshell-p10kline=
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! eshell-p10k
   :recipe (:host github :repo "elken/eshell-p10k"))
 #+end_src
@@ -484,7 +485,7 @@ Useful functions for the shell-side integration provided by vterm.
 #+end_src
 
 **** Multi-vterm
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! multi-vterm)
 #+end_src
 
@@ -589,7 +590,7 @@ below from Teco gives a much better experience for files.
 ** Info pages
 Slightly improve the look and feel of Info pages, might actually encourage me to /read/ them.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! info-colors)
 #+end_src
 
@@ -698,7 +699,7 @@ Configure the fonts across all used platforms (slightly different names).
        doom-serif-font (font-spec :family "Overpass Mono" :weight 'light))
 #+END_SRC
 
-**** Ligatures
+*** Ligatures
 Ligatures are a mess in programming languages, however they make org documents
 quite nice so let's just use them here until a good fix is found.
 
@@ -804,13 +805,13 @@ Add some transparency
 *** Mini-frame
 Keep the minibuffer in a different frame (only for =read-from-minibuffer=)
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! mini-frame)
 #+end_src
 
 #+begin_src emacs-lisp
 (use-package! mini-frame
-  :hook (doom-init-ui-hook . mini-frame-mode)
+  :hook (minibuffer-setup . mini-frame-mode)
   :init
   (custom-set-variables
    '(mini-frame-show-parameters
@@ -824,7 +825,7 @@ Keep the minibuffer in a different frame (only for =read-from-minibuffer=)
 ** fill-column
 Keep the content centered on the page when writing org documents
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! visual-fill-column)
 #+end_src
 
@@ -891,7 +892,7 @@ it makes sense to use the defined fixed width font.
 Outline structure of the org documents, apparently it has cool things for
 promoting from it.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! org-ol-tree
   :recipe (:host github :repo "Townk/org-ol-tree"))
 #+end_src
@@ -927,7 +928,7 @@ Indent guides meets org-mode, these are /surprisingly/ nice.
 
 Though, they don't work with variable pitch fonts :(
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! org-bars
   :recipe (:host github :repo "tonyaldon/org-bars"))
 #+end_src
@@ -1014,7 +1015,7 @@ Defines a minor mode to allow special forms such as /italics/, *bold*, _underlin
 =literal= to be editable when the cursor is over them, otherwise display the
 proper value.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! org-appear
   :recipe (:host github :repo "awth13/org-appear"))
 #+end_src
@@ -1187,7 +1188,7 @@ Let's jump on the bandwagon and start taking useful notes.
 It's about time I start using =org-capture=, but because I'm a developer I'm inhernetly lazy so time to steal from other people.
 
 Useful wrapper package for creating more declarative templates
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! doct)
 #+end_src
 
@@ -1738,7 +1739,7 @@ Add some packages (also very likely to change)
 **** Pretty code blocks
 Teco is the goto for this, so basically just ripping off him.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! engrave-faces
   :recipe (:host github :repo "tecosaur/engrave-faces"))
 #+end_src
@@ -1781,7 +1782,7 @@ Teco is the goto for this, so basically just ripping off him.
 **** ox-chameleon
 Chameleons are cool, not having to touches faces is cooler (not the COVID kind)
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! ox-chameleon
   :recipe (:host github :repo "tecosaur/ox-chameleon"))
 #+end_src
@@ -1969,7 +1970,7 @@ keeping score...
 
 ** Cape
 Capes are kinda cool
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! cape-yasnippet
   :recipe (:local-repo "~/build/elisp/cape-yasnippet"
            :build (:not compile)))
@@ -2143,7 +2144,7 @@ Place to put packages that don't have a guaranteed home yet.
 ** Disabled/unpin
 Packages to be unpinned or just completely disabled
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (disable-packages! evil-escape)
 (unpin! vterm)
 (unpin! lsp-mode)
@@ -2156,7 +2157,7 @@ Packages to be unpinned or just completely disabled
 ** embark-vc
 Embark additions to improve various vc operations
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! embark-vc)
 #+end_src
 
@@ -2168,7 +2169,7 @@ Embark additions to improve various vc operations
 ** laravel-mode
 Not yet fit for human consumption, but fit for mine because I'm +sub+ super-human
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! laravel-mode
   :recipe (:local-repo "~/build/elisp/laravel-mode"
            :build (:not compile)))
@@ -2187,7 +2188,7 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
 ** prescient
 Need to add this into company module when I've tested
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (when (featurep! :completion company)
   (package! company-prescient))
 #+end_src
@@ -2207,7 +2208,7 @@ Need to add this into company module when I've tested
 *** TODO Fix in web-mode
 Web-mode has normal text which should be ignored.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! rainbow-identifiers)
 #+end_src
 
@@ -2227,7 +2228,7 @@ Web-mode has normal text which should be ignored.
 ** Cucumber
 Needed for feature test files
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! feature-mode)
 #+end_src
 
@@ -2251,7 +2252,7 @@ Needed for feature test files
 * Slack
 Includes a couple of niceties locally, these /may/ end up in a module one day.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! slack)
 #+end_src
 
@@ -2264,7 +2265,7 @@ Includes a couple of niceties locally, these /may/ end up in a module one day.
 Emacs client for Harvest, the time tracker we use at =$DAYJOB=. Over time, this
 will likely become more config than just a dump of macros.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! reaper)
 #+end_src
 
@@ -2277,7 +2278,7 @@ will likely become more config than just a dump of macros.
 * Graphviz
 Some config to help with graphviz
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! graphviz-dot-mode)
 #+end_src
 
@@ -2297,7 +2298,7 @@ so I'd rather not use it as much.
 
 You know what we love? =org-mode=.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! org-jira)
 #+end_src
 
@@ -2315,7 +2316,7 @@ You know what we love? =org-mode=.
 * Translate
 I do a decent amount of copy/paste translating stuff for work, so let's make this /easier/.
 
-#+begin_src emacs-lisp :tangle packages.el
+#+begin_src elisp
 (package! google-translate)
 #+end_src
 
