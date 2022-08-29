@@ -125,6 +125,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#beamer][Beamer]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
+  - [[#dart][Dart]]
   - [[#rust][Rust]]
   - [[#c][C#]]
   - [[#elisp][ELISP]]
@@ -1807,6 +1808,22 @@ Annoying having to gate these, so let's fix that
 
 * Languages
 Configuration for various programming languages.
+
+** Dart
+Simple hook/project mode to update translations on save.
+
+#+begin_src emacs-lisp
+(defun lsp-dart--intl-update ()
+  "Update translations on save."
+  (when +dart-intl-mode
+    (lsp-dart--run-command (lsp-dart-flutter-command) "pub run intl_utils:generate")))
+
+(def-project-mode! +dart-intl-mode
+  :modes '(json-mode)
+  :files (and "pubspec.yaml" "lib/l10n")
+  :on-enter (add-hook 'after-save-hook #'lsp-dart--intl-update)
+  :on-exit (remove-hook 'after-save-hook #'lsp-dart--intl-update))
+#+end_src
 
 ** Rust
 Rust is the hot new thing, guess I better jump on the bandwagon if I want to stay cool.
