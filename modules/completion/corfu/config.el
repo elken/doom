@@ -146,11 +146,9 @@
                         (savehist-mode 1)
                         (add-to-list 'savehist-additional-variables 'corfu-history))))
 
-
 (use-package! corfu-quick
   :after corfu
   :bind (:map corfu-map
-         ("M-q" . corfu-quick-complete)
          ("C-q" . corfu-quick-insert)))
 
 
