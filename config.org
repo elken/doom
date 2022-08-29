@@ -79,7 +79,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#theme][Theme]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
-    - [[#mini-frame][Mini-frame]]
 - [[#org-mode][Org Mode]]
   - [[#fill-column][fill-column]]
   - [[#hook-setup][Hook setup]]
@@ -169,6 +168,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
 - [[#graphviz][Graphviz]]
 - [[#jira][Jira]]
   - [[#org-jira][org-jira]]
+  - [[#jira-workflow][jira-workflow]]
 - [[#translate][Translate]]
 - [[#local-settings][Local settings]]
 
@@ -800,25 +800,6 @@ Add some transparency
 (after! exwm
   (set-frame-parameter (selected-frame) 'alpha 90)
   (add-to-list 'default-frame-alist '(alpha . 90)))
-#+end_src
-
-*** Mini-frame
-Keep the minibuffer in a different frame (only for =read-from-minibuffer=)
-
-#+begin_src elisp
-(package! mini-frame)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! mini-frame
-  :hook (minibuffer-setup . mini-frame-mode)
-  :init
-  (custom-set-variables
-   '(mini-frame-show-parameters
-     '((top . 10)
-       (width . 0.7)
-       (left . 0.5)
-       (no-accept-focus . t)))))
 #+end_src
 
 * Org Mode
@@ -2304,6 +2285,7 @@ You know what we love? =org-mode=.
 
 #+begin_src emacs-lisp
 (use-package! org-jira
+  :commands (org-jira-get-issues org-jira-get-issues-from-custom-jql)
   :init
   (let ((dir (expand-file-name ".org-jira"
                                (or (getenv "XDG_CONFIG_HOME")
@@ -2311,6 +2293,26 @@ You know what we love? =org-mode=.
     (unless (file-directory-p dir)
       (make-directory dir))
     (setq org-jira-working-dir dir)))
+#+end_src
+
+** jira-workflow
+Custom package I've written to handle some of my jira workflow usage to get over
+some of the gripes I have. Still some features left to work on (eg automatic
+ticket movement) but for the most part it does a decent job
+
+#+begin_src elisp
+(package! jira-workflow
+  :recipe (:host github :repo "elken/jira-workflow"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! jira-workflow
+  :commands (jira-workflow-start-ticket)
+  :init
+  (map!
+   :desc "Start working on a ticket"
+   :leader "g c B"
+   #'jira-workflow-start-ticket))
 #+end_src
 
 * Translate
@@ -2326,7 +2328,7 @@ I do a decent amount of copy/paste translating stuff for work, so let's make thi
   (defun google-translate--search-tkk ()
     "Search TKK."
     (list 430675 2721866130))
-  (setf (alist-get "Kirirwanda" google-translate-supported-languages-alist) "rw")
+  (setf (alist-get "Kinyarwanda" google-translate-supported-languages-alist) "rw")
   (setq google-translate-output-destination 'kill-ring)
   (setq google-translate-translation-directions-alist
         '(("en" . "fr")
