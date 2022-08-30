@@ -172,6 +172,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#jira-workflow][jira-workflow]]
 - [[#translate][Translate]]
 - [[#local-settings][Local settings]]
+  - [[#dotenv][dotenv]]
 
 * Setup
 ** Workflow
@@ -625,47 +626,37 @@ for now this is just testing.
 
 (defun reaper-modeline-vanilla ()
   "Return modeline string for vanilla emacs."
-  reaper-modeline--output)
+  (when (and (string= "" reaper-api-key)
+             (string= "" reaper-account-id))
+    ;; TODO Make this a function
+    (dotenv-update-project-env doom-user-dir)
+    (customize-set-variable 'reaper-api-key (getenv "REAPER_API_KEY"))
+    (customize-set-variable 'reaper-account-id (getenv "REAPER_ACCOUNT_ID")))
+  (when-let ((note (reaper-get-running-timer-note))
+             (timer (reaper-get-running-timer-duration)))
+    (format " [ %s | %s] " (string-trim note) timer)))
 
 (defvar reaper-modeline--timer nil)
 (defun reaper-modeline-timer ()
   "Start/stop the time for updating reaper doom-modeline segment."
   (if (timerp reaper-modeline--timer)
       (cancel-timer reaper-modeline--timer))
-  (setq reaper-modeline--timer
-        (run-with-timer
-         1
-         60
-         #'reaper-modeline--update)))
-
-(after! reaper
   (when (and (not (string= "" reaper-api-key))
              (not (string= "" reaper-account-id)))
-    (reaper-modeline-timer)
-    (add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla)))))
+    (setq reaper-modeline--timer
+          (run-with-timer
+           1
+           60
+           #'reaper-refresh-entries))))
 
-(defun reaper-modeline--update ()
-  "Update the status for the reaper modeline segment."
-  (when (and (not (string= "" reaper-api-key))
-             (not (string= "" reaper-account-id)))
-    (async-start
-     `(lambda ()
-        ,(async-inject-variables "\\`\\(load-path\\|reaper-api-key\\|reaper-account-id\\)\\'")
-        (defalias 'reaper-get-running-timer-duration ,(symbol-function 'reaper-get-running-timer-duration))
-        (require 'reaper)
-        (reaper-with-buffer
-         (setq reaper-timeentries nil)
-         (reaper-refresh-entries))
-        (when-let ((note (reaper-get-running-timer-note))
-                   (timer (reaper-get-running-timer-duration)))
-          (format " [ %s | %s] " (string-trim note) timer)))
-     (lambda (result)
-       (setq reaper-modeline--output result)))))
+(after! (reaper dotenv)
+  (reaper-modeline-timer)
+  (add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla))))
 
 (customize-set-variable 'tab-bar-format '(tab-bar-format-global))
 (customize-set-variable 'tab-bar-mode t)
 (when tab-bar-mode
-  (setq display-time-format " [ %H:%M %d/%m/%y]"
+  (setq display-time-format " [  %H:%M %d/%m/%y]"
         display-time-default-load-average nil)
   (display-time-mode 1))
 #+end_src
@@ -2358,6 +2349,8 @@ ticket movement) but for the most part it does a decent job
 (use-package! jira-workflow
   :commands (jira-workflow-start-ticket)
   :init
+  (customize-set-variable 'jiralib-url (getenv "JIRALIB_URL"))
+  (customize-set-variable 'jira-workflow-harvest-service-icon-url (getenv "JIRA_WORKFLOW_SERVICE_ICON_URL"))
   (map!
    :desc "Start working on a ticket"
    :leader "g c B"
@@ -2390,4 +2383,26 @@ Needed some way to manage settings for a local machine, so let's be lazy with it
 #+begin_src emacs-lisp
 (when (file-exists-p! "config-local.el" doom-private-dir)
   (load! "config-local.el" doom-private-dir))
+#+end_src
+
+** dotenv
+Better handle setting of environment variables needed for various tools
+#+begin_src elisp
+(package! dotenv
+  :recipe (:host github :repo "pkulev/dotenv.el"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! dotenv
+  :init
+  (add-hook! 'doom-init-ui-hook
+    (defun +dotenv-startup-hook ()
+      "Load .env after starting emacs"
+      (dotenv-update-project-env doom-user-dir)
+      ))
+  :config
+  (add-hook! 'projectile-after-switch-project-hook
+    (defun +dotenv-projectile-hook ()
+      "Load .env after changing projects."
+      (dotenv-update-project-env (projectile-project-root)))))
 #+end_src
