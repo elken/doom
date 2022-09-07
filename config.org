@@ -163,6 +163,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
   - [[#cucumber][Cucumber]]
+  - [[#rpm-spec][RPM Spec]]
 - [[#spelling][Spelling]]
 - [[#slack][Slack]]
 - [[#reaper][Reaper]]
@@ -2224,6 +2225,19 @@ Needed for feature test files
 #+begin_src emacs-lisp
 (use-package! feature-mode
   :mode "\\.feature$")
+#+end_src
+
+** RPM Spec
+Needed for rpm files to not be treated poorly (there, there)
+
+#+begin_src elisp
+(package! rpm-spec-mode
+  :recipe (:host github :repo "bhavin192/rpm-spec-mode"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! rpm-spec-mode
+  :mode "\\.spec\\(\\.in\\)?$")
 #+end_src
 
 * Spelling
