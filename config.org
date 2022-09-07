@@ -642,17 +642,17 @@ for now this is just testing.
   "Start/stop the time for updating reaper doom-modeline segment."
   (if (timerp reaper-modeline--timer)
       (cancel-timer reaper-modeline--timer))
-  (when (and (not (string= "" reaper-api-key))
-             (not (string= "" reaper-account-id)))
-    (setq reaper-modeline--timer
-          (run-with-timer
-           1
-           60
-           #'reaper-refresh-entries))))
+  (setq reaper-modeline--timer
+        (run-with-timer
+         1
+         60
+         #'reaper-refresh-entries)))
 
 (after! (reaper dotenv)
-  (reaper-modeline-timer)
-  (add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla))))
+  (unless (and (or (null reaper-api-key) (string= "" reaper-api-key))
+               (or (null reaper-account-id) (string= "" reaper-account-id)))
+    (reaper-modeline-timer)
+    (add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla)))))
 
 (customize-set-variable 'tab-bar-format '(tab-bar-format-global))
 (customize-set-variable 'tab-bar-mode t)
