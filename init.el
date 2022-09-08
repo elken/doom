@@ -22,16 +22,18 @@
 (setq evil-respect-visual-line-mode t)
 
 ;; LSP prefers plists
-(setenv "LSP_USE_PLISTS" "1")
+;; (setenv "LSP_USE_PLISTS" "1")
+
+(setq process-connection-type nil)
 
 ;; Testing for Henrik
-(setq native-comp-deferred-compilation t
-      straight-disable-native-compile t
-      native-comp-warning-on-missing-source nil
-      native-comp-async-report-warnings-errors 'silent)
+;;(setq native-comp-deferred-compilation t
+;;      straight-disable-native-compile t
+;;      native-comp-warning-on-missing-source nil
+;;      native-comp-async-report-warnings-errors 'silent)
 
-(unless noninteractive
-  (setq byte-compile-warnings nil))
+;;(unless noninteractive
+;;  (setq byte-compile-warnings nil))
 
 (doom! :input
        ;;chinese
@@ -71,7 +73,7 @@
               +defaults) ; tame sudden yet inevitable temporary windows
        ;; tabs              ; a tab bar for Emacs
        (treemacs +lsp)          ; a project drawer, like neotree but cooler
-       ; unicode           ; extended unicode support for various languages
+       ;; unicode           ; extended unicode support for various languages
        (vc-gutter +pretty)         ; vcs diff in the fringe
        ;; vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        (window-select +numbers)         ; visually switch windows

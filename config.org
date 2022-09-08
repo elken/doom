@@ -642,11 +642,14 @@ for now this is just testing.
   "Start/stop the time for updating reaper doom-modeline segment."
   (if (timerp reaper-modeline--timer)
       (cancel-timer reaper-modeline--timer))
-  (setq reaper-modeline--timer
-        (run-with-timer
-         1
-         60
-         #'reaper-refresh-entries)))
+    (setq reaper-modeline--timer
+          (run-with-timer
+           1
+           60
+           (lambda ()
+             (reaper-with-buffer
+              (setq reaper-timeentries nil)
+              (reaper-refresh-entries))))))
 
 (after! (reaper dotenv)
   (unless (and (or (null reaper-api-key) (string= "" reaper-api-key))
@@ -686,7 +689,7 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
 Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
-(setq  doom-font (font-spec :family "Iosevka Nerd Font" :size 13)
+(setq  doom-font (font-spec :family "CozetteVector" :size 13)
        doom-variable-pitch-font (font-spec :family "Overpass" :size 13)
        doom-unicode-font (font-spec :family "Iosevka Nerd Font" :size 14)
        doom-serif-font (font-spec :family "Overpass Mono" :weight 'light))
@@ -1805,9 +1808,13 @@ Configuration for various programming languages.
 Simple hook/project mode to update translations on save.
 
 #+begin_src emacs-lisp
+(customize-set-variable 'lsp-dart-dap-extension-version "3.46.1")
+
 (defun lsp-dart--intl-update ()
   "Update translations on save."
-  (when +dart-intl-mode
+  (when (and +dart-intl-mode
+             buffer-file-name
+             (string-search "lib/l10n" buffer-file-name))
     (lsp-dart--run-command (lsp-dart-flutter-command) "pub run intl_utils:generate")))
 
 (def-project-mode! +dart-intl-mode
@@ -2361,10 +2368,9 @@ ticket movement) but for the most part it does a decent job
 
 #+begin_src emacs-lisp
 (use-package! jira-workflow
+  :after dotenv
   :commands (jira-workflow-start-ticket)
   :init
-  (customize-set-variable 'jiralib-url (getenv "JIRALIB_URL"))
-  (customize-set-variable 'jira-workflow-harvest-service-icon-url (getenv "JIRA_WORKFLOW_SERVICE_ICON_URL"))
   (map!
    :desc "Start working on a ticket"
    :leader "g c B"
@@ -2413,7 +2419,9 @@ Better handle setting of environment variables needed for various tools
     (defun +dotenv-startup-hook ()
       "Load .env after starting emacs"
       (dotenv-update-project-env doom-user-dir)
-      ))
+      (customize-set-variable 'jiralib-url (getenv "JIRALIB_URL"))
+      (customize-set-variable 'jira-workflow-harvest-service-icon-url (getenv "JIRA_WORKFLOW_SERVICE_ICON_URL"))
+      (customize-set-variable 'jira-workflow-harvest-service-name (replace-regexp-in-string "http[s]://" "" jiralib-url))))
   :config
   (add-hook! 'projectile-after-switch-project-hook
     (defun +dotenv-projectile-hook ()
