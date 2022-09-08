@@ -1,5 +1,5 @@
 ;;; completion/corfu/autoload/corfu.el -*- lexical-binding: t; -*-
-;;;###if (featurep! :completion corfu +minibuffer)
+;;;###if (modulep! :completion corfu +minibuffer)
 
 ;;;###autoload
 (defun +corfu--enable-in-minibuffer ()
@@ -8,6 +8,6 @@
               (memq this-command '(evil-ex
                                    evil-ex-search-forward
                                    evil-ex-search-backward))
-              (and (featurep! :completion helm)
+              (and (modulep! :completion helm)
                    (helm--alive-p))
               (corfu-mode +1))))

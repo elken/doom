@@ -1942,7 +1942,7 @@ Make sure it's loaded in php-mode
 Set some config needed for the server
 
 #+begin_src emacs-lisp
-(when (featurep! :tools lsp +eglot)
+(when (modulep! :tools lsp +eglot)
   (defvar php-intelephense-storage-path (expand-file-name "lsp-intelephense" doom-etc-dir))
   (defvar php-intelephense-command (expand-file-name "lsp/npm/intelephense/bin/intelephense" doom-etc-dir)))
 #+end_src
@@ -2147,7 +2147,7 @@ Packages to be unpinned or just completely disabled
 (unpin! lsp-mode)
 (unpin! lsp-dart)
 (unpin! forge)
-(when (featurep! :completion corfu)
+(when (modulep! :completion corfu)
   (unpin! evil-collection))
 #+end_src
 
@@ -2186,12 +2186,12 @@ Not yet fit for human consumption, but fit for mine because I'm +sub+ super-huma
 Need to add this into company module when I've tested
 
 #+begin_src elisp
-(when (featurep! :completion company)
+(when (modulep! :completion company)
   (package! company-prescient))
 #+end_src
 
 #+begin_src emacs-lisp
-(when (featurep! :completion company)
+(when (modulep! :completion company)
   (use-package! company-prescient
     :after company
     :hook (company-mode . company-prescient-mode)

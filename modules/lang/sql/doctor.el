@@ -1,10 +1,10 @@
 ;;; lang/sql/doctor.el -*- lexical-binding: t; -*-
 
-(when (featurep! :checkers syntax)
+(when (modulep! :checkers syntax)
   (unless (executable-find "sqlint")
     (warn! "Couldn't find sqlint. Syntax checking will not work")))
 
-(when (featurep! +lsp)
+(when (modulep! +lsp)
   (unless (executable-find "sqls")
     (error! "Couldn't find sqls. Needed for LSP")))
 

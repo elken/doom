@@ -15,7 +15,7 @@ commonly used.")
 
 
 (add-hook! sql-mode
-  (when (featurep! +lsp)
+  (when (modulep! +lsp)
     (add-hook 'sql-mode-local-vars-hook #'lsp!))
   (unless (file-directory-p (expand-file-name "sql/" doom-cache-dir))
     (mkdir (expand-file-name "sql/" doom-cache-dir) t))
@@ -24,6 +24,6 @@ commonly used.")
 
 
 (use-package! sqllint
-  :when (featurep! :checkers syntax)
-  :unless (featurep! +lsp)
+  :when (modulep! :checkers syntax)
+  :unless (modulep! +lsp)
   :after sql-mode)
