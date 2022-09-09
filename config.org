@@ -1011,17 +1011,10 @@ proper value.
 Enable =mixed-pitch-mode= to enable the more readable fonts where it makes sense.
 
 #+begin_src emacs-lisp
-(defvar elken/mixed-pitch-modes '(org-mode LaTeX-mode markdown-mode gfm-mode Info-mode)
-  "Only use `mixed-pitch-mode' for given modes.")
+(setq +zen-mixed-pitch-modes '(org-mode LaTeX-mode markdown-mode gfm-mode Info-mode rst-mode adoc-mode))
 
-(defun init-mixed-pitch-h ()
-  "Hook `mixed-pitch-mode' into each mode of `elken/mixed-pitch-modes'"
-  (when (memq major-mode elken/mixed-pitch-modes)
-    (mixed-pitch-mode 1))
-  (dolist (hook elken/mixed-pitch-modes)
-    (add-hook (intern (concat (symbol-name hook) "-hook")) #'mixed-pitch-mode)))
-
-(add-hook 'doom-init-ui-hook #'init-mixed-pitch-h)
+(dolist (hook +zen-mixed-pitch-modes)
+  (add-hook (intern (concat (symbol-name hook) "-hook")) #'mixed-pitch-mode))
 #+end_src
 
 ** Archive/Cleanup
