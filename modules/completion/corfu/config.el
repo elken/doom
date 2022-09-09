@@ -152,7 +152,6 @@
          ("C-q" . corfu-quick-insert)))
 
 
-;; TODO This doesn't _quite_ work
 (use-package! evil-collection-corfu
   :when (modulep! :editor evil +everywhere)
   :defer t
