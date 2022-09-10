@@ -26,15 +26,6 @@
 
 (setq process-connection-type nil)
 
-;; Testing for Henrik
-;;(setq native-comp-deferred-compilation t
-;;      straight-disable-native-compile t
-;;      native-comp-warning-on-missing-source nil
-;;      native-comp-async-report-warnings-errors 'silent)
-
-;;(unless noninteractive
-;;  (setq byte-compile-warnings nil))
-
 (doom! :input
        ;;chinese
        ;;japanese
