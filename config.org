@@ -689,7 +689,7 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
 Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
-(setq  doom-font (font-spec :family "CozetteVector" :size 13)
+(setq  doom-font (font-spec :family "Iosevka Nerd Font" :size 13)
        doom-variable-pitch-font (font-spec :family "Overpass" :size 13)
        doom-unicode-font (font-spec :family "Iosevka Nerd Font" :size 14)
        doom-serif-font (font-spec :family "Overpass Mono" :weight 'light))
@@ -1801,20 +1801,23 @@ Configuration for various programming languages.
 Simple hook/project mode to update translations on save.
 
 #+begin_src emacs-lisp
-(customize-set-variable 'lsp-dart-dap-extension-version "3.46.1")
+(after! lsp-dart
+  (customize-set-variable 'lsp-dart-dap-extension-version "3.46.1")
 
-(defun lsp-dart--intl-update ()
-  "Update translations on save."
-  (when (and +dart-intl-mode
-             buffer-file-name
-             (string-search "lib/l10n" buffer-file-name))
-    (lsp-dart--run-command (lsp-dart-flutter-command) "pub run intl_utils:generate")))
+  (defun lsp-dart--intl-update ()
+    "Update translations on save."
+    (when (and +dart-intl-mode
+               buffer-file-name
+               (string-search "lib/l10n" buffer-file-name))
+      (lsp-dart--run-command (lsp-dart-flutter-command) "pub run intl_utils:generate")))
 
-(def-project-mode! +dart-intl-mode
-  :modes '(json-mode)
-  :files (and "pubspec.yaml" "lib/l10n")
-  :on-enter (add-hook 'after-save-hook #'lsp-dart--intl-update)
-  :on-exit (remove-hook 'after-save-hook #'lsp-dart--intl-update))
+  (def-project-mode! +dart-intl-mode
+    :modes '(json-mode)
+    :files (and "pubspec.yaml" "lib/l10n")
+    :on-enter (add-hook 'after-save-hook #'lsp-dart--intl-update)
+    :on-exit (remove-hook 'after-save-hook #'lsp-dart--intl-update))
+
+  (setq lsp-dart-dap-flutter-hot-reload-on-save t))
 #+end_src
 
 ** Rust
@@ -1929,7 +1932,8 @@ Make sure it's loaded in php-mode
 
 #+begin_src emacs-lisp
 (after! eglot
-  (add-hook 'php-mode-hook 'eglot-ensure))
+  (add-hook 'php-mode-hook 'eglot-ensure)
+  (add-hook 'dart-mode-hook 'eglot-ensure))
 #+end_src
 
 Set some config needed for the server
@@ -2139,6 +2143,8 @@ Packages to be unpinned or just completely disabled
 (unpin! vterm)
 (unpin! lsp-mode)
 (unpin! lsp-dart)
+(when (modulep! :tools lsp +eglot)
+  (unpin! eglot))
 (unpin! forge)
 (when (modulep! :completion corfu)
   (unpin! evil-collection))
@@ -2408,13 +2414,14 @@ Better handle setting of environment variables needed for various tools
 #+begin_src emacs-lisp
 (use-package! dotenv
   :init
-  (add-hook! 'doom-init-ui-hook
-    (defun +dotenv-startup-hook ()
-      "Load .env after starting emacs"
-      (dotenv-update-project-env doom-user-dir)
-      (customize-set-variable 'jiralib-url (getenv "JIRALIB_URL"))
-      (customize-set-variable 'jira-workflow-harvest-service-icon-url (getenv "JIRA_WORKFLOW_SERVICE_ICON_URL"))
-      (customize-set-variable 'jira-workflow-harvest-service-name (replace-regexp-in-string "http[s]://" "" jiralib-url))))
+  (when (file-exists-p (expand-file-name ".env" doom-user-dir))
+    (add-hook! 'doom-init-ui-hook
+      (defun +dotenv-startup-hook ()
+        "Load .env after starting emacs"
+        (dotenv-update-project-env doom-user-dir)
+        (customize-set-variable 'jiralib-url (getenv "JIRALIB_URL"))
+        (customize-set-variable 'jira-workflow-harvest-service-icon-url (getenv "JIRA_WORKFLOW_SERVICE_ICON_URL"))
+        (customize-set-variable 'jira-workflow-harvest-service-name (replace-regexp-in-string "http[s]://" "" jiralib-url)))))
   :config
   (add-hook! 'projectile-after-switch-project-hook
     (defun +dotenv-projectile-hook ()
