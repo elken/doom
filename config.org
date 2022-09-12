@@ -6,6 +6,7 @@
 #+caption: Banner
 #+latex_class: chameleon
 #+html_content_class: chameleon
+#+html_head: <script src='static/index.js'></script>
 #+html_head: <link rel='stylesheet' type='text/css' href='static/index.css' />
 #+html_head: <link rel='shortcut icon' type='image/png' href='https://raw.githubusercontent.com/eccentric-j/doom-icon/master/cute-doom/src/doom.iconset/icon_32x32.png'>
 

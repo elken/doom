@@ -3,6 +3,14 @@
   --body-width: 70vw;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   width: var(--body-width);
   min-width: var(--body-width);
@@ -23,9 +31,16 @@ body {
   top: 0;
   left: 0;
   width: var(--sidebar-width);
+  overflow-x: auto;
   height: 100vh;
   display: flex;
   flex-direction: column;
+  margin-left: 20px;
+}
+
+#table-of-contents li.active > a {
+  color: red;
+  font-weight: 500;
 }
 
 img {

@@ -3,7 +3,7 @@
 
 (defcli! (publish) ()
   "Publish my doom config as a html page."
-  (require 'core-start)
+  (require 'doom-start)
   (require 'ox-publish)
   (require 'htmlize)
   ;; Set theme needed for ox-chameleon
