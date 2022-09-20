@@ -172,6 +172,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#org-jira][org-jira]]
   - [[#jira-workflow][jira-workflow]]
 - [[#translate][Translate]]
+- [[#exercism][Exercism]]
 - [[#local-settings][Local settings]]
   - [[#dotenv][dotenv]]
 
@@ -2394,6 +2395,23 @@ I do a decent amount of copy/paste translating stuff for work, so let's make thi
   (setq google-translate-translation-directions-alist
         '(("en" . "fr")
           ("en" . "rw"))))
+#+end_src
+
+* Exercism
+Exercism is a useful site for learning a programming language by performing
+various exercises. You can opt to use either an in-browser editor or your own
+via a local CLI.
+
+Which do you think I want?
+
+#+begin_src elisp
+(package! exercism
+  :recipe (:host github :repo "elken/exercism.el"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! exercism
+:commands (exercism exercism-view-tracks))
 #+end_src
 
 * Local settings
