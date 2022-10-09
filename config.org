@@ -2405,13 +2405,13 @@ via a local CLI.
 Which do you think I want?
 
 #+begin_src elisp
-(package! exercism
-  :recipe (:host github :repo "elken/exercism.el"))
+(package! exercism-modern
+  :recipe (:host github :repo "elken/exercism-modern"))
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! exercism
-:commands (exercism exercism-view-tracks))
+(use-package! exercism-modern
+  :commands (exercism-modern-jump exercism-modern-view-tracks))
 #+end_src
 
 * Local settings
