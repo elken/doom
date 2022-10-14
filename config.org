@@ -2406,7 +2406,8 @@ Which do you think I want?
 
 #+begin_src elisp
 (package! exercism-modern
-  :recipe (:host github :repo "elken/exercism-modern"))
+  :recipe (:files (:defaults "icons")
+           :host github :repo "elken/exercism-modern"))
 #+end_src
 
 #+begin_src emacs-lisp
