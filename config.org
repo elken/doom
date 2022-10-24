@@ -61,6 +61,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#fix-c-backspace][Fix =c-backspace=]]
       - [[#functions][Functions]]
       - [[#multi-vterm][Multi-vterm]]
+      - [[#ensure-the-shell-is-zsh][Ensure the shell is ZSH]]
 - [[#keybindings][Keybindings]]
   - [[#save][Save]]
   - [[#search][Search]]
@@ -496,6 +497,13 @@ Useful functions for the shell-side integration provided by vterm.
 #+begin_src emacs-lisp
 (use-package! multi-vterm
   :after vterm)
+#+end_src
+
+**** Ensure the shell is ZSH
+Noticed a few weird cases where =chsh= doesn't /quite/ apply, so let's force that to be the case instead.
+
+#+begin_src emacs-lisp
+(setq vterm-shell "/bin/zsh")
 #+end_src
 
 * Keybindings
