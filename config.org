@@ -957,11 +957,34 @@ When a drawer is collapsed, show a nice dropdown arrow.
 Default keywords are /far/ too minimal. This will need further tweaking as I start
 using org mode for organisation more.
 
+Some tasks we want to file an action for, eg =DONE=, =KILL= and =WAIT= occur and we want to list a reason why. =org-todo-keywords= handles this natively by simply adding ~@/!~ after the shortcut key.
+
+The below is courtesy of [[https://git.sr.ht/~gagbo/doom-config/tree/eb615417ca0cc01df89bc9a9aea06e5c99f97540/item/config-org.el#L57-62][gagbo]].
+
 #+begin_src emacs-lisp
 (after! org
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "INPROG(i)" "PROJ(p)" "STORY(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
-          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))))
+        '((sequence "TODO(t)" "INPROG(i)" "PROJ(p)" "STORY(s)" "WAIT(w@/!)" "|" "DONE(d@/!)" "KILL(k@/!)")
+          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))
+        ;; The triggers break down to the following rules:
+
+        ;; - Moving a task to =KILLED= adds a =killed= tag
+        ;; - Moving a task to =WAIT= adds a =waiting= tag
+        ;; - Moving a task to a done state removes =WAIT= and =HOLD= tags
+        ;; - Moving a task to =TODO= removes all tags
+        ;; - Moving a task to =NEXT= removes all tags
+        ;; - Moving a task to =DONE= removes all tags
+        org-todo-state-tags-triggers
+        '(("KILL" ("killed" . t))
+          ("WAIT" ("waiting" . t))
+          (done ("waiting") ("hold"))
+          ("TODO" ("waiting") ("cancelled") ("hold"))
+          ("NEXT" ("waiting") ("cancelled") ("hold"))
+          ("DONE" ("waiting") ("cancelled") ("hold")))
+
+        ;; This settings allows to fixup the state of a todo item without
+        ;; triggering notes or log.
+        org-treat-S-cursor-todo-selection-as-state-change nil))
 #+end_src
 
 ** Agenda/Log
