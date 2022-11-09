@@ -128,7 +128,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
 - [[#languages][Languages]]
   - [[#dart][Dart]]
   - [[#rust][Rust]]
-  - [[#lua][Lua]]
   - [[#c][C#]]
   - [[#elisp][ELISP]]
   - [[#lspdap][LSP/DAP]]
@@ -1860,24 +1859,6 @@ Rust is the hot new thing, guess I better jump on the bandwagon if I want to sta
 (after! lsp-mode
   (setq lsp-rust-analyzer-display-parameter-hints t
         lsp-rust-analyzer-server-display-inlay-hints t))
-#+end_src
-
-** Lua
-I'm not a fan of lua, but until I can be bothered enough to port lua config to fennel, we're stuck with it.
-
-First things first; we need a project mode for my awesomewm config so we get proper LSP results.
-
-#+begin_src emacs-lisp
-(def-project-mode! +awesome-config-mode
-  :modes '(lua-mode)
-  :files ("rc.lua")
-  :when (string-prefix-p (expand-file-name "awesome" (xdg-config-home)) default-directory))
-
-(add-hook! '+awesome-config-mode-hook
-  (defun +awesome-config-mode-lsp-h ()
-    (require 'ht)
-    (setq lsp-lua-workspace-library (ht ("/usr/share/awesome/lib" t))
-          lsp-lua-diagnostics-globals ["awesome" "client" "tag" "screen"])))
 #+end_src
 
 ** C#
