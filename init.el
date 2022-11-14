@@ -100,7 +100,7 @@
 
        :checkers
        syntax       ; tasing you for every semicolon you forget
-       (:if (executable-find "aspell") spell +aspell) ; tasing you for misspelling mispelling
+       (:if (executable-find "aspell") (spell +aspell)) ; tasing you for misspelling mispelling
        ;; grammar           ; tasing grammar mistake every you make
 
        :tools
@@ -134,15 +134,15 @@
        ;;agda              ; types of types of types of types...
        ;;cc                ; C/C++/Obj-C madness
        (clojure +lsp)                   ; java with a lisp
-       common-lisp       ; if you've seen one lisp, you've seen them all
+       ;; common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
-       (csharp +lsp
-               +sharper
-               +tree-sitter)            ; unity, .NET, and mono shenanigans
+       ;; (csharp +lsp
+       ;;         +sharper
+       ;;         +tree-sitter) ; unity, .NET, and mono shenanigans
        data                     ; config/data formats
-       (dart +lsp
-             +flutter)   ; paint ui and not much else
+       ;; (dart +lsp
+       ;;       +flutter) ; paint ui and not much else
        ;;(elixir +lsp
        ;;        +tree-sitter)            ; erlang done right
        ;;elm               ; care for a cup of TEA?
@@ -162,21 +162,20 @@
        ;;idris             ; a language you can depend on
        (json +lsp
              +tree-sitter)              ; At least it ain't XML
-       (java +lsp
-             +tree-sitter) ; the poster child for carpal tunnel syndrome
+       ;; (java +lsp
+       ;;       +tree-sitter) ; the poster child for carpal tunnel syndrome
        (javascript +lsp
                    +tree-sitter)    ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
-       (kotlin +lsp)            ; a better, slicker Java(Script)
+       ;; (kotlin +lsp)  ; a better, slicker Java(Script)
        ;;latex             ; writing papers in Emacs has never been so fun
        ;;lean
        ;;factor
        ;;ledger            ; an accounting system in Emacs
-       (lua +fennel
-            +lsp)               ; one-based indices? one-based indices
+       (lua +lsp)               ; one-based indices? one-based indices
        (markdown +grip)          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
-       nix                              ; I hereby declare "nix geht mehr!"
+       ;; nix                              ; I hereby declare "nix geht mehr!"
        (ocaml +lsp)             ; an objective camel
        (org +gnuplot
             +dragndrop
@@ -187,13 +186,13 @@
             +present
             +pretty
             +roam2)    ; organize your plain life in plain text
-       (php +lsp)       ; perl's insecure younger brother
+       ;; (php +lsp) ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       (python +lsp
-               +pyright
-               +tree-sitter
-               +poetry)            ; beautiful is better than ugly
+       ;; (python +lsp
+       ;;         +pyright
+       ;;         +tree-sitter
+       ;;         +poetry) ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
@@ -202,10 +201,10 @@
        ;;(ruby +lsp
        ;;      +tree-sitter
        ;;      +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       (rust +lsp
-             +tree-sitter)          ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ;; (rust +lsp
+       ;;       +tree-sitter) ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
-       scheme ; a fully conniving family of lisps
+       ;; scheme ; a fully conniving family of lisps
        (sh +lsp)     ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity          ; do you need a blockchain? No.
@@ -217,8 +216,8 @@
        (yaml +lsp)              ; JSON, but readable
 
        :email
-       ;; (mu4e +gmail
-       ;;       +org)
+       (mu4e +gmail
+             +org)
        ;;notmuch
        ;;(wanderlust +gmail)
 

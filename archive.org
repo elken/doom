@@ -1,0 +1,488 @@
+#+title: Archive
+
+A listing of various snippets no longer in use but maintain for historical significance.
+
+* Archive
+** EXWM Setup
+One of the former usecases for this config is =exwm= which was pulled from a number of files in the current environment. Loading =exwm= is a simple case of enabling the exwm module, although it's /wildly/ untested and is basically hardcoded to just work for me. Any input is welcome, although unlikely to make it into /this/ module (until I stop being lazy and attempt to make it better for upstream....)
+
+Due to a number of issues with Emacs itself though (mostly around the single-threaded nature and the ease of which you can lock up your whole WM), this has been abandoned in favour of Awesomewm.
+
+*** modules/ui/exwm
+The primary lisp file where the bulk of the configuration is held, with everything from my process manager to a now-playing segment. Below are some usage screenshots.
+Standard doom module layout, nothing fishy going on. For those unfamiliar,
+
+ - =init.el= is loaded before anything else really, which is important to properly check if the flag exists to load the exwm code as early as possible
+ - =config.el= is the main bread and butter, all the config lives here (surprisingly)
+ - =doctor.el= is currently just used for detecting missing exe's, by plugging into =doom doctor=
+ - =packages.el= is a list of extra packages to be installed by doom's package manager
+
+[[file:images/kill-process.png]]
+
+[[file:images/tray.png]]
+
+Transparency is handled both through [[*GUI/Frame][Doom]] and via [[file:exwm/picom.conf][picom]].
+
+*** Session
+For the sake of simplicity, I use a slightly modified version of [[https://github.com/WJCFerguson/exwm-gnome-flashback][GNOME Flashback]] to run the startup scripts. It also gives me ootb access to things like =pinentry=, the various password stores, =gnome-screensaver= lock screen and the useful screenshot tool.
+
+As such, everything is themed around [[https://nordtheme.com][Nord]].
+
+Over time and due to various issues, I have been migrating to a plain =exwm= session but I haven't yet settled on the best approach.
+
+*** start.sh / start-debug.sh
+The scripts responsible for starting up exwm in the right way, including env variables and picom.
+** Tab-bar-mode
+Acting as a global modeline (of sorts), this could end up being quite useful but
+for now this is just testing.
+
+Due to issues with window managers and no longer needing the extra info, the
+tab-bar-mode setup has been archived.
+
+#+begin_src emacs-lisp
+(defun reaper-get-running-timer-duration ()
+  "Return duration of current running timer."
+  (reaper-with-buffer
+   (when reaper-running-timer
+     (reaper--hours-to-time
+      (let ((entry (assoc reaper-running-timer reaper-timeentries)))
+        (cdr (assoc :hours entry)))))))
+
+(defun reaper-modeline-vanilla ()
+  "Return modeline string for vanilla emacs."
+  (when (and (string= "" reaper-api-key)
+             (string= "" reaper-account-id))
+    ;; TODO Make this a function
+    (dotenv-update-project-env doom-user-dir)
+    (customize-set-variable 'reaper-api-key (getenv "REAPER_API_KEY"))
+    (customize-set-variable 'reaper-account-id (getenv "REAPER_ACCOUNT_ID")))
+  (when-let ((note (reaper-get-running-timer-note))
+             (timer (reaper-get-running-timer-duration)))
+    (format " [ %s | %s] " (string-trim note) timer)))
+
+(defvar reaper-modeline--timer nil)
+(defun reaper-modeline-timer ()
+  "Start/stop the time for updating reaper doom-modeline segment."
+  (if (timerp reaper-modeline--timer)
+      (cancel-timer reaper-modeline--timer))
+    (setq reaper-modeline--timer
+          (run-with-timer
+           1
+           60
+           (lambda ()
+             (reaper-with-buffer
+              (setq reaper-timeentries nil)
+              (reaper-refresh-entries))))))
+
+(after! (reaper dotenv)
+  (unless (and (or (null reaper-api-key) (string= "" reaper-api-key))
+               (or (null reaper-account-id) (string= "" reaper-account-id)))
+    (reaper-modeline-timer)
+    (add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla)))))
+
+;; (customize-set-variable 'tab-bar-format '(tab-bar-format-global))
+;; (customize-set-variable 'tab-bar-mode t)
+;; (when tab-bar-mode
+;;   (setq display-time-format " [  %H:%M %d/%m/%y]"
+;;         display-time-default-load-average nil)
+  ;; (display-time-mode 1))
+#+end_src
+
+
+** Languages
+*** Dart
+Simple hook/project mode to update translations on save.
+
+#+begin_src emacs-lisp
+(after! lsp-dart
+  (customize-set-variable 'lsp-dart-dap-extension-version "3.46.1")
+
+  (defun lsp-dart--intl-update ()
+    "Update translations on save."
+    (when (and +dart-intl-mode
+               buffer-file-name
+               (string-search "lib/l10n" buffer-file-name))
+      (lsp-dart--run-command (lsp-dart-flutter-command) "pub run intl_utils:generate")))
+
+  (def-project-mode! +dart-intl-mode
+    :modes '(json-mode)
+    :files (and "pubspec.yaml" "lib/l10n")
+    :on-enter (add-hook 'after-save-hook #'lsp-dart--intl-update)
+    :on-exit (remove-hook 'after-save-hook #'lsp-dart--intl-update))
+
+  (setq lsp-dart-dap-flutter-hot-reload-on-save t))
+#+end_src
+
+*** Rust
+Rust is the hot new thing, guess I better jump on the bandwagon if I want to stay cool.
+
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (setq lsp-rust-analyzer-display-parameter-hints t
+        lsp-rust-analyzer-server-display-inlay-hints t))
+#+end_src
+
+*** C#
+Projectile doesn't recognise these projects properly, so we have to fix that
+
+#+begin_src emacs-lisp
+(after! projectile
+  (defun projectile-dotnet-project-p ()
+    "Check if a project contains a *.sln file at the project root, or either
+a .csproj or .fsproj file at either the project root or within src/*/."
+    (or (projectile-verify-file-wildcard "?*.sln")
+        (projectile-verify-file-wildcard "?*.csproj")
+        (projectile-verify-file-wildcard "src/*/?*.csproj")
+        (projectile-verify-file-wildcard "?*.fsproj")
+        (projectile-verify-file-wildcard "src/*/?*.fsproj"))))
+#+end_src
+
+*** Ignore files in xref
+PHP is a dumb language (don't get me started...), as such we need extra files to
+get decent completion & documentation. 0% of the time will we want to use them
+as references, so we won't.
+
+#+begin_src emacs-lisp
+(defvar xref-ignored-files '("_ide_helper_models.php" "_ide_helper.php")
+  "List of files to be ignored by `xref'.")
+
+(defun xref-ignored-file-p (item)
+  "Return t if `item' should be ignored."
+  (seq-some
+   (lambda (cand)
+     (string-suffix-p cand (oref (xref-item-location item) file))) xref-ignored-files))
+
+(defadvice! +lsp--ignored-locations-to-xref-items-a (items)
+  "Remove ignored files from list of xref-items."
+  :filter-return #'lsp--locations-to-xref-items
+  (cl-remove-if #'xref-ignored-file-p items))
+
+(defadvice! +lsp-ui-peek--ignored-locations-a (items)
+  "Remove ignored files from list of xref-items."
+  :filter-return #'lsp-ui-peek--get-references
+  (cl-remove-if #'xref-ignored-file-p items))
+#+end_src
+
+*** Ignore directories
+Add some extra ignored directories for =+lsp=.
+
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\vendor"))
+#+end_src
+
+And some more for projectile
+
+#+begin_src emacs-lisp
+(after! projectile
+  (add-to-list 'projectile-globally-ignored-directories "vendor"))
+#+end_src
+
+*** PHP
+**** Web-mode setup
+#+begin_src emacs-lisp
+(after! web-mode
+  (pushnew! web-mode-engines-alist '(("blade"  . "\\.blade\\."))))
+#+end_src
+
+**** Intelephense
+Because I'm a massive sellout who likes features
+
+#+begin_src emacs-lisp
+(after! eglot
+  (setq lsp-intelephense-licence-key (or (ignore-errors (fetch-auth-source :user "intelephense") nil))))
+#+end_src
+
+**** Eglot
+Trying out this eglot thing for a bit, let's see how it goes.
+
+Make sure it's loaded in php-mode
+
+#+begin_src emacs-lisp
+(after! eglot
+  (add-hook 'php-mode-hook 'eglot-ensure)
+  (add-hook 'dart-mode-hook 'eglot-ensure))
+#+end_src
+
+Set some config needed for the server
+
+#+begin_src emacs-lisp
+(when (modulep! :tools lsp +eglot)
+  (defvar php-intelephense-storage-path (expand-file-name "lsp-intelephense" doom-etc-dir))
+  (defvar php-intelephense-command (expand-file-name "lsp/npm/intelephense/bin/intelephense" doom-etc-dir)))
+#+end_src
+
+And set the server to be loaded
+
+#+begin_src emacs-lisp
+(after! eglot
+  (defclass eglot-php (eglot-lsp-server) () :documentation "PHP's Intelephense")
+  (cl-defmethod eglot-initialization-options ((server eglot-php))
+    "Passes through required intelephense options"
+    `(:storagePath ,php-intelephense-storage-path
+      :licenceKey ,lsp-intelephense-licence-key
+      :clearCache t))
+  (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio")))))
+#+end_src
+
+
+** Snippets
+*** PHP-Mode
+**** function
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: function
+# key: fu
+# uuid: fu
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+${1:$$(yas-auto-next (yas-completing-read "Visibility (public): " '("public" "private" "protected") nil nil nil nil "public"))} function ${2:name}($3)
+{
+    $0
+}
+#+end_src
+
+**** php
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: <?php
+# key: php
+# uuid: php
+# --
+<?php
+$0
+#+end_src
+
+*** kotlin-mode
+**** __
+
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: Kotlin template
+# --
+package `(mapconcat 'identity (cdr (member "kotlin" (split-string default-directory "/" t))) ".")`
+
+class `(s-join "" (mapcar 's-titleize (s-split-words (file-name-base buffer-file-name))))`
+{
+    $0
+}
+#+end_src
+
+*** +php-laravel-mode
+**** .yas-parents.el
+#+begin_src emacs-lisp
+
+(eval-when-compile (require 'subr-x))
+
+(defun string-split-words (string)
+  (split-string
+   (let ((case-fold-search nil))
+     (replace-regexp-in-string
+      "\\([[:lower:]]\\)\\([[:upper:]]\\)" "\\1 \\2"
+      (replace-regexp-in-string "\\([[:upper:]]\\)\\([[:upper:]][0-9[:lower:]]\\)" "\\1 \\2" string)))
+   "[^[:word:]0-9]+"
+   t))
+
+(defun +php-laravel-mode--get-namespace ()
+    "Get a formatted namespace for the current PHP file"
+    (substring
+        (replace-regexp-in-string "/" (regexp-quote "\\")
+            (thread-first
+                buffer-file-name
+                (file-relative-name (doom-project-root))
+                file-name-directory
+                capitalize))
+        0
+        -1))
+
+(defun +php-laravel-mode--get-class-name ()
+    "Get a formatted class name for the current PHP file"
+    (string-join (mapcar 'capitalize (string-split-words (file-name-base buffer-file-name)))))
+#+end_src
+**** __
+
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: PHP template
+# --
+<?php
+
+namespace `(+php-laravel-mode--get-namespace)`;
+
+class `(+php-laravel-mode--get-class-name)`
+{
+    $0
+}
+#+end_src
+
+**** migration
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: Laravel Migration method
+# key: mig
+# uuid: mig
+# --
+Schema::table('$1', function (Blueprint $table) {
+    `%`$0
+});
+#+end_src
+
+**** scope
+#+begin_src snippet
+# -*- mode: snippet -*-
+# name: Sentry scope
+# key: scope
+# uuid: scope
+# --
+withScope(function (Scope $scope) use ($1) {
+    $scope->setContext('$2', [
+        $3
+    ]);
+
+    `%`$0
+});
+#+end_src
+
+*** laravel-mode
+Not yet fit for human consumption, but fit for mine because I'm +sub+ super-human
+
+#+begin_src elisp
+;; (package! laravel-mode
+;;   :recipe (:local-repo "~/build/elisp/laravel-mode"
+;;            :build (:not compile)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! laravel-tinker
+  :after php-mode
+  :init
+  (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :ttl nil)
+  (map! :localleader
+         :map php-mode-map
+         :desc "Toggle a project-local Tinker REPL" "o t" #'laravel-tinker-toggle))
+#+end_src
+
+** Slack
+Includes a couple of niceties locally, these /may/ end up in a module one day.
+
+#+begin_src elisp
+(package! slack)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! slack
+  :commands (slack-start)
+  :custom
+  (slack-buffer-emojify t)
+  (slack-prefer-current-team t)
+  (slack-enable-global-mode-string t)
+  (slack-modeline-count-only-subscribed-channel nil)
+  :init
+  (require 'auth-source)
+  (require 'slack-util)
+
+  (defun +slack/register-team (&rest plist)
+    "Given an email, get the `:token' and `:cookie' for the given EMAIL."
+    (let ((token (auth-source-pick-first-password
+                  :host (plist-get plist :host)
+                  :user (plist-get plist :email)))
+          (cookie (auth-source-pick-first-password
+                   :host (plist-get plist :host)
+                   :user (format "%s^cookie" (plist-get plist :email)))))
+      (apply 'slack-register-team (slack-merge-plist `(:token ,token :cookie ,cookie) plist))))
+
+  (defun +slack/post-standup-message ()
+    "Create a standup message to send to a room."
+    (interactive)
+    (let* ((team (slack-team-select))
+           (channel (slack-room-select
+                     (cl-loop for team in (list team)
+                              for channels = (append (slack-team-channels team) (slack-team-ims team))
+                              nconc channels)
+                     team))
+           (buf (slack-create-room-message-compose-buffer channel team)))
+
+      (slack-buffer-display buf)
+      (yas-expand-snippet (yas-lookup-snippet "Standup template" 'slack-message-compose-buffer-mode)))))
+#+end_src
+
+** Reaper
+Emacs client for Harvest, the time tracker we use at =$DAYJOB=. Over time, this
+will likely become more config than just a dump of macros.
+
+#+begin_src elisp
+(package! reaper)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! reaper
+   :init
+   (map! :leader :n :desc "Track time" "t t" #'reaper))
+#+end_src
+
+** Jira
+Config related to setting up Jira.
+
+*** org-jira
+Used for accessing Jira tasks through org-mode. Jira's interface is /quite/ a mess
+so I'd rather not use it as much.
+
+You know what we love? =org-mode=.
+
+#+begin_src elisp
+(package! org-jira)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! org-jira
+  :commands (org-jira-get-issues org-jira-get-issues-from-custom-jql)
+  :init
+  (let ((dir (expand-file-name ".org-jira"
+                               (or (getenv "XDG_CONFIG_HOME")
+                                   (getenv "HOME")))))
+    (unless (file-directory-p dir)
+      (make-directory dir))
+    (setq org-jira-working-dir dir)))
+#+end_src
+
+*** jira-workflow
+Custom package I've written to handle some of my jira workflow usage to get over
+some of the gripes I have. Still some features left to work on (eg automatic
+ticket movement) but for the most part it does a decent job
+
+#+begin_src elisp
+(package! jira-workflow
+  :recipe (:host github :repo "elken/jira-workflow"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! jira-workflow
+  :after dotenv
+  :commands (jira-workflow-start-ticket)
+  :init
+  (map!
+   :desc "Start working on a ticket"
+   :leader "g c B"
+   #'jira-workflow-start-ticket))
+#+end_src
+
+** Translate
+I do a decent amount of copy/paste translating stuff for work, so let's make this /easier/.
+
+#+begin_src elisp
+(package! google-translate)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! google-translate
+  :config
+  (defun google-translate--search-tkk ()
+    "Search TKK."
+    (list 430675 2721866130))
+  (setf (alist-get "Kinyarwanda" google-translate-supported-languages-alist) "rw")
+  (setq google-translate-output-destination 'kill-ring)
+  (setq google-translate-translation-directions-alist
+        '(("en" . "fr")
+          ("en" . "rw"))))
+#+end_src
+
