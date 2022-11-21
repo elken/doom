@@ -150,6 +150,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#dotenv][dotenv]]
 - [[#yadm][YADM]]
   - [[#tramp-yadm][tramp-yadm]]
+- [[#keychain][Keychain]]
 
 * Setup
 ** Workflow
@@ -1936,4 +1937,26 @@ tramp-yadm to the rescue! This lets me use magit & projectile as expected on the
   (after! magit
     (tramp-yadm-register)
     (map! :leader :desc "Open yadm status" "g p" #'yadm-status)))
+#+end_src
+
+* Keychain
+[[http://www.funtoo.org/wiki/Keychain][Keychain]] is /amazing/. It wraps ssh-agent and gpg-agent so I never have to.
+
+The /problem/ is Emacs doesn't always detect it nicely ... until now!
+
+#+begin_src elisp
+(add-hook! 'doom-init-ui-hook
+  (defun +keychain-startup-hook ()
+    "Load keychain env after emacs"
+    (let* ((ssh (shell-command-to-string "keychain -q --noask --agents ssh --eval"))
+           (gpg (shell-command-to-string "keychain -q --noask --agents gpg --eval")))
+      (list (and ssh
+                 (string-match "SSH_AUTH_SOCK[=\s]\\([^\s;\n]*\\)" ssh)
+                 (setenv       "SSH_AUTH_SOCK" (match-string 1 ssh)))
+            (and ssh
+                 (string-match "SSH_AGENT_PID[=\s]\\([0-9]*\\)?" ssh)
+                 (setenv       "SSH_AGENT_PID" (match-string 1 ssh)))
+            (and gpg
+                 (string-match "GPG_AGENT_INFO[=\s]\\([^\s;\n]*\\)" gpg)
+                 (setenv       "GPG_AGENT_INFO" (match-string 1 gpg)))))))
 #+end_src
