@@ -152,6 +152,15 @@
               ("C-q" . corfu-quick-insert)))
 
 
+(use-package! corfu-echo
+  :after corfu
+  :hook (corfu-mode . corfu-echo-mode))
+
+
+(use-package! corfu-info
+  :after corfu)
+
+
 (use-package! corfu-popupinfo
   :after corfu
   :hook (corfu-mode . corfu-popupinfo-mode))
