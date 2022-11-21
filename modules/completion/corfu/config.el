@@ -37,13 +37,22 @@
             (lambda ()
               (setf (alist-get 'lsp-capf completion-category-defaults) '((styles . (orderless flex))))))
 
+  (defun corfu-move-to-minibuffer ()
+    "Move current completions to the minibuffer"
+    (interactive)
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+
   (map! :map corfu-map
         "C-SPC"    #'corfu-insert-separator
         "C-n"      #'corfu-next
         "C-p"      #'corfu-previous
+        "M-m"      #'corfu-move-to-minibuffer
         (:prefix "C-x"
                  "C-k"     #'cape-dict
                  "C-f"     #'cape-file))
+
   (after! evil
     (advice-add 'corfu--setup :after 'evil-normalize-keymaps)
     (advice-add 'corfu--teardown :after 'evil-normalize-keymaps)
