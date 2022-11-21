@@ -1755,6 +1755,8 @@ Packages to be unpinned or just completely disabled
 (package! ox-chameleon
   :pin "93a2ba6"
   :recipe (:host github :repo "tecosaur/ox-chameleon"))
+(package! apheleia
+ :recipe (:local-repo "~/build/elisp/apheleia"))
 #+end_src
 
 ** embark-vc
@@ -1926,13 +1928,12 @@ tramp-yadm to the rescue! This lets me use magit & projectile as expected on the
 (use-package! tramp-yadm
   :defer t
   :init
-  (defun yadm ()
+  (defun yadm-status ()
     "Invoke magit on the yadm repo"
     (interactive)
     (magit-status "/yadm::~"))
 
   (after! magit
-    (tramp-yadm-register))
-  (after! projectile
-    (add-to-list 'projectile-known-projects "/yadm::~")))
+    (tramp-yadm-register)
+    (map! :leader :desc "Open yadm status" "g p" #'yadm-status)))
 #+end_src
