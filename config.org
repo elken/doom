@@ -1738,6 +1738,9 @@ Packages to be unpinned or just completely disabled
 (unpin! forge)
 (when (modulep! :completion corfu)
   (unpin! evil-collection))
+(package! ox-chameleon
+  :pin "93a2ba6"
+  :recipe (:host github :repo "tecosaur/ox-chameleon"))
 #+end_src
 
 ** embark-vc
