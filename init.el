@@ -150,9 +150,9 @@
        ;;erlang            ; an elegant language for a more civilized age
        ;;ess               ; emacs speaks statistics
        ;;faust             ; dsp, but you get to keep your soul
-       (fsharp
-        +tree-sitter
-        +lsp)                           ; ML stands for Microsoft's Language
+       ;; (fsharp
+       ;;  +tree-sitter
+       ;;  +lsp) ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        (graphql +lsp)      ; Give it a REST
        ;;gdscript          ; the language you waited for
@@ -176,7 +176,7 @@
        (markdown +grip)          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
        ;; nix                              ; I hereby declare "nix geht mehr!"
-       (ocaml +lsp)             ; an objective camel
+       ;; (ocaml +lsp) ; an objective camel
        (org +gnuplot
             +dragndrop
             +journal
@@ -216,8 +216,8 @@
        (yaml +lsp)              ; JSON, but readable
 
        :email
-       (mu4e +gmail
-             +org)
+       ;; (mu4e +gmail
+       ;;       +org)
        ;;notmuch
        ;;(wanderlust +gmail)
 
