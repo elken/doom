@@ -13,6 +13,7 @@
   (tab-always-indent 'complete)
   (corfu-min-width 80)
   (corfu-max-width corfu-min-width)
+  (corfu-preselect-first nil)
   :hook
   (doom-first-buffer . global-corfu-mode)
   :config
