@@ -123,6 +123,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#beamer][Beamer]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
 - [[#languages][Languages]]
+  - [[#lua][Lua]]
   - [[#elisp][ELISP]]
   - [[#lspdap][LSP/DAP]]
     - [[#increase-variable-line-length][Increase variable line length]]
@@ -1636,6 +1637,19 @@ Annoying having to gate these, so let's fix that
 
 * Languages
 Configuration for various programming languages.
+
+** Lua
+First things first; we need a project mode for my awesomewm config.
+
+#+begin_src emacs-lisp
+(def-project-mode! +awesome-config-mode
+  :modes '(lua-mode)
+  :files ("rc.lua")
+  :when (string-prefix-p (expand-file-name "awesome" (xdg-config-home)) default-directory))
+
+(add-hook '+awesome-config-mode-hook #'rainbow-mode)
+#+end_src
+
 
 ** ELISP
 /Finally/ get the completion in elisp working (not sure why it's been so bad for so long...)
