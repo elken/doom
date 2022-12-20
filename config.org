@@ -1928,7 +1928,7 @@ tramp-yadm to the rescue! This lets me use magit & projectile as expected on the
 
 The /problem/ is Emacs doesn't always detect it nicely ... until now!
 
-#+begin_src elisp
+#+begin_src emacs-lisp
 (add-hook! 'doom-init-ui-hook
   (defun +keychain-startup-hook ()
     "Load keychain env after emacs"
