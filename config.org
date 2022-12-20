@@ -1944,3 +1944,8 @@ The /problem/ is Emacs doesn't always detect it nicely ... until now!
                  (string-match "GPG_AGENT_INFO[=\s]\\([^\s;\n]*\\)" gpg)
                  (setenv       "GPG_AGENT_INFO" (match-string 1 gpg)))))))
 #+end_src
+
+* Asciidoc
+#+begin_src elisp
+(package! adoc-mode)
+#+end_src
