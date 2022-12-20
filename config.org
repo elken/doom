@@ -23,9 +23,10 @@ worth skimming from there too.
 Most of this cobbled mess is now mine, and if you do intend to use any of it it
 would be nice if you mentioned me when doing so. It's just polite :)
 
+Depends on Emacs 29 because of some super cool stuff, so if you're not using it
+_please_ don't open any issues about missing variables.
+
 * Table of Contents :TOC_5_gh:noexport:
-- [[#setup][Setup]]
-  - [[#workflow][Workflow]]
 - [[#faq][FAQ]]
 - [[#globals][Globals]]
   - [[#constants-and-variables][Constants and Variables]]
@@ -67,6 +68,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#dired][Dired]]
   - [[#journal][Journal]]
 - [[#graphical-setup][Graphical setup]]
+  - [[#pixel-precision-scrolling][Pixel-precision scrolling]]
   - [[#which-key][which-key]]
   - [[#marginalia][Marginalia]]
     - [[#files][Files]]
@@ -150,10 +152,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
 - [[#yadm][YADM]]
   - [[#tramp-yadm][tramp-yadm]]
 - [[#keychain][Keychain]]
-
-* Setup
-** Workflow
-[[file:images/overview.png]]
+- [[#asciidoc][Asciidoc]]
 
 * FAQ
 None yet because luckily nobody else has seen this spaghetti junction
@@ -492,6 +491,13 @@ convenience binding
 #+end_src
 
 * Graphical setup
+** Pixel-precision scrolling
+Emacs 29 has some new hotness, including a cool new scrolling thing.
+
+#+begin_src emacs-lisp
+(when (version< "29.0.50" emacs-version)
+  (pixel-scroll-precision-mode))
+#+end_src
 ** which-key
 Remove some of the useless =evil-= prefixes from which-key commands.
 
@@ -621,14 +627,14 @@ quite nice so let's just use them here until a good fix is found.
 Load my current flavour-of-the-month colour scheme.
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-theme 'doom-nord)
+(setq doom-theme 'doom-rouge)
 #+END_SRC
 
 Along with a few face overrides (thought about merging upstream but it would
 have sparked a discussion, maybe later)
 
 #+begin_src emacs-lisp
-(custom-theme-set-faces! 'doom-nord
+(custom-theme-set-faces! 'doom-rouge
   `(tree-sitter-hl-face:constructor :foreground ,(doom-color 'blue))
   `(tree-sitter-hl-face:number :foreground ,(doom-color 'magenta))
   `(tree-sitter-hl-face:attribute :foreground ,(doom-color 'magenta) :weight bold)
@@ -699,8 +705,8 @@ Add some transparency when running under awesome
 
 #+begin_src emacs-lisp
 (unless (string= "" (shell-command-to-string "pgrep awesome"))
-  (set-frame-parameter (selected-frame) 'alpha 95)
-  (add-to-list 'default-frame-alist '(alpha . 95)))
+  (set-frame-parameter (selected-frame) 'alpha-background 90)
+  (add-to-list 'default-frame-alist '(alpha-background . 90)))
 #+end_src
 
 * Org Mode
