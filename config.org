@@ -129,7 +129,6 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#increase-variable-line-length][Increase variable line length]]
     - [[#improve-completions][Improve completions]]
 - [[#snippets][Snippets]]
-  - [[#cape][Cape]]
   - [[#snippet-definitions][Snippet definitions]]
     - [[#org-mode-1][Org-mode]]
       - [[#__][__]]
@@ -1681,27 +1680,6 @@ The default completions are quite bad
 I constantly find myself complaining I don't have snippets setup, and yet I
 always forget to set snippets up. [[https://www.youtube.com/watch?v=sc5iTNVEOAg][My own worst enemy]]? Probably. But who's
 keeping score...
-
-** Cape
-Capes are kinda cool
-#+begin_src elisp
-;;(package! cape-yasnippet
-;;   :recipe (:local-repo "~/build/elisp/cape-yasnippet"
-;;            :build (:not compile)))
-(package! cape-yasnhippet
-  :recipe (:host github :repo "elken/cape-yasnippet"))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! cape-yasnippet
-  :after cape
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-yasnippet)
-  (after! lsp-mode
-    (add-hook 'lsp-managed-mode-hook #'cape-yasnippet--lsp))
-  (after! eglot
-    (add-hook 'eglot-managed-mode-hook #'cape-yasnippet--eglot)))
-#+end_src
 
 ** Snippet definitions
 :PROPERTIES:

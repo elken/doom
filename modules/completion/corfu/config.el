@@ -1,5 +1,21 @@
 ;;; completion/corfu/config.el -*- lexical-binding: t; -*-
 
+(defvar +corfu-global-capes
+  '(cape-yasnippet
+    :completion
+    cape-dict)
+  "A list of global capes to be available at all times.
+The key :completion is used to specify where completion candidates should be
+placed, otherwise they come first.")
+
+(defvar +corfu-capf-hosts
+  '(lsp-completion-at-point
+    eglot-completion-at-point
+    elisp-completion-at-point
+    tags-completion-at-point-function)
+  "A prioritised list of host capfs to create a super cape onto from
+  `+corfu-global-capes'.")
+
 (use-package! corfu
   :custom
   (corfu-separator ?\s)
@@ -37,6 +53,21 @@
   (add-hook 'lsp-completion-mode-hook
             (lambda ()
               (setf (alist-get 'lsp-capf completion-category-defaults) '((styles . (orderless flex))))))
+
+  (defun +corfu--load-capes ()
+    "Load all capes specified in `+corfu-global-capes'."
+    (interactive)
+    (when-let ((host (cl-intersection +corfu-capf-hosts completion-at-point-functions)))
+      (setq-local
+       completion-at-point-functions
+       (cl-substitute
+        (apply #'cape-super-capf (cl-substitute (car host) :completion (cl-pushnew :completion +corfu-global-capes)))
+        (car host)
+        completion-at-point-functions))))
+
+  (add-hook 'lsp-mode-hook #'+corfu--load-capes)
+  (add-hook 'eglot-mode-hook #'+corfu--load-capes)
+  (add-hook 'after-change-major-mode-hook #'+corfu--load-capes)
 
   (defun corfu-move-to-minibuffer ()
     "Move current completions to the minibuffer"
@@ -130,14 +161,13 @@
   (map!
    [remap dabbrev-expand] 'cape-dabbrev)
   (add-hook! 'latex-mode-hook (defun +corfu--latex-set-capfs ()
-                                (add-to-list 'completion-at-point-functions #'cape-tex)))
+                                (add-to-list '+corfu-global-capes #'cape-tex)))
   (when (modulep! :checkers spell)
-    (add-to-list 'completion-at-point-functions #'cape-dict)
-    (add-to-list 'completion-at-point-functions #'cape-ispell))
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-keyword t)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev t))
-
+    (add-to-list '+corfu-global-capes #'cape-dict)
+    (add-to-list '+corfu-global-capes #'cape-ispell))
+  (add-to-list '+corfu-global-capes #'cape-file)
+  (add-to-list '+corfu-global-capes #'cape-keyword t)
+  (add-to-list '+corfu-global-capes #'cape-dabbrev t))
 
 (use-package! corfu-history
   :after corfu
