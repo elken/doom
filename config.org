@@ -1916,7 +1916,9 @@ tramp-yadm to the rescue! This lets me use magit & projectile as expected on the
   (defun yadm-status ()
     "Invoke magit on the yadm repo"
     (interactive)
-    (magit-status "/yadm::~"))
+    (magit-status "/yadm::~")
+    (setq-local magit-git-executable (executable-find "yadm"))
+    (setq-local magit-remote-git-executable (executable-find "yadm")))
 
   (after! magit
     (tramp-yadm-register)
