@@ -627,14 +627,14 @@ quite nice so let's just use them here until a good fix is found.
 Load my current flavour-of-the-month colour scheme.
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-theme 'doom-rouge)
+(setq doom-theme 'doom-nord)
 #+END_SRC
 
 Along with a few face overrides (thought about merging upstream but it would
 have sparked a discussion, maybe later)
 
 #+begin_src emacs-lisp
-(custom-theme-set-faces! 'doom-rouge
+(custom-theme-set-faces! 'doom-nord
   `(tree-sitter-hl-face:constructor :foreground ,(doom-color 'blue))
   `(tree-sitter-hl-face:number :foreground ,(doom-color 'magenta))
   `(tree-sitter-hl-face:attribute :foreground ,(doom-color 'magenta) :weight bold)
