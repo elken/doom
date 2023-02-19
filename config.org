@@ -1749,13 +1749,7 @@ Packages to be unpinned or just completely disabled
 
 #+begin_src elisp
 (disable-packages! evil-escape)
-(unpin! vterm)
-(unpin! lsp-mode)
-(when (modulep! :tools lsp +eglot)
-  (unpin! eglot))
 (unpin! forge)
-(when (modulep! :completion corfu)
-  (unpin! evil-collection))
 (package! ox-chameleon
   :pin "93a2ba6"
   :recipe (:host github :repo "tecosaur/ox-chameleon"))
