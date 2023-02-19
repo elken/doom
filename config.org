@@ -38,6 +38,7 @@ _please_ don't open any issues about missing variables.
     - [[#prevent-flickering][Prevent flickering]]
     - [[#clear-snippets-before-loading][Clear snippets before loading]]
     - [[#load-env-after-reload][Load env after reload]]
+    - [[#reload-config-without-sync][Reload config without sync]]
     - [[#bury-compile-buffer][Bury compile buffer]]
     - [[#evil][Evil]]
       - [[#splits][Splits]]
@@ -233,6 +234,28 @@ Most of the time, reloading breaks. So, let's not break.
 
 #+begin_src emacs-lisp
 (add-hook! 'doom-after-reload-hook (doom-load-envvars-file (expand-file-name "env" doom-local-dir) t))
+#+end_src
+
+*** Reload config without sync
+Seems there's a bug I'm too lazy to look into atm on this, so let's just define
+another reload command for me to use that doesn't depend on =doom sync=.
+
+#+begin_src emacs-lisp
+(defun doom/reload-without-sync ()
+  (interactive)
+  (mapc #'require (cdr doom-incremental-packages))
+  (doom-context-with '(reload modules)
+    (doom-run-hooks 'doom-before-reload-hook)
+    (doom-load (file-name-concat doom-user-dir doom-module-init-file) t)
+    (with-demoted-errors "PRIVATE CONFIG ERROR: %s"
+      (general-auto-unbind-keys)
+      (unwind-protect
+          (startup--load-user-init-file nil)
+        (general-auto-unbind-keys t)))
+    (doom-run-hooks 'doom-after-reload-hook)
+    (message "Config successfully reloaded!")))
+
+(define-key! help-map "rc" #'doom/reload-without-sync)
 #+end_src
 
 *** Bury compile buffer
