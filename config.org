@@ -125,6 +125,7 @@ _please_ don't open any issues about missing variables.
       - [[#ox-chameleon][ox-chameleon]]
       - [[#beamer][Beamer]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
+    - [[#auto-export][Auto-export]]
 - [[#languages][Languages]]
   - [[#lua][Lua]]
   - [[#lspdap][LSP/DAP]]
@@ -1667,6 +1668,25 @@ Annoying having to gate these, so let's fix that
 
 #+begin_src emacs-lisp
 (setq org-export-with-sub-superscripts '{})
+#+end_src
+
+*** Auto-export
+Defines a minor mode I can use to automatically export a PDF on save.
+
+#+begin_src emacs-lisp
+(defun +org-auto-export ()
+  (org-beamer-export-to-pdf t))
+
+(define-minor-mode org-auto-export-mode
+  "Toggle auto exporting the Org file."
+  :global nil
+  :lighter ""
+  (if org-auto-export-mode
+      ;; When the mode is enabled
+      (progn
+        (add-hook 'after-save-hook #'+org-auto-export :append :local))
+    ;; When the mode is disabled
+    (remove-hook 'after-save-hook #'+org-auto-export :local)))
 #+end_src
 
 * Languages
