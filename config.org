@@ -695,7 +695,15 @@ have sparked a discussion, maybe later)
   `(php-static-method-call :foreground ,(doom-color 'magenta))
   `(php-method-call :foreground ,(doom-color 'magenta))
   `(php-function-name :foreground ,(doom-lighten 'magenta 0.3))
-  `(corfu-default :font "Iosevka Nerd Font Mono" :background "#272C36" :foreground "#ECEFF4"))
+  `(corfu-default :font "Iosevka Nerd Font Mono" :background ,(face-attribute 'default :background) :foreground ,(face-attribute 'default :foreground))
+  `(markup-title-0-face :foreground ,(doom-color 'blue) :height 1.2)
+  `(markup-title-1-face :foreground ,(doom-color 'magenta) :height 1.1)
+  `(markup-title-2-face :foreground ,(doom-color 'violet) :height 1.05)
+  `(markup-title-3-face :foreground ,(doom-lighten (doom-color 'blue) 0.25) :height 1.0)
+  `(markup-title-4-face :foreground ,(doom-lighten (doom-color 'magenta) 0.25) :height 1.1)
+  `(markup-verbatim-face :background nil)
+  `(markup-list-face :background nil)
+  `(markup-internal-reference-face :foreground ,(face-attribute 'font-lock-comment-face :foreground)))
 #+end_src
 
 Change the default banner (need to add the ASCII banner at some point)
@@ -788,7 +796,7 @@ it makes sense to use the defined fixed width font.
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Montserrat" :weight 'regular :height (cdr face)))
+    (set-face-attribute (car face) nil :font "Montserrat" :weight 'regular :height (cdr face) :slant 'unspecified))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-tag nil :foreground nil :inherit '(shadow fixed-pitch) :weight 'bold)
