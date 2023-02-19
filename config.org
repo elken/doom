@@ -1982,10 +1982,7 @@ Better handle setting of environment variables needed for various tools
     (add-hook! 'doom-init-ui-hook
       (defun +dotenv-startup-hook ()
         "Load .env after starting emacs"
-        (dotenv-update-project-env doom-user-dir)
-        (customize-set-variable 'jiralib-url (getenv "JIRALIB_URL"))
-        (customize-set-variable 'jira-workflow-harvest-service-icon-url (getenv "JIRA_WORKFLOW_SERVICE_ICON_URL"))
-        (customize-set-variable 'jira-workflow-harvest-service-name (replace-regexp-in-string "http[s]://" "" jiralib-url)))))
+        (dotenv-update-project-env doom-user-dir))))
   :config
   (add-hook! 'projectile-after-switch-project-hook
     (defun +dotenv-projectile-hook ()
