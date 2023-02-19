@@ -926,6 +926,10 @@ proper value.
 ** Mixed pitch
 Enable =mixed-pitch-mode= to enable the more readable fonts where it makes sense.
 
+#+begin_src elisp
+(package! mixed-pitch)
+#+end_src
+
 #+begin_src emacs-lisp
 (setq +zen-mixed-pitch-modes '(org-mode LaTeX-mode markdown-mode gfm-mode Info-mode rst-mode adoc-mode))
 
