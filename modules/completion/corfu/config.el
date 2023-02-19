@@ -1,9 +1,7 @@
 ;;; completion/corfu/config.el -*- lexical-binding: t; -*-
 
 (defvar +corfu-global-capes
-  '(cape-yasnippet
-    :completion
-    cape-dict)
+  '(:completion)
   "A list of global capes to be available at all times.
 The key :completion is used to specify where completion candidates should be
 placed, otherwise they come first.")
@@ -34,7 +32,13 @@ placed, otherwise they come first.")
   (doom-first-buffer . global-corfu-mode)
   :config
   (when (modulep! +minibuffer)
-    (add-hook 'minibuffer-setup-hook #'+corfu--enable-in-minibuffer))
+    (add-hook! 'minibuffer-setup-hook
+      (defun corfu-move-to-minibuffer ()
+        "Move current completions to the minibuffer"
+        (interactive)
+        (let ((completion-extra-properties corfu--extra)
+              completion-cycle-threshold completion-cycling)
+          (apply #'consult-completion-in-region completion-in-region--data)))))
 
   ;; Dirty hack to get c completion running
   ;; Discussion in https://github.com/minad/corfu/issues/34
@@ -44,37 +48,20 @@ placed, otherwise they come first.")
           :i [remap c-indent-line-or-region] #'completion-at-point))
 
   ;; Reset lsp-completion provider
-  (add-hook 'doom-init-modules-hook
-            (lambda ()
-              (after! lsp-mode
-                (setq lsp-completion-provider :none))))
+  (after! lsp-mode
+    (setq lsp-completion-provider :none))
 
-  ;; Set orderless filtering for LSP-mode completions
-  (add-hook 'lsp-completion-mode-hook
-            (lambda ()
-              (setf (alist-get 'lsp-capf completion-category-defaults) '((styles . (orderless flex))))))
-
-  (defun +corfu--load-capes ()
-    "Load all capes specified in `+corfu-global-capes'."
-    (interactive)
-    (when-let ((host (cl-intersection +corfu-capf-hosts completion-at-point-functions)))
-      (setq-local
-       completion-at-point-functions
-       (cl-substitute
-        (apply #'cape-super-capf (cl-substitute (car host) :completion (cl-pushnew :completion +corfu-global-capes)))
-        (car host)
-        completion-at-point-functions))))
-
-  (add-hook 'lsp-mode-hook #'+corfu--load-capes)
-  (add-hook 'eglot-mode-hook #'+corfu--load-capes)
-  (add-hook 'after-change-major-mode-hook #'+corfu--load-capes)
-
-  (defun corfu-move-to-minibuffer ()
-    "Move current completions to the minibuffer"
-    (interactive)
-    (let ((completion-extra-properties corfu--extra)
-          completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
+  (add-hook! '(lsp-mode-hook eglot-mode-hook after-change-major-mode-hook)
+    (defun +corfu--load-capes ()
+      "Load all capes specified in `+corfu-global-capes'."
+      (interactive)
+      (when-let ((host (cl-intersection +corfu-capf-hosts completion-at-point-functions)))
+        (setq-local
+         completion-at-point-functions
+         (cl-substitute
+          (apply #'cape-super-capf (cl-substitute (car host) :completion (cl-pushnew :completion +corfu-global-capes)))
+          (car host)
+          completion-at-point-functions)))))
 
   (map! :map corfu-map
         "C-SPC"    #'corfu-insert-separator
@@ -106,7 +93,6 @@ placed, otherwise they come first.")
   :when (modulep! +orderless)
   :init
   (setq completion-styles '(orderless partial-completion)
-        completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
 
@@ -115,10 +101,11 @@ placed, otherwise they come first.")
   :when (modulep! +icons)
   :custom
   (kind-icon-default-face 'corfu-default)
+  (kind-icon-use-icons t)
+  (svg-lib-icons-dir (expand-file-name "svg-lib" doom-cache-dir))
+  :hook (doom-load-theme . kind-icon-reset-cache)
   :config
-  (setq kind-icon-use-icons t
-        svg-lib-icons-dir (expand-file-name "svg-lib" doom-cache-dir)
-        kind-icon-mapping
+  (setq kind-icon-mapping
         '((array "a" :icon "code-brackets" :face font-lock-variable-name-face)
           (boolean "b" :icon "circle-half-full" :face font-lock-builtin-face)
           (class "c" :icon "view-grid-plus-outline" :face font-lock-type-face)
@@ -151,7 +138,6 @@ placed, otherwise they come first.")
           (unit "u" :icon "ruler-square" :face shadow)
           (value "v" :icon "numeric-1-box-multiple-outline" :face font-lock-builtin-face)
           (variable "va" :icon "adjust" :face font-lock-variable-name-face)))
-  (add-hook 'doom-load-theme-hook #'kind-icon-reset-cache)
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 
@@ -160,21 +146,28 @@ placed, otherwise they come first.")
   :init
   (map!
    [remap dabbrev-expand] 'cape-dabbrev)
-  (add-hook! 'latex-mode-hook (defun +corfu--latex-set-capfs ()
-                                (add-to-list '+corfu-global-capes #'cape-tex)))
-  (when (modulep! :checkers spell)
-    (add-to-list '+corfu-global-capes #'cape-dict t)
-    (add-to-list '+corfu-global-capes #'cape-ispell t))
+
+  (add-hook! 'latex-mode-hook
+    (defun +corfu--latex-set-capfs ()
+      (add-to-list '+corfu-global-capes #'cape-tex)))
+
+  (add-hook! '(text-mode-hook org-mode-hook)
+    (defun +corfu--set-spell-capfs ()
+      (add-to-list '+corfu-global-capes #'cape-dict t)
+      (add-to-list '+corfu-global-capes #'cape-ispell t)))
+
   (add-to-list '+corfu-global-capes #'cape-file)
   (add-to-list '+corfu-global-capes #'cape-keyword t)
   (add-to-list '+corfu-global-capes #'cape-dabbrev t))
 
+
 (use-package! corfu-history
   :after corfu
-  :hook (corfu-mode . (lambda ()
-                        (corfu-history-mode 1)
-                        (savehist-mode 1)
-                        (add-to-list 'savehist-additional-variables 'corfu-history))))
+  :init
+  (after! savehist
+    (add-to-list 'savehist-additional-variables 'corfu-history))
+  :hook (corfu-mode . corfu-history-mode))
+
 
 (use-package! corfu-quick
   :after corfu
@@ -194,6 +187,12 @@ placed, otherwise they come first.")
 (use-package! corfu-popupinfo
   :after corfu
   :hook (corfu-mode . corfu-popupinfo-mode))
+
+
+(use-package! cape-yasnippet
+  :after corfu
+  :init
+  (add-to-list '+corfu-global-capes #'cape-yasnippet))
 
 
 (use-package! evil-collection-corfu
