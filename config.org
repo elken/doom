@@ -144,15 +144,17 @@ _please_ don't open any issues about missing variables.
     - [[#fix-in-web-mode][Fix in web-mode]]
   - [[#cucumber][Cucumber]]
   - [[#rpm-spec][RPM Spec]]
+  - [[#autothemer][Autothemer]]
+  - [[#bamboo][Bamboo]]
+  - [[#yadm][YADM]]
+    - [[#tramp-yadm][tramp-yadm]]
+  - [[#keychain][Keychain]]
+  - [[#asciidoc][Asciidoc]]
+  - [[#graphviz][Graphviz]]
+  - [[#exercism][Exercism]]
 - [[#spelling][Spelling]]
-- [[#graphviz][Graphviz]]
-- [[#exercism][Exercism]]
 - [[#local-settings][Local settings]]
   - [[#dotenv][dotenv]]
-- [[#yadm][YADM]]
-  - [[#tramp-yadm][tramp-yadm]]
-- [[#keychain][Keychain]]
-- [[#asciidoc][Asciidoc]]
 
 * FAQ
 None yet because luckily nobody else has seen this spaghetti junction
@@ -1838,19 +1840,83 @@ Needed for rpm files to not be treated poorly (there, there)
   :mode "\\.spec\\(\\.in\\)?$")
 #+end_src
 
-* Spelling
+** Autothemer
+Needed for a very WIP theme, otherwise not needed.
 
-#+begin_src emacs-lisp
-(setq ispell-program-name "aspell"
-      ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
-      ispell-dictionary "en"
-      ispell-personal-dictionary "~/Nextcloud/dict")
-
-(after! cape
-  (setq cape-dict-file (if (file-exists-p ispell-personal-dictionary) ispell-personal-dictionary cape-dict-file)))
+#+begin_src elisp
+(package! autothemer)
 #+end_src
 
-* Graphviz
+** Bamboo
+Setup for my package for integrating with Bamboo HR
+
+#+begin_src elisp
+(package! bhr
+  :recipe
+  (:local-repo "~/build/elisp/bamboo.el/"
+   :build (:not compile)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! bhr
+  :commands (bhr-view-timesheet bhr-submit-multiple))
+#+end_src
+
+** YADM
+[[https://yadm.io][yadm]] is my preferred dotfile manager of choice, but by default because of the nature of how the repo is handled; it's quite a pain to manage from Emacs.
+
+*** tramp-yadm
+tramp-yadm to the rescue! This lets me use magit & projectile as expected on the repo; allowing me to manage dotfile changes with the superior git client.
+
+#+begin_src elisp
+(package! tramp-yadm
+  :recipe (:host github :repo "seanfarley/tramp-yadm"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! tramp-yadm
+  :defer t
+  :init
+  (defun yadm-status ()
+    "Invoke magit on the yadm repo"
+    (interactive)
+    (magit-status "/yadm::~")
+    (setq-local magit-git-executable (executable-find "yadm"))
+    (setq-local magit-remote-git-executable (executable-find "yadm")))
+
+  (after! magit
+    (tramp-yadm-register)
+    (map! :leader :desc "Open yadm status" "g p" #'yadm-status)))
+#+end_src
+
+** Keychain
+[[http://www.funtoo.org/wiki/Keychain][Keychain]] is /amazing/. It wraps ssh-agent and gpg-agent so I never have to.
+
+The /problem/ is Emacs doesn't always detect it nicely ... until now!
+
+#+begin_src emacs-lisp
+(add-hook! 'doom-init-ui
+  (defun +keychain-startup-hook ()
+    "Load keychain env after emacs"
+    (let* ((ssh (shell-command-to-string "keychain -q --noask --agents ssh --eval"))
+           (gpg (shell-command-to-string "keychain -q --noask --agents gpg --eval")))
+      (list (and ssh
+                 (string-match "SSH_AUTH_SOCK[=\s]\\([^\s;\n]*\\)" ssh)
+                 (setenv       "SSH_AUTH_SOCK" (match-string 1 ssh)))
+            (and ssh
+                 (string-match "SSH_AGENT_PID[=\s]\\([0-9]*\\)?" ssh)
+                 (setenv       "SSH_AGENT_PID" (match-string 1 ssh)))
+            (and gpg
+                 (string-match "GPG_AGENT_INFO[=\s]\\([^\s;\n]*\\)" gpg)
+                 (setenv       "GPG_AGENT_INFO" (match-string 1 gpg)))))))
+#+end_src
+
+** Asciidoc
+#+begin_src elisp
+(package! adoc-mode)
+#+end_src
+
+** Graphviz
 Some config to help with graphviz
 
 #+begin_src elisp
@@ -1864,7 +1930,7 @@ Some config to help with graphviz
     (require 'company-graphviz-dot)))
 #+end_src
 
-* Exercism
+** Exercism
 Exercism is a useful site for learning a programming language by performing
 various exercises. You can opt to use either an in-browser editor or your own
 via a local CLI.
@@ -1880,6 +1946,18 @@ Which do you think I want?
 #+begin_src emacs-lisp
 (use-package! exercism-modern
   :commands (exercism-modern-jump exercism-modern-view-tracks))
+#+end_src
+
+* Spelling
+
+#+begin_src emacs-lisp
+(setq ispell-program-name "aspell"
+      ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
+      ispell-dictionary "en"
+      ispell-personal-dictionary "~/Nextcloud/dict")
+
+(after! cape
+  (setq cape-dict-file (if (file-exists-p ispell-personal-dictionary) ispell-personal-dictionary cape-dict-file)))
 #+end_src
 
 * Local settings
@@ -1913,58 +1991,4 @@ Better handle setting of environment variables needed for various tools
     (defun +dotenv-projectile-hook ()
       "Load .env after changing projects."
       (dotenv-update-project-env (projectile-project-root)))))
-#+end_src
-
-* YADM
-[[https://yadm.io][yadm]] is my preferred dotfile manager of choice, but by default because of the nature of how the repo is handled; it's quite a pain to manage from Emacs.
-
-** tramp-yadm
-tramp-yadm to the rescue! This lets me use magit & projectile as expected on the repo; allowing me to manage dotfile changes with the superior git client.
-
-#+begin_src elisp
-(package! tramp-yadm
-  :recipe (:host github :repo "seanfarley/tramp-yadm"))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! tramp-yadm
-  :defer t
-  :init
-  (defun yadm-status ()
-    "Invoke magit on the yadm repo"
-    (interactive)
-    (magit-status "/yadm::~")
-    (setq-local magit-git-executable (executable-find "yadm"))
-    (setq-local magit-remote-git-executable (executable-find "yadm")))
-
-  (after! magit
-    (tramp-yadm-register)
-    (map! :leader :desc "Open yadm status" "g p" #'yadm-status)))
-#+end_src
-
-* Keychain
-[[http://www.funtoo.org/wiki/Keychain][Keychain]] is /amazing/. It wraps ssh-agent and gpg-agent so I never have to.
-
-The /problem/ is Emacs doesn't always detect it nicely ... until now!
-
-#+begin_src emacs-lisp
-(add-hook! 'doom-init-ui-hook
-  (defun +keychain-startup-hook ()
-    "Load keychain env after emacs"
-    (let* ((ssh (shell-command-to-string "keychain -q --noask --agents ssh --eval"))
-           (gpg (shell-command-to-string "keychain -q --noask --agents gpg --eval")))
-      (list (and ssh
-                 (string-match "SSH_AUTH_SOCK[=\s]\\([^\s;\n]*\\)" ssh)
-                 (setenv       "SSH_AUTH_SOCK" (match-string 1 ssh)))
-            (and ssh
-                 (string-match "SSH_AGENT_PID[=\s]\\([0-9]*\\)?" ssh)
-                 (setenv       "SSH_AGENT_PID" (match-string 1 ssh)))
-            (and gpg
-                 (string-match "GPG_AGENT_INFO[=\s]\\([^\s;\n]*\\)" gpg)
-                 (setenv       "GPG_AGENT_INFO" (match-string 1 gpg)))))))
-#+end_src
-
-* Asciidoc
-#+begin_src elisp
-(package! adoc-mode)
 #+end_src
