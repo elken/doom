@@ -16,18 +16,12 @@ placed, otherwise they come first.")
 
 (use-package! corfu
   :custom
-  (corfu-separator ?\s)
   (corfu-auto t)
-  (corfu-auto-delay 0.3)
   (corfu-on-exact-match nil)
-  (corfu-quit-no-match t)
   (corfu-cycle t)
   (corfu-auto-prefix 2)
   (completion-cycle-threshold 1)
   (tab-always-indent 'complete)
-  (corfu-min-width 80)
-  (corfu-max-width corfu-min-width)
-  (corfu-preselect-first nil)
   :hook
   (doom-first-buffer . global-corfu-mode)
   :config
@@ -149,10 +143,12 @@ placed, otherwise they come first.")
 
   (add-hook! 'latex-mode-hook
     (defun +corfu--latex-set-capfs ()
+      (make-local-variable '+corfu-global-capes)
       (add-to-list '+corfu-global-capes #'cape-tex)))
 
   (add-hook! '(text-mode-hook org-mode-hook)
     (defun +corfu--set-spell-capfs ()
+      (make-local-variable '+corfu-global-capes)
       (add-to-list '+corfu-global-capes #'cape-dict t)
       (add-to-list '+corfu-global-capes #'cape-ispell t)))
 
