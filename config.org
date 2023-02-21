@@ -153,6 +153,7 @@ _please_ don't open any issues about missing variables.
   - [[#asciidoc][Asciidoc]]
   - [[#graphviz][Graphviz]]
   - [[#exercism][Exercism]]
+  - [[#litable][litable]]
 - [[#spelling][Spelling]]
 - [[#local-settings][Local settings]]
   - [[#dotenv][dotenv]]
@@ -1968,6 +1969,25 @@ Which do you think I want?
 #+begin_src emacs-lisp
 (use-package! exercism-modern
   :commands (exercism-modern-jump exercism-modern-view-tracks))
+#+end_src
+
+** litable
+This is literally the coolest package ever...
+
+#+begin_src elisp
+(package! litable
+  :recipe (:host github :repo "Fuco1/litable"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! litable
+  :custom
+  (litable-list-file (expand-file-name "litable-lists.el" doom-cache-dir))
+  :init
+  (map! :localleader
+        :map emacs-lisp-mode-map
+        (:prefix ("t" . "toggle")
+          "l" #'litable-mode)))
 #+end_src
 
 * Spelling
