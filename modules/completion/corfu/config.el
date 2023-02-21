@@ -22,6 +22,7 @@ placed, otherwise they come first.")
   (corfu-auto-prefix 2)
   (completion-cycle-threshold 1)
   (tab-always-indent 'complete)
+  (corfu-min-width 50)
   :hook
   (doom-first-buffer . global-corfu-mode)
   :config
