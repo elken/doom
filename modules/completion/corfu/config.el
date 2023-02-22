@@ -192,6 +192,15 @@ placed, otherwise they come first.")
   (add-to-list '+corfu-global-capes #'cape-yasnippet))
 
 
+(use-package! cape-use-package
+  :after corfu
+  :init
+  (add-hook! 'emacs-lisp-mode-hook
+    (defun +corfu--emacs-lisp-set-capfs ()
+      (make-local-variable '+corfu-global-capes)
+      (add-to-list '+corfu-global-capes #'cape-use-package))))
+
+
 (use-package! evil-collection-corfu
   :when (modulep! :editor evil +everywhere)
   :defer t

@@ -18,3 +18,6 @@
   :recipe (:type git :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"))
 (package! corfu-doc-terminal
   :recipe (:type git :repo "https://codeberg.org/akib/emacs-corfu-doc-terminal.git"))
+(package! cape-use-package
+  :recipe (:host github :repo "elken/cape-use-package"))
+
