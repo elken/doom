@@ -6,9 +6,6 @@
 #+caption: Banner
 #+latex_class: chameleon
 #+html_content_class: chameleon
-#+html_head: <link rel='stylesheet' type='text/css' href='static/index.css' />
-#+html_head: <link rel='shortcut icon' type='image/png' href='https://raw.githubusercontent.com/eccentric-j/doom-icon/master/cute-doom/src/doom.iconset/icon_32x32.png'>
-
 [[file:images/banner.png]]
 
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
@@ -80,6 +77,7 @@ _please_ don't open any issues about missing variables.
     - [[#defaults][Defaults]]
     - [[#ligatures][Ligatures]]
   - [[#theme][Theme]]
+  - [[#banner][Banner]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
 - [[#org-mode][Org Mode]]
@@ -707,6 +705,7 @@ have sparked a discussion, maybe later)
   `(markup-internal-reference-face :foreground ,(face-attribute 'font-lock-comment-face :foreground)))
 #+end_src
 
+** Banner
 Change the default banner (need to add the ASCII banner at some point)
 
 #+BEGIN_SRC emacs-lisp
@@ -1778,10 +1777,6 @@ Packages to be unpinned or just completely disabled
 
 #+begin_src elisp
 (disable-packages! evil-escape)
-(unpin! forge)
-(package! ox-chameleon
-  :pin "93a2ba6"
-  :recipe (:host github :repo "tecosaur/ox-chameleon"))
 (package! apheleia
  :recipe (:local-repo "~/build/elisp/apheleia"))
 #+end_src
