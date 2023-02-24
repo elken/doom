@@ -1870,9 +1870,7 @@ Setup for my package for integrating with Bamboo HR
 
 #+begin_src elisp
 (package! bhr
-  :recipe
-  (:local-repo "~/build/elisp/bamboo.el/"
-   :build (:not compile)))
+  :recipe (:host github :repo "elken/bhr.el"))
 #+end_src
 
 #+begin_src emacs-lisp
