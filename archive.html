@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2023-02-25 -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Archive</title>
+<meta name="author" content="Ellis Kenyő" />
+<meta name="generator" content="Org Mode" />
+<link rel='stylesheet' type='text/css' href='static/index.css' />
+<link rel='shortcut icon' type='image/png' href='https://raw.githubusercontent.com/eccentric-j/doom-icon/master/cute-doom/src/doom.iconset/icon_32x32.png'>
+<script src='static/index.js'></script>
+</head>
+<body>
+<main id="content" class="content">
+<header>
+<h1 class="title">Archive</h1>
+</header><nav id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgbdaa8cf">Archive</a>
+<ul>
+<li><a href="#org39b3c8d">EXWM Setup</a>
+<ul>
+<li><a href="#org8e369e6">modules/ui/exwm</a></li>
+<li><a href="#org7f7179c">Session</a></li>
+<li><a href="#orgf1c027d">start.sh / start-debug.sh</a></li>
+</ul>
+</li>
+<li><a href="#org54a3368">Tab-bar-mode</a></li>
+<li><a href="#orgf3add28">Languages</a>
+<ul>
+<li><a href="#orgf3b6990">Dart</a></li>
+<li><a href="#org778ea4b">Rust</a></li>
+<li><a href="#orgbf6a90f">C#</a></li>
+<li><a href="#orgbce771a">Ignore files in xref</a></li>
+<li><a href="#orgb81abba">Ignore directories</a></li>
+<li><a href="#orgbb06972">PHP</a>
+<ul>
+<li><a href="#org1740361">Web-mode setup</a></li>
+<li><a href="#orgbb1902b">Intelephense</a></li>
+<li><a href="#org8b383b8">Eglot</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org821005a">Snippets</a>
+<ul>
+<li><a href="#orga87a424">PHP-Mode</a>
+<ul>
+<li><a href="#orgc2a1694">function</a></li>
+<li><a href="#orged6288d">php</a></li>
+</ul>
+</li>
+<li><a href="#org7885085">kotlin-mode</a>
+<ul>
+<li><a href="#orgeb7b6af">__</a></li>
+</ul>
+</li>
+<li><a href="#org679ca37">+php-laravel-mode</a>
+<ul>
+<li><a href="#org0e27acd">.yas-parents.el</a></li>
+<li><a href="#org3a974b9">__</a></li>
+<li><a href="#orga6c1813">migration</a></li>
+<li><a href="#org6cb8c1d">scope</a></li>
+</ul>
+</li>
+<li><a href="#org9c42661">laravel-mode</a></li>
+</ul>
+</li>
+<li><a href="#orgb3254d2">Slack</a></li>
+<li><a href="#org4332fb1">Reaper</a></li>
+<li><a href="#orgf983079">Jira</a>
+<ul>
+<li><a href="#orgebe9e07">org-jira</a></li>
+<li><a href="#org0981c01">jira-workflow</a></li>
+</ul>
+</li>
+<li><a href="#orge667267">Translate</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<p>
+A listing of various snippets no longer in use but maintain for historical significance.
+</p>
+
+<section id="outline-container-orgbdaa8cf" class="outline-2">
+<h2 id="orgbdaa8cf">Archive</h2>
+<div class="outline-text-2" id="text-orgbdaa8cf">
+</div>
+<div id="outline-container-org39b3c8d" class="outline-3">
+<h3 id="org39b3c8d">EXWM Setup</h3>
+<div class="outline-text-3" id="text-org39b3c8d">
+<p>
+One of the former usecases for this config is <code>exwm</code> which was pulled from a number of files in the current environment. Loading <code>exwm</code> is a simple case of enabling the exwm module, although it&rsquo;s <i>wildly</i> untested and is basically hardcoded to just work for me. Any input is welcome, although unlikely to make it into <i>this</i> module (until I stop being lazy and attempt to make it better for upstream&#x2026;.)
+</p>
+
+<p>
+Due to a number of issues with Emacs itself though (mostly around the single-threaded nature and the ease of which you can lock up your whole WM), this has been abandoned in favour of Awesomewm.
+</p>
+</div>
+
+<div id="outline-container-org8e369e6" class="outline-4">
+<h4 id="org8e369e6">modules/ui/exwm</h4>
+<div class="outline-text-4" id="text-org8e369e6">
+<p>
+The primary lisp file where the bulk of the configuration is held, with everything from my process manager to a now-playing segment. Below are some usage screenshots.
+Standard doom module layout, nothing fishy going on. For those unfamiliar,
+</p>
+
+<ul class="org-ul">
+<li><code>init.el</code> is loaded before anything else really, which is important to properly check if the flag exists to load the exwm code as early as possible</li>
+<li><code>config.el</code> is the main bread and butter, all the config lives here (surprisingly)</li>
+<li><code>doctor.el</code> is currently just used for detecting missing exe&rsquo;s, by plugging into <code>doom doctor</code></li>
+<li><code>packages.el</code> is a list of extra packages to be installed by doom&rsquo;s package manager</li>
+</ul>
+
+
+<figure id="org42a2f70">
+<img src="images/kill-process.png" alt="kill-process.png">
+
+</figure>
+
+
+<figure id="orgc9a74c1">
+<img src="images/tray.png" alt="tray.png">
+
+</figure>
+
+<p>
+Transparency is handled both through and via <a href="exwm/picom.conf">picom</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7f7179c" class="outline-4">
+<h4 id="org7f7179c">Session</h4>
+<div class="outline-text-4" id="text-org7f7179c">
+<p>
+For the sake of simplicity, I use a slightly modified version of <a href="https://github.com/WJCFerguson/exwm-gnome-flashback">GNOME Flashback</a> to run the startup scripts. It also gives me ootb access to things like <code>pinentry</code>, the various password stores, <code>gnome-screensaver</code> lock screen and the useful screenshot tool.
+</p>
+
+<p>
+As such, everything is themed around <a href="https://nordtheme.com">Nord</a>.
+</p>
+
+<p>
+Over time and due to various issues, I have been migrating to a plain <code>exwm</code> session but I haven&rsquo;t yet settled on the best approach.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf1c027d" class="outline-4">
+<h4 id="orgf1c027d">start.sh / start-debug.sh</h4>
+<div class="outline-text-4" id="text-orgf1c027d">
+<p>
+The scripts responsible for starting up exwm in the right way, including env variables and picom.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org54a3368" class="outline-3">
+<h3 id="org54a3368">Tab-bar-mode</h3>
+<div class="outline-text-3" id="text-org54a3368">
+<p>
+Acting as a global modeline (of sorts), this could end up being quite useful but
+for now this is just testing.
+</p>
+
+<p>
+Due to issues with window managers and no longer needing the extra info, the
+tab-bar-mode setup has been archived.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">reaper-get-running-timer-duration</span> <span class="org-rainbow-delimiters-depth-2">()</span>
+  <span class="org-doc">"Return duration of current running timer."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>reaper-with-buffer
+   <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">when</span> reaper-running-timer
+     <span class="org-rainbow-delimiters-depth-4">(</span>reaper--hours-to-time
+      <span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-rainbow-delimiters-depth-3">(</span>entry <span class="org-rainbow-delimiters-depth-4">(</span>assoc reaper-running-timer reaper-timeentries<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+        <span class="org-rainbow-delimiters-depth-2">(</span>cdr <span class="org-rainbow-delimiters-depth-3">(</span>assoc <span class="org-builtin">:hours</span> entry<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">reaper-modeline-vanilla</span> <span class="org-rainbow-delimiters-depth-2">()</span>
+  <span class="org-doc">"Return modeline string for vanilla emacs."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">when</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">and</span> <span class="org-rainbow-delimiters-depth-4">(</span>string= <span class="org-string">""</span> reaper-api-key<span class="org-rainbow-delimiters-depth-4">)</span>
+             <span class="org-rainbow-delimiters-depth-4">(</span>string= <span class="org-string">""</span> reaper-account-id<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-comment-delimiter">;; </span><span class="org-comment"><span class="org-bold"><span class="org-warning">TODO</span></span></span><span class="org-comment"> Make this a function
+</span>    <span class="org-rainbow-delimiters-depth-3">(</span>dotenv-update-project-env doom-user-dir<span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span>customize-set-variable <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">reaper-api-key</span> <span class="org-rainbow-delimiters-depth-4">(</span>getenv <span class="org-string">"REAPER_API_KEY"</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span>customize-set-variable <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">reaper-account-id</span> <span class="org-rainbow-delimiters-depth-4">(</span>getenv <span class="org-string">"REAPER_ACCOUNT_ID"</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">when-let</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>note <span class="org-rainbow-delimiters-depth-1">(</span>reaper-get-running-timer-note<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+             <span class="org-rainbow-delimiters-depth-4">(</span>timer <span class="org-rainbow-delimiters-depth-1">(</span>reaper-get-running-timer-duration<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span>format <span class="org-string">" [&#61463; %s | %s] "</span> <span class="org-rainbow-delimiters-depth-4">(</span>string-trim note<span class="org-rainbow-delimiters-depth-4">)</span> timer<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defvar</span> <span class="org-variable-name">reaper-modeline--timer</span> nil<span class="org-rainbow-delimiters-depth-1">)</span>
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">reaper-modeline-timer</span> <span class="org-rainbow-delimiters-depth-2">()</span>
+  <span class="org-doc">"Start/stop the time for updating reaper doom-modeline segment."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">if</span> <span class="org-rainbow-delimiters-depth-3">(</span>timerp reaper-modeline--timer<span class="org-rainbow-delimiters-depth-3">)</span>
+      <span class="org-rainbow-delimiters-depth-3">(</span>cancel-timer reaper-modeline--timer<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+    <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">setq</span> reaper-modeline--timer
+          <span class="org-rainbow-delimiters-depth-3">(</span>run-with-timer
+           <span class="org-highlight-numbers-number">1</span>
+           <span class="org-highlight-numbers-number">60</span>
+           <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">lambda</span> <span class="org-rainbow-delimiters-depth-1">()</span>
+             <span class="org-rainbow-delimiters-depth-1">(</span>reaper-with-buffer
+              <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">setq</span> reaper-timeentries nil<span class="org-rainbow-delimiters-depth-2">)</span>
+              <span class="org-rainbow-delimiters-depth-2">(</span>reaper-refresh-entries<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> <span class="org-rainbow-delimiters-depth-2">(</span>reaper dotenv<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">unless</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">and</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">or</span> <span class="org-rainbow-delimiters-depth-1">(</span>null reaper-api-key<span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">(</span>string= <span class="org-string">""</span> reaper-api-key<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+               <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">or</span> <span class="org-rainbow-delimiters-depth-1">(</span>null reaper-account-id<span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">(</span>string= <span class="org-string">""</span> reaper-account-id<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span>reaper-modeline-timer<span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span>add-to-list <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">global-mode-string</span> <span class="org-highlight-quoted-quote">'</span><span class="org-rainbow-delimiters-depth-4">(</span><span class="org-builtin">:eval</span> <span class="org-rainbow-delimiters-depth-1">(</span>reaper-modeline-vanilla<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-comment-delimiter">;; </span><span class="org-comment">(customize-set-variable 'tab-bar-format '(tab-bar-format-global))
+</span><span class="org-comment-delimiter">;; </span><span class="org-comment">(customize-set-variable 'tab-bar-mode t)
+</span><span class="org-comment-delimiter">;; </span><span class="org-comment">(when tab-bar-mode
+</span><span class="org-comment-delimiter">;;   </span><span class="org-comment">(setq display-time-format " [&#61747;  %H:%M %d/%m/%y]"
+</span><span class="org-comment-delimiter">;;         </span><span class="org-comment">display-time-default-load-average nil)
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">(display-time-mode 1))</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgf3add28" class="outline-3">
+<h3 id="orgf3add28">Languages</h3>
+<div class="outline-text-3" id="text-orgf3add28">
+</div>
+<div id="outline-container-orgf3b6990" class="outline-4">
+<h4 id="orgf3b6990">Dart</h4>
+<div class="outline-text-4" id="text-orgf3b6990">
+<p>
+Simple hook/project mode to update translations on save.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> lsp-dart
+  <span class="org-rainbow-delimiters-depth-2">(</span>customize-set-variable <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">lsp-dart-dap-extension-version</span> <span class="org-string">"3.46.1"</span><span class="org-rainbow-delimiters-depth-2">)</span>
+
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">defun</span> <span class="org-function-name">lsp-dart--intl-update</span> <span class="org-rainbow-delimiters-depth-3">()</span>
+    <span class="org-doc">"Update translations on save."</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">when</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">and</span> +dart-intl-mode
+               buffer-file-name
+               <span class="org-rainbow-delimiters-depth-1">(</span>string-search <span class="org-string">"lib/l10n"</span> buffer-file-name<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>lsp-dart--run-command <span class="org-rainbow-delimiters-depth-1">(</span>lsp-dart-flutter-command<span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-string">"pub run intl_utils:generate"</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">def-project-mode!</span> +dart-intl-mode
+    <span class="org-builtin">:modes</span> <span class="org-highlight-quoted-quote">'</span><span class="org-rainbow-delimiters-depth-3">(</span>json-mode<span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-builtin">:files</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">and</span> <span class="org-string">"pubspec.yaml"</span> <span class="org-string">"lib/l10n"</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-builtin">:on-enter</span> <span class="org-rainbow-delimiters-depth-3">(</span>add-hook <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">after-save-hook</span> <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">lsp-dart--intl-update</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-builtin">:on-exit</span> <span class="org-rainbow-delimiters-depth-3">(</span>remove-hook <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">after-save-hook</span> <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">lsp-dart--intl-update</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">setq</span> lsp-dart-dap-flutter-hot-reload-on-save t<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org778ea4b" class="outline-4">
+<h4 id="org778ea4b">Rust</h4>
+<div class="outline-text-4" id="text-org778ea4b">
+<p>
+Rust is the hot new thing, guess I better jump on the bandwagon if I want to stay cool.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> lsp-mode
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">setq</span> lsp-rust-analyzer-display-parameter-hints t
+        lsp-rust-analyzer-server-display-inlay-hints t<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbf6a90f" class="outline-4">
+<h4 id="orgbf6a90f">C#</h4>
+<div class="outline-text-4" id="text-orgbf6a90f">
+<p>
+Projectile doesn&rsquo;t recognise these projects properly, so we have to fix that
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> projectile
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">defun</span> <span class="org-function-name">projectile-dotnet-project-p</span> <span class="org-rainbow-delimiters-depth-3">()</span>
+    <span class="org-doc">"Check if a project contains a *.sln file at the project root, or either
+a .csproj or .fsproj file at either the project root or within src/*/."</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">or</span> <span class="org-rainbow-delimiters-depth-4">(</span>projectile-verify-file-wildcard <span class="org-string">"?*.sln"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+        <span class="org-rainbow-delimiters-depth-4">(</span>projectile-verify-file-wildcard <span class="org-string">"?*.csproj"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+        <span class="org-rainbow-delimiters-depth-4">(</span>projectile-verify-file-wildcard <span class="org-string">"src/*/?*.csproj"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+        <span class="org-rainbow-delimiters-depth-4">(</span>projectile-verify-file-wildcard <span class="org-string">"?*.fsproj"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+        <span class="org-rainbow-delimiters-depth-4">(</span>projectile-verify-file-wildcard <span class="org-string">"src/*/?*.fsproj"</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbce771a" class="outline-4">
+<h4 id="orgbce771a">Ignore files in xref</h4>
+<div class="outline-text-4" id="text-orgbce771a">
+<p>
+PHP is a dumb language (don&rsquo;t get me started&#x2026;), as such we need extra files to
+get decent completion &amp; documentation. 0% of the time will we want to use them
+as references, so we won&rsquo;t.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defvar</span> <span class="org-variable-name">xref-ignored-files</span> <span class="org-highlight-quoted-quote">'</span><span class="org-rainbow-delimiters-depth-2">(</span><span class="org-string">"_ide_helper_models.php"</span> <span class="org-string">"_ide_helper.php"</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"List of files to be ignored by `</span><span class="org-doc"><span class="org-constant">xref</span></span><span class="org-doc">'."</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">xref-ignored-file-p</span> <span class="org-rainbow-delimiters-depth-2">(</span>item<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Return t if `</span><span class="org-doc"><span class="org-constant">item</span></span><span class="org-doc">' should be ignored."</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>seq-some
+   <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">lambda</span> <span class="org-rainbow-delimiters-depth-4">(</span>cand<span class="org-rainbow-delimiters-depth-4">)</span>
+     <span class="org-rainbow-delimiters-depth-4">(</span>string-suffix-p cand <span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">oref</span> <span class="org-rainbow-delimiters-depth-2">(</span>xref-item-location item<span class="org-rainbow-delimiters-depth-2">)</span> file<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-warning">xref-ignored-files</span><span class="org-warning"><span class="org-rainbow-delimiters-depth-2">)</span></span><span class="org-warning"><span class="org-rainbow-delimiters-depth-1">)</span></span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defadvice!</span> +lsp--ignored-locations-to-xref-items-a <span class="org-rainbow-delimiters-depth-2">(</span>items<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Remove ignored files from list of xref-items."</span>
+  <span class="org-builtin">:filter-return</span> <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">lsp--locations-to-xref-items</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>cl-remove-if <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">xref-ignored-file-p</span> items<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defadvice!</span> +lsp-ui-peek--ignored-locations-a <span class="org-rainbow-delimiters-depth-2">(</span>items<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-doc">"Remove ignored files from list of xref-items."</span>
+  <span class="org-builtin">:filter-return</span> <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">lsp-ui-peek--get-references</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>cl-remove-if <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">xref-ignored-file-p</span> items<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb81abba" class="outline-4">
+<h4 id="orgb81abba">Ignore directories</h4>
+<div class="outline-text-4" id="text-orgb81abba">
+<p>
+Add some extra ignored directories for <code>+lsp</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> lsp-mode
+  <span class="org-rainbow-delimiters-depth-2">(</span>add-to-list <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">lsp-file-watch-ignored-directories</span> <span class="org-string">"[/\\\\]\\vendor"</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+And some more for projectile
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> projectile
+  <span class="org-rainbow-delimiters-depth-2">(</span>add-to-list <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">projectile-globally-ignored-directories</span> <span class="org-string">"vendor"</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbb06972" class="outline-4">
+<h4 id="orgbb06972">PHP</h4>
+<div class="outline-text-4" id="text-orgbb06972">
+</div>
+<div id="outline-container-org1740361" class="outline-5">
+<h5 id="org1740361">Web-mode setup</h5>
+<div class="outline-text-5" id="text-org1740361">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> web-mode
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">pushnew!</span> web-mode-engines-alist <span class="org-highlight-quoted-quote">'</span><span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span><span class="org-string">"blade"</span>  . <span class="org-string">"\\.blade\\."</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbb1902b" class="outline-5">
+<h5 id="orgbb1902b">Intelephense</h5>
+<div class="outline-text-5" id="text-orgbb1902b">
+<p>
+Because I&rsquo;m a massive sellout who likes features
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> eglot
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">setq</span> lsp-intelephense-licence-key <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">or</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">ignore-errors</span> <span class="org-rainbow-delimiters-depth-1">(</span>fetch-auth-source <span class="org-builtin">:user</span> <span class="org-string">"intelephense"</span><span class="org-rainbow-delimiters-depth-1">)</span> nil<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8b383b8" class="outline-5">
+<h5 id="org8b383b8">Eglot</h5>
+<div class="outline-text-5" id="text-org8b383b8">
+<p>
+Trying out this eglot thing for a bit, let&rsquo;s see how it goes.
+</p>
+
+<p>
+Make sure it&rsquo;s loaded in php-mode
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> eglot
+  <span class="org-rainbow-delimiters-depth-2">(</span>add-hook <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">php-mode-hook</span> <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">eglot-ensure</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>add-hook <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">dart-mode-hook</span> <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">eglot-ensure</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+Set some config needed for the server
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">when</span> <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">modulep!</span> <span class="org-builtin">:tools</span> lsp +eglot<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">defvar</span> <span class="org-variable-name">php-intelephense-storage-path</span> <span class="org-rainbow-delimiters-depth-3">(</span>expand-file-name <span class="org-string">"lsp-intelephense"</span> doom-etc-dir<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">defvar</span> <span class="org-variable-name">php-intelephense-command</span> <span class="org-rainbow-delimiters-depth-3">(</span>expand-file-name <span class="org-string">"lsp/npm/intelephense/bin/intelephense"</span> doom-etc-dir<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+And set the server to be loaded
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">after!</span> eglot
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">defclass</span> <span class="org-type">eglot-php</span> <span class="org-rainbow-delimiters-depth-3">(</span>eglot-lsp-server<span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-rainbow-delimiters-depth-3">()</span> <span class="org-builtin">:documentation</span> <span class="org-doc">"PHP's Intelephense"</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">cl-defmethod</span> <span class="org-function-name">eglot-initialization-options</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>server eglot-php<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-doc">"Passes through required intelephense options"</span>
+    <span class="org-highlight-quoted-quote">`</span><span class="org-rainbow-delimiters-depth-3">(</span><span class="org-builtin">:storagePath</span> ,php-intelephense-storage-path
+      <span class="org-builtin">:licenceKey</span> ,lsp-intelephense-licence-key
+      <span class="org-builtin">:clearCache</span> t<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>add-to-list <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">eglot-server-programs</span> <span class="org-highlight-quoted-quote">`</span><span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>php-mode phps-mode<span class="org-rainbow-delimiters-depth-4">)</span> . <span class="org-rainbow-delimiters-depth-4">(</span>eglot-php . <span class="org-rainbow-delimiters-depth-1">(</span>,php-intelephense-command <span class="org-string">"--stdio"</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org821005a" class="outline-3">
+<h3 id="org821005a">Snippets</h3>
+<div class="outline-text-3" id="text-org821005a">
+</div>
+<div id="outline-container-orga87a424" class="outline-4">
+<h4 id="orga87a424">PHP-Mode</h4>
+<div class="outline-text-4" id="text-orga87a424">
+</div>
+<div id="outline-container-orgc2a1694" class="outline-5">
+<h5 id="orgc2a1694">function</h5>
+<div class="outline-text-5" id="text-orgc2a1694">
+<div class="org-src-container">
+<pre class="src src-snippet"><span class="org-comment"># -*- mode: snippet -*-</span>
+<span class="org-comment"># name: function</span>
+<span class="org-comment"># key: fu</span>
+<span class="org-comment"># uuid: fu</span>
+<span class="org-comment"># expand-env: </span><span class="org-comment"><span class="org-rainbow-delimiters-depth-1">(</span></span><span class="org-comment"><span class="org-rainbow-delimiters-depth-2">(</span></span><span class="org-comment">yas-indent-line 'fixed</span><span class="org-comment"><span class="org-rainbow-delimiters-depth-2">)</span></span><span class="org-comment"> </span><span class="org-comment"><span class="org-rainbow-delimiters-depth-2">(</span></span><span class="org-comment">yas-wrap-around-region 'nil</span><span class="org-comment"><span class="org-rainbow-delimiters-depth-2">)</span></span><span class="org-comment"><span class="org-rainbow-delimiters-depth-1">)</span></span>
+<span class="org-comment"># --</span>
+$<span class="org-rainbow-delimiters-depth-1">{</span><span class="org-warning">1</span>:$<span class="org-preprocessor">$</span><span class="org-preprocessor"><span class="org-rainbow-delimiters-depth-2">(</span></span><span class="org-keyword">yas-auto-next</span> <span class="org-rainbow-delimiters-depth-3">(</span>yas-completing-read <span class="org-string">"Visibility (public): "</span> <span class="org-highlight-quoted-quote">'</span><span class="org-rainbow-delimiters-depth-4">(</span><span class="org-string">"public"</span> <span class="org-string">"private"</span> <span class="org-string">"protected"</span><span class="org-rainbow-delimiters-depth-4">)</span> nil nil nil nil <span class="org-string">"public"</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-keyword"><span class="org-rainbow-delimiters-depth-1">}</span></span> function $<span class="org-rainbow-delimiters-depth-1">{</span><span class="org-warning">2</span>:name<span class="org-keyword"><span class="org-rainbow-delimiters-depth-1">}</span></span><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">$</span><span class="org-string">3</span><span class="org-rainbow-delimiters-depth-1">)</span>
+<span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-keyword">$</span><span class="org-string">0</span>
+<span class="org-keyword"><span class="org-rainbow-delimiters-depth-1">}</span></span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orged6288d" class="outline-5">
+<h5 id="orged6288d">php</h5>
+<div class="outline-text-5" id="text-orged6288d">
+<div class="org-src-container">
+<pre class="src src-snippet"><span class="org-comment"># -*- mode: snippet -*-</span>
+<span class="org-comment"># name: &lt;?php</span>
+<span class="org-comment"># key: php</span>
+<span class="org-comment"># uuid: php</span>
+<span class="org-comment"># --</span>
+&lt;?php
+<span class="org-keyword">$</span><span class="org-string">0</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7885085" class="outline-4">
+<h4 id="org7885085">kotlin-mode</h4>
+<div class="outline-text-4" id="text-org7885085">
+</div>
+<div id="outline-container-orgeb7b6af" class="outline-5">
+<h5 id="orgeb7b6af">__</h5>
+<div class="outline-text-5" id="text-orgeb7b6af">
+<div class="org-src-container">
+<pre class="src src-snippet"><span class="org-comment"># -*- mode: snippet -*-</span>
+<span class="org-comment"># name: Kotlin template</span>
+<span class="org-comment"># --</span>
+package <span class="org-highlight-quoted-quote">`</span><span class="org-rainbow-delimiters-depth-1">(</span>mapconcat <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">identity</span> <span class="org-rainbow-delimiters-depth-2">(</span>cdr <span class="org-rainbow-delimiters-depth-3">(</span>member <span class="org-string">"kotlin"</span> <span class="org-rainbow-delimiters-depth-4">(</span>split-string default-directory <span class="org-string">"/"</span> t<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-string">"."</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-highlight-quoted-quote">`</span>
+
+<span class="org-highlight-quoted-symbol">class</span> <span class="org-highlight-quoted-quote">`</span><span class="org-rainbow-delimiters-depth-1">(</span>s-join <span class="org-string">""</span> <span class="org-rainbow-delimiters-depth-2">(</span>mapcar <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">s-titleize</span> <span class="org-rainbow-delimiters-depth-3">(</span>s-split-words <span class="org-rainbow-delimiters-depth-4">(</span>file-name-base buffer-file-name<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-highlight-quoted-quote">`</span>
+<span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-keyword">$</span><span class="org-string">0</span>
+<span class="org-keyword"><span class="org-rainbow-delimiters-depth-1">}</span></span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org679ca37" class="outline-4">
+<h4 id="org679ca37">+php-laravel-mode</h4>
+<div class="outline-text-4" id="text-org679ca37">
+</div>
+<div id="outline-container-org0e27acd" class="outline-5">
+<h5 id="org0e27acd">.yas-parents.el</h5>
+<div class="outline-text-5" id="text-org0e27acd">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">eval-when-compile</span> <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">require</span> <span class="org-highlight-quoted-quote">'</span><span class="org-constant">subr-x</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">string-split-words</span> <span class="org-rainbow-delimiters-depth-2">(</span>string<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>split-string
+   <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-rainbow-delimiters-depth-1">(</span>case-fold-search nil<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+     <span class="org-rainbow-delimiters-depth-4">(</span>replace-regexp-in-string
+      <span class="org-string">"</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">[[:lower:]]</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">[[:upper:]]</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">"</span> <span class="org-string">"\\1 \\2"</span>
+      <span class="org-rainbow-delimiters-depth-1">(</span>replace-regexp-in-string <span class="org-string">"</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">[[:upper:]]</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">[[:upper:]][0-9[:lower:]]</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">"</span> <span class="org-string">"\\1 \\2"</span> string<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+   <span class="org-string">"[</span><span class="org-string"><span class="org-negation-char">^</span></span><span class="org-string">[:word:]0-9]+"</span>
+   t<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">+php-laravel-mode--get-namespace</span> <span class="org-rainbow-delimiters-depth-2">()</span>
+    <span class="org-doc">"Get a formatted namespace for the current PHP file"</span>
+    <span class="org-rainbow-delimiters-depth-2">(</span>substring
+        <span class="org-rainbow-delimiters-depth-3">(</span>replace-regexp-in-string <span class="org-string">"/"</span> <span class="org-rainbow-delimiters-depth-4">(</span>regexp-quote <span class="org-string">"\\"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+            <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-keyword">thread-first</span>
+                buffer-file-name
+                <span class="org-rainbow-delimiters-depth-1">(</span>file-relative-name <span class="org-rainbow-delimiters-depth-2">(</span>doom-project-root<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+                file-name-directory
+                capitalize<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+        <span class="org-highlight-numbers-number">0</span>
+        <span class="org-highlight-numbers-number">-1</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+
+<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">defun</span> <span class="org-function-name">+php-laravel-mode--get-class-name</span> <span class="org-rainbow-delimiters-depth-2">()</span>
+    <span class="org-doc">"Get a formatted class name for the current PHP file"</span>
+    <span class="org-rainbow-delimiters-depth-2">(</span>string-join <span class="org-rainbow-delimiters-depth-3">(</span>mapcar <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">capitalize</span> <span class="org-rainbow-delimiters-depth-4">(</span>string-split-words <span class="org-rainbow-delimiters-depth-1">(</span>file-name-base buffer-file-name<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3a974b9" class="outline-5">
+<h5 id="org3a974b9">__</h5>
+<div class="outline-text-5" id="text-org3a974b9">
+<div class="org-src-container">
+<pre class="src src-snippet"><span class="org-comment"># -*- mode: snippet -*-</span>
+<span class="org-comment"># name: PHP template</span>
+<span class="org-comment"># --</span>
+&lt;?php
+
+namespace <span class="org-highlight-quoted-quote">`</span><span class="org-rainbow-delimiters-depth-1">(</span>+php-laravel-mode--get-namespace<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-highlight-quoted-quote">`</span>;
+
+class <span class="org-highlight-quoted-quote">`</span><span class="org-rainbow-delimiters-depth-1">(</span>+php-laravel-mode--get-class-name<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-highlight-quoted-quote">`</span>
+<span class="org-rainbow-delimiters-depth-1">{</span>
+    <span class="org-keyword">$</span><span class="org-string">0</span>
+<span class="org-keyword"><span class="org-rainbow-delimiters-depth-1">}</span></span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga6c1813" class="outline-5">
+<h5 id="orga6c1813">migration</h5>
+<div class="outline-text-5" id="text-orga6c1813">
+<div class="org-src-container">
+<pre class="src src-snippet"><span class="org-comment"># -*- mode: snippet -*-</span>
+<span class="org-comment"># name: Laravel Migration method</span>
+<span class="org-comment"># key: mig</span>
+<span class="org-comment"># uuid: mig</span>
+<span class="org-comment"># --</span>
+Schema::table<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-highlight-quoted-quote">'</span><span class="org-constant">$</span><span class="org-string">1</span><span class="org-highlight-quoted-quote">'</span>, function <span class="org-rainbow-delimiters-depth-2">(</span>Blueprint $table<span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+    <span class="org-highlight-quoted-quote">`</span><span class="org-highlight-quoted-symbol">%</span><span class="org-highlight-quoted-quote">`</span><span class="org-keyword">$</span><span class="org-string">0</span>
+<span class="org-keyword"><span class="org-rainbow-delimiters-depth-2">}</span></span><span class="org-rainbow-delimiters-depth-1">)</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6cb8c1d" class="outline-5">
+<h5 id="org6cb8c1d">scope</h5>
+<div class="outline-text-5" id="text-org6cb8c1d">
+<div class="org-src-container">
+<pre class="src src-snippet"><span class="org-comment"># -*- mode: snippet -*-</span>
+<span class="org-comment"># name: Sentry scope</span>
+<span class="org-comment"># key: scope</span>
+<span class="org-comment"># uuid: scope</span>
+<span class="org-comment"># --</span>
+withScope<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">function</span> <span class="org-rainbow-delimiters-depth-2">(</span>Scope $scope<span class="org-rainbow-delimiters-depth-2">)</span> use <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">$</span><span class="org-string">1</span><span class="org-rainbow-delimiters-depth-2">)</span> <span class="org-rainbow-delimiters-depth-2">{</span>
+    $scope-&gt;setContext<span class="org-rainbow-delimiters-depth-3">(</span><span class="org-highlight-quoted-quote">'</span><span class="org-constant">$</span><span class="org-string">2</span><span class="org-highlight-quoted-quote">'</span>, <span class="org-rainbow-delimiters-depth-4">[</span>
+        <span class="org-keyword">$</span><span class="org-string">3</span>
+    <span class="org-rainbow-delimiters-depth-4">]</span><span class="org-rainbow-delimiters-depth-3">)</span>;
+
+    <span class="org-highlight-quoted-quote">`</span><span class="org-highlight-quoted-symbol">%</span><span class="org-highlight-quoted-quote">`</span><span class="org-keyword">$</span><span class="org-string">0</span>
+<span class="org-keyword"><span class="org-rainbow-delimiters-depth-2">}</span></span><span class="org-rainbow-delimiters-depth-1">)</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9c42661" class="outline-4">
+<h4 id="org9c42661">laravel-mode</h4>
+<div class="outline-text-4" id="text-org9c42661">
+<p>
+Not yet fit for human consumption, but fit for mine because I&rsquo;m <del>sub</del> super-human
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp"><span class="org-comment-delimiter">;; </span><span class="org-comment">(package! laravel-mode
+</span><span class="org-comment-delimiter">;;   </span><span class="org-comment">:recipe (:local-repo "~/build/elisp/laravel-mode"
+</span><span class="org-comment-delimiter">;;            </span><span class="org-comment">:build (:not compile)))</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">use-package!</span> laravel-tinker
+  <span class="org-builtin">:after</span> php-mode
+  <span class="org-builtin">:init</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>set-popup-rule! <span class="org-string">"^\\tinker:"</span> <span class="org-builtin">:vslot</span> <span class="org-highlight-numbers-number">-5</span> <span class="org-builtin">:size</span> <span class="org-highlight-numbers-number">0.35</span> <span class="org-builtin">:select</span> t <span class="org-builtin">:modeline</span> nil <span class="org-builtin">:ttl</span> nil<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">map!</span> <span class="org-builtin">:localleader</span>
+         <span class="org-builtin">:map</span> php-mode-map
+         <span class="org-builtin">:desc</span> <span class="org-string">"Toggle a project-local Tinker REPL"</span> <span class="org-string">"o t"</span> <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">laravel-tinker-toggle</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb3254d2" class="outline-3">
+<h3 id="orgb3254d2">Slack</h3>
+<div class="outline-text-3" id="text-orgb3254d2">
+<p>
+Includes a couple of niceties locally, these <i>may</i> end up in a module one day.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">package!</span> slack<span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">use-package!</span> slack
+  <span class="org-builtin">:commands</span> <span class="org-rainbow-delimiters-depth-2">(</span>slack-start<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-builtin">:custom</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>slack-buffer-emojify t<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>slack-prefer-current-team t<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>slack-enable-global-mode-string t<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span>slack-modeline-count-only-subscribed-channel nil<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-builtin">:init</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">require</span> <span class="org-highlight-quoted-quote">'</span><span class="org-constant">auth-source</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">require</span> <span class="org-highlight-quoted-quote">'</span><span class="org-constant">slack-util</span><span class="org-rainbow-delimiters-depth-2">)</span>
+
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">defun</span> <span class="org-function-name">+slack/register-team</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-type">&amp;rest</span> plist<span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-doc">"Given an email, get the `</span><span class="org-doc"><span class="org-constant">:token</span></span><span class="org-doc">' and `</span><span class="org-doc"><span class="org-constant">:cookie</span></span><span class="org-doc">' for the given EMAIL."</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-rainbow-delimiters-depth-1">(</span>token <span class="org-rainbow-delimiters-depth-2">(</span>auth-source-pick-first-password
+                  <span class="org-builtin">:host</span> <span class="org-rainbow-delimiters-depth-3">(</span>plist-get plist <span class="org-builtin">:host</span><span class="org-rainbow-delimiters-depth-3">)</span>
+                  <span class="org-builtin">:user</span> <span class="org-rainbow-delimiters-depth-3">(</span>plist-get plist <span class="org-builtin">:email</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+          <span class="org-rainbow-delimiters-depth-1">(</span>cookie <span class="org-rainbow-delimiters-depth-2">(</span>auth-source-pick-first-password
+                   <span class="org-builtin">:host</span> <span class="org-rainbow-delimiters-depth-3">(</span>plist-get plist <span class="org-builtin">:host</span><span class="org-rainbow-delimiters-depth-3">)</span>
+                   <span class="org-builtin">:user</span> <span class="org-rainbow-delimiters-depth-3">(</span>format <span class="org-string">"%s^cookie"</span> <span class="org-rainbow-delimiters-depth-4">(</span>plist-get plist <span class="org-builtin">:email</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>apply <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">slack-register-team</span> <span class="org-rainbow-delimiters-depth-1">(</span>slack-merge-plist <span class="org-highlight-quoted-quote">`</span><span class="org-rainbow-delimiters-depth-2">(</span><span class="org-builtin">:token</span> ,token <span class="org-builtin">:cookie</span> ,cookie<span class="org-rainbow-delimiters-depth-2">)</span> plist<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">defun</span> <span class="org-function-name">+slack/post-standup-message</span> <span class="org-rainbow-delimiters-depth-3">()</span>
+    <span class="org-doc">"Create a standup message to send to a room."</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">interactive</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">let*</span> <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-rainbow-delimiters-depth-1">(</span>team <span class="org-rainbow-delimiters-depth-2">(</span>slack-team-select<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+           <span class="org-rainbow-delimiters-depth-1">(</span>channel <span class="org-rainbow-delimiters-depth-2">(</span>slack-room-select
+                     <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">cl-loop</span> for team in <span class="org-rainbow-delimiters-depth-4">(</span>list team<span class="org-rainbow-delimiters-depth-4">)</span>
+                              for channels = <span class="org-rainbow-delimiters-depth-4">(</span>append <span class="org-rainbow-delimiters-depth-1">(</span>slack-team-channels team<span class="org-rainbow-delimiters-depth-1">)</span> <span class="org-rainbow-delimiters-depth-1">(</span>slack-team-ims team<span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+                              nconc channels<span class="org-rainbow-delimiters-depth-3">)</span>
+                     team<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+           <span class="org-rainbow-delimiters-depth-1">(</span>buf <span class="org-rainbow-delimiters-depth-2">(</span>slack-create-room-message-compose-buffer channel team<span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span>
+
+      <span class="org-rainbow-delimiters-depth-4">(</span>slack-buffer-display buf<span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>yas-expand-snippet <span class="org-rainbow-delimiters-depth-1">(</span>yas-lookup-snippet <span class="org-string">"Standup template"</span> <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">slack-message-compose-buffer-mode</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4332fb1" class="outline-3">
+<h3 id="org4332fb1">Reaper</h3>
+<div class="outline-text-3" id="text-org4332fb1">
+<p>
+Emacs client for Harvest, the time tracker we use at <code>$DAYJOB</code>. Over time, this
+will likely become more config than just a dump of macros.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">package!</span> reaper<span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">use-package!</span> reaper
+   <span class="org-builtin">:init</span>
+   <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">map!</span> <span class="org-builtin">:leader</span> <span class="org-builtin">:n</span> <span class="org-builtin">:desc</span> <span class="org-string">"Track time"</span> <span class="org-string">"t t"</span> <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">reaper</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf983079" class="outline-3">
+<h3 id="orgf983079">Jira</h3>
+<div class="outline-text-3" id="text-orgf983079">
+<p>
+Config related to setting up Jira.
+</p>
+</div>
+
+<div id="outline-container-orgebe9e07" class="outline-4">
+<h4 id="orgebe9e07">org-jira</h4>
+<div class="outline-text-4" id="text-orgebe9e07">
+<p>
+Used for accessing Jira tasks through org-mode. Jira&rsquo;s interface is <i>quite</i> a mess
+so I&rsquo;d rather not use it as much.
+</p>
+
+<p>
+You know what we love? <code>org-mode</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">package!</span> org-jira<span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">use-package!</span> org-jira
+  <span class="org-builtin">:commands</span> <span class="org-rainbow-delimiters-depth-2">(</span>org-jira-get-issues org-jira-get-issues-from-custom-jql<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-builtin">:init</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">let</span> <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span>dir <span class="org-rainbow-delimiters-depth-1">(</span>expand-file-name <span class="org-string">".org-jira"</span>
+                               <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">or</span> <span class="org-rainbow-delimiters-depth-3">(</span>getenv <span class="org-string">"XDG_CONFIG_HOME"</span><span class="org-rainbow-delimiters-depth-3">)</span>
+                                   <span class="org-rainbow-delimiters-depth-3">(</span>getenv <span class="org-string">"HOME"</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">unless</span> <span class="org-rainbow-delimiters-depth-4">(</span>file-directory-p dir<span class="org-rainbow-delimiters-depth-4">)</span>
+      <span class="org-rainbow-delimiters-depth-4">(</span>make-directory dir<span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span><span class="org-keyword">setq</span> org-jira-working-dir dir<span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0981c01" class="outline-4">
+<h4 id="org0981c01">jira-workflow</h4>
+<div class="outline-text-4" id="text-org0981c01">
+<p>
+Custom package I&rsquo;ve written to handle some of my jira workflow usage to get over
+some of the gripes I have. Still some features left to work on (eg automatic
+ticket movement) but for the most part it does a decent job
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">package!</span> jira-workflow
+  <span class="org-builtin">:recipe</span> <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-builtin">:host</span> github <span class="org-builtin">:repo</span> <span class="org-string">"elken/jira-workflow"</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">use-package!</span> jira-workflow
+  <span class="org-builtin">:after</span> dotenv
+  <span class="org-builtin">:commands</span> <span class="org-rainbow-delimiters-depth-2">(</span>jira-workflow-start-ticket<span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-builtin">:init</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">map!</span>
+   <span class="org-builtin">:desc</span> <span class="org-string">"Start working on a ticket"</span>
+   <span class="org-builtin">:leader</span> <span class="org-string">"g c B"</span>
+   <span class="org-highlight-quoted-quote">#'</span><span class="org-highlight-quoted-symbol">jira-workflow-start-ticket</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge667267" class="outline-3">
+<h3 id="orge667267">Translate</h3>
+<div class="outline-text-3" id="text-orge667267">
+<p>
+I do a decent amount of copy/paste translating stuff for work, so let&rsquo;s make this <i>easier</i>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">package!</span> google-translate<span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-rainbow-delimiters-depth-1">(</span><span class="org-keyword">use-package!</span> google-translate
+  <span class="org-builtin">:config</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">defun</span> <span class="org-function-name">google-translate--search-tkk</span> <span class="org-rainbow-delimiters-depth-3">()</span>
+    <span class="org-doc">"Search TKK."</span>
+    <span class="org-rainbow-delimiters-depth-3">(</span>list <span class="org-highlight-numbers-number">430675</span> <span class="org-highlight-numbers-number">2721866130</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">setf</span> <span class="org-rainbow-delimiters-depth-3">(</span>alist-get <span class="org-string">"Kinyarwanda"</span> google-translate-supported-languages-alist<span class="org-rainbow-delimiters-depth-3">)</span> <span class="org-string">"rw"</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">setq</span> google-translate-output-destination <span class="org-highlight-quoted-quote">'</span><span class="org-highlight-quoted-symbol">kill-ring</span><span class="org-rainbow-delimiters-depth-2">)</span>
+  <span class="org-rainbow-delimiters-depth-2">(</span><span class="org-keyword">setq</span> google-translate-translation-directions-alist
+        <span class="org-highlight-quoted-quote">'</span><span class="org-rainbow-delimiters-depth-3">(</span><span class="org-rainbow-delimiters-depth-4">(</span><span class="org-string">"en"</span> . <span class="org-string">"fr"</span><span class="org-rainbow-delimiters-depth-4">)</span>
+          <span class="org-rainbow-delimiters-depth-4">(</span><span class="org-string">"en"</span> . <span class="org-string">"rw"</span><span class="org-rainbow-delimiters-depth-4">)</span><span class="org-rainbow-delimiters-depth-3">)</span><span class="org-rainbow-delimiters-depth-2">)</span><span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer id="postamble" class="status">
+<p class="author">Author: Ellis Kenyő</p>
+<p class="date">Created: 2023-02-25</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 28.2 (<a href="https://orgmode.org">Org</a> mode 9.6.1)</p>
+</footer>
+</body>
+</html>
