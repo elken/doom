@@ -94,13 +94,12 @@ placed, otherwise they come first.")
 (use-package! kind-icon
   :after corfu
   :when (modulep! +icons)
-  :custom
-  (kind-icon-default-face 'corfu-default)
-  (kind-icon-use-icons t)
-  (svg-lib-icons-dir (expand-file-name "svg-lib" doom-cache-dir))
   :hook (doom-load-theme . kind-icon-reset-cache)
-  :config
-  (setq kind-icon-mapping
+  :init
+  (setq kind-icon-default-face 'corfu-default
+        kind-icon-use-icons t
+        svg-lib-icons-dir (expand-file-name "svg-lib" doom-cache-dir)
+        kind-icon-mapping
         '((array "a" :icon "code-brackets" :face font-lock-variable-name-face)
           (boolean "b" :icon "circle-half-full" :face font-lock-builtin-face)
           (class "c" :icon "view-grid-plus-outline" :face font-lock-type-face)
