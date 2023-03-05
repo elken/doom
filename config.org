@@ -778,7 +778,8 @@ for documentation and organisation.
 Let's set a sane default directory based on where I am
 
 #+begin_src emacs-lisp
-(setq org-directory "~/Nextcloud/org")
+(setq org-directory "~/Nextcloud/org"
+      org-agenda-files '("~/Nextcloud/org/Home.org" "~/Nextcloud/org/Work.org" "~/Nextcloud/org/Notes.org"))
 #+end_src
 
 ** Font setup
