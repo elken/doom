@@ -870,6 +870,7 @@ The below is courtesy of [[https://git.sr.ht/~gagbo/doom-config/tree/eb615417ca0
         ;; - Moving a task to =DONE= removes all tags
         org-todo-state-tags-triggers
         '(("KILL" ("killed" . t))
+          ("HOLD" ("hold" . t))
           ("WAIT" ("waiting" . t))
           (done ("waiting") ("hold"))
           ("TODO" ("waiting") ("cancelled") ("hold"))
