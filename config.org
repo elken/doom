@@ -1827,6 +1827,12 @@ Packages to be unpinned or just completely disabled
 (disable-packages! evil-escape)
 (package! apheleia
  :recipe (:local-repo "~/build/elisp/apheleia"))
+(package! engrave-faces
+  :recipe (:host github :repo "elken/engrave-faces"))
+(package! ox-chameleon
+  :recipe (:host github :repo "elken/ox-chameleon"))
+(package! forge
+  :recipe (:host github :repo "elken/forge" :branch "feat/forge-max-topics"))
 #+end_src
 
 ** embark-vc
