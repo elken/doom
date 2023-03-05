@@ -1256,6 +1256,15 @@ Sprinkle in some =doct= utility functions
 And we can now add some templates! This isn't even remotely set in stone, I wouldn't even describe them as set in /jelly/ really.
 #+begin_src emacs-lisp
 (after! org-capture
+  (defun +org-capture/replace-brackets (link)
+    (mapconcat
+     (lambda (c)
+       (pcase (key-description (vector c))
+         ("[" "(")
+         ("]" ")")
+         (_ (key-description (vector c)))))
+     link))
+
   (setq org-capture-templates
         (doct `(("Home" :keys "h"
                  :icon ("home" :set "octicon" :color "cyan")
@@ -1276,7 +1285,7 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                 ("Note" :keys "n"
                  :icon ("sticky-note" :set "faicon" :color "yellow")
                  :file "Notes.org"
-                 :template ("* *?"
+                 :template ("* %?"
                             "%i %a"))
                 ("Journal" :keys "j"
                  :icon ("calendar" :set "faicon" :color "pink")
@@ -1289,6 +1298,21 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                  :template "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?"
                  :jump-to-captured t
                  :immediate-finish t)
+                ("Protocol" :keys "P"
+                 :icon ("link" :set "faicon" :color "blue")
+                 :file "Notes.org"
+                 :template ("* TODO %^{Title}"
+                            "Source: %u, %c"
+                            "#+BEGIN_QUOTE"
+                            "%i"
+                            "#+END_QUOTE"
+                            "%?"))
+                ("Protocol link" :keys "L"
+                 :icon ("link" :set "faicon" :color "blue")
+                 :file "Notes.org"
+                 :template ("* TODO %?"
+                            "[[%:link][%:description]]"
+                            "Captured on: %U"))
                 ("Project" :keys "p"
                  :icon ("repo" :set "octicon" :color "silver")
                  :prepend t
@@ -1306,9 +1330,7 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                             ("Note" :keys "n"
                              :icon ("sticky-note" :set "faicon" :color "yellow")
                              :keyword "%U"
-                             :file +org-capture-project-notes-file)))
-                ))))
-
+                             :file +org-capture-project-notes-file)))))))
 #+end_src
 
 ** Export
