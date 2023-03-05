@@ -124,6 +124,7 @@ _please_ don't open any issues about missing variables.
       - [[#beamer][Beamer]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
     - [[#auto-export][Auto-export]]
+  - [[#org-protocol][org-protocol]]
 - [[#languages][Languages]]
   - [[#lua][Lua]]
   - [[#lspdap][LSP/DAP]]
@@ -1719,6 +1720,29 @@ Defines a minor mode I can use to automatically export a PDF on save.
         (add-hook 'after-save-hook #'+org-auto-export :append :local))
     ;; When the mode is disabled
     (remove-hook 'after-save-hook #'+org-auto-export :local)))
+#+end_src
+
+** org-protocol
+Interact with org-mode from other applications, /including my web browser/. Being
+able to create things like tasks and other org items from anywhere sounds ideal.
+
+#+begin_src emacs-lisp
+(use-package! org-protocol
+ :defer t)
+#+end_src
+
+#+begin_src conf :tangle ~/.local/share/applications/org-protocol.desktop
+[Desktop Entry]
+Name=org-protocol
+Comment=Intercept calls from emacsclient to trigger custom actions
+Categories=Other;
+Keywords=org-protocol;
+Icon=emacs
+Type=Application
+Exec=emacsclient -- %u
+Terminal=false
+StartupWMClass=Emacs
+MimeType=x-scheme-handler/org-protocol;
 #+end_src
 
 * Languages
