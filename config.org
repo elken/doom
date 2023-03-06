@@ -1731,7 +1731,7 @@ able to create things like tasks and other org items from anywhere sounds ideal.
  :defer t)
 #+end_src
 
-#+begin_src conf :tangle ~/.local/share/applications/org-protocol.desktop
+#+begin_src conf :tangle ~/.local/share/applications/org-protocol.desktop :mkdirp yes
 [Desktop Entry]
 Name=org-protocol
 Comment=Intercept calls from emacsclient to trigger custom actions
