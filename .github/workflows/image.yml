@@ -5,10 +5,14 @@ on:
     types: [completed]
 
   workflow_dispatch:
+    inputs:
+      override:
+        description: "Manually build image?"
+        type: "boolean"
 jobs:
   build-image:
     runs-on: ubuntu-20.04
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event.inputs.override }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2

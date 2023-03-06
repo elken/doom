@@ -41,7 +41,7 @@ jobs:
         env:
           DOOMDIR: /__w/doom/doom
         run: |
-          /root/.config/emacs/bin/doom sync
+          /root/.config/emacs/bin/doom sync -u
           /root/.config/emacs/bin/doom publish
 
       - name: 🚀 Deploy
