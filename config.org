@@ -1292,7 +1292,7 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                  :icon ("link" :set "faicon" :color "blue")
                  :file "Notes.org"
                  :template ("* TODO %^{Title}"
-                            "Source: %u, %c"
+                            "Source: %u"
                             "#+BEGIN_QUOTE"
                             "%i"
                             "#+END_QUOTE"
