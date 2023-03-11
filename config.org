@@ -65,6 +65,7 @@ _please_ don't open any issues about missing variables.
       - [[#functions][Functions]]
       - [[#multi-vterm][Multi-vterm]]
       - [[#ensure-the-shell-is-zsh][Ensure the shell is ZSH]]
+  - [[#convert-a-url-to-a-valid-package-recipe][Convert a URL to a valid package recipe]]
 - [[#keybindings][Keybindings]]
   - [[#save][Save]]
   - [[#search][Search]]
@@ -481,6 +482,41 @@ Noticed a few weird cases where =chsh= doesn't /quite/ apply, so let's force tha
 
 #+begin_src emacs-lisp
 (setq vterm-shell "/bin/zsh")
+#+end_src
+
+** Convert a URL to a valid package recipe
+Useful when copying links to try new packages. Attempt to create one using
+=straight-hosts=, but fall back if one can't be found.
+
+#+begin_src emacs-lisp
+(defun lkn/url->package (string &optional arg)
+  "Interactively select a URL from the kill-ring and create a package! block."
+  (interactive (list (consult--read-from-kill-ring) current-prefix-arg))
+  (let* ((str (substring-no-properties string))
+         (str (string-replace "\"" "" str))
+         (str (string-trim str))
+         (url (url-generic-parse-url str)))
+    (if-let ((host
+              (cl-find-if (lambda (cell)
+                            (member (url-host url) cell))
+                          straight-hosts)))
+        (insert
+         (concat
+          "(package! "
+          (car (last (string-split (url-filename url) "/")))
+          "\n:recipe (:host "
+          (symbol-name (car host))
+          " :repo \""
+          (substring (url-filename url) 1)
+          "\"))"))
+      (insert
+       (concat
+        "(package! "
+          (car (last (string-split (url-filename url) "/")))
+          "\n:recipe (:host nil :repo \""
+          str
+          "\"))")))
+    (call-interactively #'indent-region)))
 #+end_src
 
 * Keybindings
