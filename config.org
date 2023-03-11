@@ -132,6 +132,8 @@ _please_ don't open any issues about missing variables.
     - [[#auto-export][Auto-export]]
   - [[#org-protocol][org-protocol]]
 - [[#languages][Languages]]
+  - [[#clojure][Clojure]]
+    - [[#epithet][Epithet]]
   - [[#lua][Lua]]
   - [[#lspdap][LSP/DAP]]
     - [[#increase-variable-line-length][Increase variable line length]]
@@ -1779,6 +1781,38 @@ MimeType=x-scheme-handler/org-protocol;
 
 * Languages
 Configuration for various programming languages.
+
+** Clojure
+
+*** Epithet
+Buffers are pretty great, but sometimes they can be named ... less usefully.
+
+#+begin_src elisp
+(package! epithet
+  :recipe (:host github :repo "oantolin/epithet"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! epithet
+  :hook (clojure-mode . epithet-rename-buffer)
+  :init
+  ;; (setq-hook! 'clojure-mode-hook doom-modeline-buffer-file-name-style 'buffer-name)
+  (defun epithet-for-clojure ()
+    "Suggest a name for a `clojure-mode' buffer."
+    (when (and (require 'cider nil t)
+               (derived-mode-p 'clojure-mode))
+      (after! doom-modeline
+        (setq-local doom-modeline-buffer-file-name-style 'buffer-name))
+      (format
+       "%s <%s>"
+       (substring-no-properties (cider-current-ns))
+       (projectile-project-name))))
+
+  :config
+  (add-to-list 'epithet-suggesters #'epithet-for-clojure)
+  (after! doom-modeline
+    (advice-add #'epithet-rename-buffer :after #'doom-modeline-update-buffer-file-name)))
+#+end_src
 
 ** Lua
 First things first; we need a project mode for my awesomewm config.
