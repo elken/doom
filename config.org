@@ -23,6 +23,11 @@ would be nice if you mentioned me when doing so. It's just polite :)
 Depends on Emacs 29 because of some super cool stuff, so if you're not using it
 _please_ don't open any issues about missing variables.
 
+#+name: file-name
+#+begin_src emacs-lisp :tangle no
+(buffer-file-name)
+#+end_src
+
 * Table of Contents :TOC_5_gh:noexport:
 - [[#faq][FAQ]]
 - [[#globals][Globals]]
@@ -1717,10 +1722,12 @@ able to create things like tasks and other org items from anywhere sounds ideal.
 
 #+begin_src emacs-lisp
 (use-package! org-protocol
- :defer t)
+  :defer t)
 #+end_src
 
-#+begin_src conf :tangle ~/.local/share/applications/org-protocol.desktop :mkdirp yes
+#+begin_src conf :tangle ~/.local/share/applications/org-protocol.desktop :mkdirp yes :noweb yes
+# DO NOT EDIT THIS
+# I have been generated from <<file-name()>>
 [Desktop Entry]
 Name=org-protocol
 Comment=Intercept calls from emacsclient to trigger custom actions
