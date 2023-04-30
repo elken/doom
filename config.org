@@ -134,6 +134,7 @@ _please_ don't open any issues about missing variables.
 - [[#languages][Languages]]
   - [[#clojure][Clojure]]
     - [[#epithet][Epithet]]
+    - [[#portal][Portal]]
   - [[#lua][Lua]]
   - [[#lspdap][LSP/DAP]]
     - [[#increase-variable-line-length][Increase variable line length]]
@@ -1812,6 +1813,68 @@ Buffers are pretty great, but sometimes they can be named ... less usefully.
   (add-to-list 'epithet-suggesters #'epithet-for-clojure)
   (after! doom-modeline
     (advice-add #'epithet-rename-buffer :after #'doom-modeline-update-buffer-file-name)))
+#+end_src
+
+*** Portal
+This portal thing looks pretty cool yanno.
+
+#+begin_src emacs-lisp
+(defvar lkn/clj-portal-viewers '(":portal.viewer/inspector"
+                                 ":portal.viewer/pprint"
+                                 ":portal.viewer/table"
+                                 ":portal.viewer/tree"
+                                 ":portal.viewer/hiccup"))
+
+(defun lkn/clj-start-of-sexp ()
+  (save-excursion
+    (paredit-backward-up)
+    (point)))
+
+(defun lkn/clj-end-of-sexp ()
+  (save-excursion
+    (paredit-forward-up)
+    (point)))
+
+(defun lkn/portal-open ()
+  (interactive)
+  (cider-nrepl-sync-request:eval
+   "(do (ns dev) (def portal ((requiring-resolve 'portal.api/open) {:launcher :emacs})) (add-tap (requiring-resolve 'portal.api/submit)))"))
+
+(defun lkn/portal-clear ()
+  (interactive)
+  (cider-nrepl-sync-request:eval "(portal.api/clear)"))
+
+(defun lkn/portal-close ()
+  (interactive)
+  (cider-nrepl-sync-request:eval "portal.api/close"))
+
+(defun lkn/portal-tap-contained (&optional viewer)
+  (interactive (list (when (consp current-prefix-arg)
+                       (completing-read "Default Viewer: " lkn/clj-portal-viewers))))
+  (let ((beg (lkn/clj-start-of-sexp))
+        (end (lkn/clj-end-of-sexp)))
+    (cider-interactive-eval
+   (format "(tap> ^{:portal.viewer/default %s} %s)" (or viewer (car lkn/clj-portal-viewers)) (buffer-substring-no-properties beg end)))))
+
+(defun lkn/portal-tap-last (&optional viewer)
+  (interactive (list (when (consp current-prefix-arg)
+                       (completing-read "Default Viewer: " lkn/clj-portal-viewers))))
+  (cider-interactive-eval
+   (format "(tap> ^{:portal.viewer/default %s} %s)" (or viewer (car lkn/clj-portal-viewers)) (cider-last-sexp))))
+
+(map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+      :localleader
+      (:prefix ("p p" . "Portal")
+        :desc "Open Portal"
+        "o" #'lkn/portal-open
+        :desc "Clear layers"
+        "c" #'lkn/portal-clear
+        :desc "Close current session"
+        "q" #'lkn/portal-close
+        :desc "Send sexp around point"
+        "s" #'lkn/portal-tap-contained
+        :desc "Send sexp next to point"
+        "S" #'lkn/portal-tap-last))
 #+end_src
 
 ** Lua
