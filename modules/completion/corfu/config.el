@@ -146,14 +146,7 @@ placed, otherwise they come first.")
       (make-local-variable '+corfu-global-capes)
       (add-to-list '+corfu-global-capes #'cape-tex)))
 
-  (add-hook! '(text-mode-hook org-mode-hook)
-    (defun +corfu--set-spell-capfs ()
-      (make-local-variable '+corfu-global-capes)
-      (add-to-list '+corfu-global-capes #'cape-dict t)
-      (add-to-list '+corfu-global-capes #'cape-ispell t)))
-
   (add-to-list '+corfu-global-capes #'cape-file)
-  (add-to-list '+corfu-global-capes #'cape-keyword t)
   (add-to-list '+corfu-global-capes #'cape-dabbrev t))
 
 
