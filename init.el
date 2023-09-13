@@ -21,6 +21,8 @@
 ;; Make line endings work
 (setq evil-respect-visual-line-mode t)
 
+(setq doom-localleader-key ",")
+
 ;; LSP prefers plists
 ;; (setenv "LSP_USE_PLISTS" "1")
 
