@@ -24,7 +24,7 @@
 (setq doom-localleader-key ",")
 
 ;; LSP prefers plists
-;; (setenv "LSP_USE_PLISTS" "1")
+(setenv "LSP_USE_PLISTS" "1")
 
 (setq process-connection-type nil)
 
