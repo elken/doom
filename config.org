@@ -245,11 +245,11 @@ Some attempt to make them reproducible.
 
 #+begin_src emacs-lisp
 (add-hook! 'org-babel-pre-tangle-hook
-  (when (file-directory-p "snippets")
+  (when (file-directory-p (expand-file-name "snippets" doom-user-dir))
     (require 'async)
     (async-start
      (lambda ()
-       (delete-directory "snippets" t (not (null delete-by-moving-to-trash))))
+       (delete-directory (expand-file-name "snippets" doom-user-dir) t (not (null delete-by-moving-to-trash))))
      (lambda (result)
        (print! "Delete snippets dir got: " result)))))
 #+end_src
