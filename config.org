@@ -66,6 +66,7 @@ _please_ don't open any issues about missing variables.
       - [[#functions][Functions]]
       - [[#multi-vterm][Multi-vterm]]
       - [[#ensure-the-shell-is-zsh][Ensure the shell is ZSH]]
+    - [[#default-modes][Default modes]]
   - [[#convert-a-url-to-a-valid-package-recipe][Convert a URL to a valid package recipe]]
 - [[#keybindings][Keybindings]]
   - [[#save][Save]]
@@ -499,6 +500,24 @@ Noticed a few weird cases where =chsh= doesn't /quite/ apply, so let's force tha
 
 #+begin_src emacs-lisp
 (setq vterm-shell "/bin/zsh")
+#+end_src
+
+*** Default modes
+Ensuring that correct modes are loaded for given file extensions
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.jsonc\\'" . jsonc-mode))
+
+(after! nerd-icons
+  (setf (alist-get "yuck" nerd-icons-extension-icon-alist)
+        '(nerd-icons-fileicon "lisp" :face nerd-icons-orange))
+  (setf (alist-get 'yuck-mode nerd-icons-mode-icon-alist)
+        '(nerd-icons-fileicon "lisp" :face nerd-icons-orange))
+
+  (setf (alist-get "jsonc" nerd-icons-extension-icon-alist)
+        '(nerd-icons-fileicon "config-js" :v-adjust -0.05 :face nerd-icons-orange))
+  (setf (alist-get 'jsonc-mode nerd-icons-mode-icon-alist)
+        '(nerd-icons-fileicon "config-js" :v-adjust -0.05 :face nerd-icons-orange)))
 #+end_src
 
 ** Convert a URL to a valid package recipe
