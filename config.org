@@ -1963,10 +1963,10 @@ A collection of snippets tangled using clever magic.
 # -*- mode: snippet -*-
 # name: Org template
 # --
-#+title: ${1:`(s-titleized-words (replace-regexp-in-string "^[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9]-" "" (file-name-base (or buffer-file-name "new buffer"))))`}
-#+author: ${2:`(user-full-name)`}
-#+date: ${3:`(format-time-string "%Y-%m-%d")`}
-#+latex_class: chameleon
+,#+title: ${1:`(s-titleized-words (replace-regexp-in-string "^[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9]-" "" (file-name-base (or buffer-file-name "new buffer"))))`}
+,#+author: ${2:`(user-full-name)`}
+,#+date: \today
+,#+latex_class: chameleon
 
 $0
 #+end_src
