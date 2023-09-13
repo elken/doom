@@ -530,10 +530,14 @@ Useful when copying links to try new packages. Attempt to create one using
 (defun lkn/url->package (string &optional arg)
   "Interactively select a URL from the kill-ring and create a package! block."
   (interactive (list (consult--read-from-kill-ring) current-prefix-arg))
-  (let* ((str (substring-no-properties string))
-         (str (string-replace "\"" "" str))
-         (str (string-trim str))
-         (url (url-generic-parse-url str)))
+  (require 'consult)
+  (require 'straight)
+  (let ((url (thread-first
+               string
+               substring-no-properties
+               (substring 1 (length string))
+               string-trim
+               url-generic-parse-url)))
     (if-let ((host
               (cl-find-if (lambda (cell)
                             (member (url-host url) cell))
@@ -550,10 +554,10 @@ Useful when copying links to try new packages. Attempt to create one using
       (insert
        (concat
         "(package! "
-          (car (last (string-split (url-filename url) "/")))
-          "\n:recipe (:host nil :repo \""
-          str
-          "\"))")))
+        (car (last (string-split (url-filename url) "/")))
+        "\n:recipe (:host nil :repo \""
+        str
+        "\"))")))
     (call-interactively #'indent-region)))
 #+end_src
 
