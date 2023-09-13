@@ -33,6 +33,7 @@ _please_ don't open any issues about missing variables.
 - [[#globals][Globals]]
   - [[#constants-and-variables][Constants and Variables]]
     - [[#lexical-binding][Lexical binding]]
+    - [[#frame-title-format][Frame title format]]
     - [[#default-projectile-path][Default projectile path]]
     - [[#lookup-provider-urls][Lookup provider URLs]]
     - [[#subword-mode][Subword-mode]]
@@ -178,6 +179,19 @@ think of one? Would have thought of one.
 
 #+begin_src emacs-lisp
 ;;; -*- lexical-binding: t; -*-
+#+end_src
+
+*** Frame title format
+Making a /marginally/ more useful title format, since we often times might not necessarily running Emacs through the host.
+
+#+begin_src emacs-lisp
+(setq-default
+ frame-title-format
+ '(:eval (format "[%%b%s] - %s"
+           (if (buffer-modified-p)
+                      " •"
+             "")
+           system-name)))
 #+end_src
 
 *** Default projectile path
