@@ -10,8 +10,8 @@
 (package! corfu-doc
   :recipe (:host github :repo "galeo/corfu-doc"))
 (package! cape)
-(package! cape-yasnippet
-  :recipe (:host github :repo "elken/cape-yasnippet"))
+ (package! cape-yasnippet
+   :recipe (:host github :repo "elken/cape-yasnippet"))
 (package! cape-use-package
   :recipe (:host github :repo "elken/cape-use-package"))
 
