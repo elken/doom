@@ -154,6 +154,7 @@ _please_ don't open any issues about missing variables.
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
   - [[#cucumber][Cucumber]]
+  - [[#systemd][Systemd]]
   - [[#rpm-spec][RPM Spec]]
   - [[#autothemer][Autothemer]]
   - [[#bamboo][Bamboo]]
@@ -2059,6 +2060,18 @@ Needed for feature test files
 #+begin_src emacs-lisp
 (use-package! feature-mode
   :mode "\\.feature$")
+#+end_src
+
+** Systemd
+Starting to actually write more of these now, so this is an easy sell
+
+#+begin_src elisp
+(package! systemd)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! systemd
+  :mode "\\.service$")
 #+end_src
 
 ** RPM Spec
