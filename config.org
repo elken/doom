@@ -2140,8 +2140,7 @@ tramp-yadm to the rescue! This lets me use magit & projectile as expected on the
 The /problem/ is Emacs doesn't always detect it nicely ... until now!
 
 #+begin_src emacs-lisp
-(add-hook! 'doom-init-ui
-  (defun +keychain-startup-hook ()
+(defun +keychain-startup-hook ()
     "Load keychain env after emacs"
     (let* ((ssh (shell-command-to-string "keychain -q --noask --agents ssh --eval"))
            (gpg (shell-command-to-string "keychain -q --noask --agents gpg --eval")))
@@ -2153,7 +2152,9 @@ The /problem/ is Emacs doesn't always detect it nicely ... until now!
                  (setenv       "SSH_AGENT_PID" (match-string 1 ssh)))
             (and gpg
                  (string-match "GPG_AGENT_INFO[=\s]\\([^\s;\n]*\\)" gpg)
-                 (setenv       "GPG_AGENT_INFO" (match-string 1 gpg)))))))
+                 (setenv       "GPG_AGENT_INFO" (match-string 1 gpg))))))
+
+(add-hook 'after-init-hook #'+keychain-startup-hook)
 #+end_src
 
 ** Asciidoc
