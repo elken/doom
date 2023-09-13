@@ -1,6 +1,5 @@
 ;;; cli.el -*- lexical-binding: t; -*-
 
-
 (defcli! (publish) ()
   "Publish my doom config as a html page."
   (require 'doom-start)
@@ -143,4 +142,9 @@
 
           ("site" :components ("dotfiles" "static" "images"))))
 
-  (org-publish-project "site" t))
+  (when (file-exists-p "publish.el")
+    (print! (blue "Loading extra config from %S" (expand-file-name "publish.el")))
+    (load! (expand-file-name "publish.el")))
+
+  (org-publish-project "site" t)
+  (print! (green "Done! ")))
