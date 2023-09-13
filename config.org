@@ -164,6 +164,7 @@ _please_ don't open any issues about missing variables.
   - [[#asciidoc][Asciidoc]]
   - [[#graphviz][Graphviz]]
   - [[#exercism][Exercism]]
+  - [[#evil-cleverparens][evil-cleverparens]]
   - [[#litable][litable]]
 - [[#spelling][Spelling]]
 - [[#local-settings][Local settings]]
@@ -2192,6 +2193,26 @@ Which do you think I want?
 #+begin_src emacs-lisp
 (use-package! exercism-modern
   :commands (exercism-modern-jump exercism-modern-view-tracks))
+#+end_src
+
+** evil-cleverparens
+Trying to find a decent structural editor I like...
+
+#+begin_src elisp
+(package! evil-cleverparens
+  :recipe (:host github :repo "tomdl89/evil-cleverparens" :branch "fix/delete-escaped-parens"))
+
+(package! paredit)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! paredit
+  :hook (emacs-lisp-mode . paredit-mode)
+  :hook (clojure-mode . paredit-mode))
+
+(use-package! evil-cleverparens
+  :when (modulep! :editor evil +everywhere)
+  :hook (paredit-mode . evil-cleverparens-mode))
 #+end_src
 
 ** litable
