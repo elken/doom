@@ -1952,7 +1952,7 @@ keeping score...
 
 ** Snippet definitions
 :PROPERTIES:
-:header-args:snippet: :mkdirp yes :tangle (expand-file-name (downcase (elt (org-get-outline-path t) (- (length (org-get-outline-path t)) 1))) (expand-file-name (downcase (elt (org-get-outline-path t) 1)) "snippets"))
+:header-args:snippet: :mkdirp yes :tangle (expand-file-name (downcase (car (last (org-get-outline-path t)))) (expand-file-name (downcase (car (last (butlast (org-get-outline-path t))))) "snippets"))
 :END:
 
 A collection of snippets tangled using clever magic.
