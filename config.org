@@ -1646,11 +1646,58 @@ Tectonic is the hot new thing, which also means I can get rid of my tex installa
 #+end_src
 
 **** Classes
-Add some saner defaults for them
+Simple base header shared by all defines classes
+
+#+name: base-template
+#+begin_src latex
+\\documentclass[10pt]{scrartcl}
+[PACKAGES]
+[DEFAULT-PACKAGES]
+[EXTRA]
+\\setmainfont[Ligatures=TeX]{Montserrat}
+\\setmonofont[Ligatures=TeX]{Iosevka Nerd Font Mono}
+#+end_src
+
+#+name: chameleon-template
+#+begin_src latex :noweb yes
+% Using chameleon
+<<base-template>>
+#+end_src
+
+#+name: work-template
+#+begin_src latex :noweb yes
+% Using work
+<<base-template>>
+\\usepackage{fontawesome5}
+\\usepackage{tcolorbox}
+\\usepackage{fancyhdr}
+\\usepackage{lastpage}
+\\pagestyle{fancy}
+\\fancyhead{}
+\\fancyhead[RO, LE]{}
+#+end_src
+
+Now for some class setup (likely to change over time)
+
+#+begin_src emacs-lisp :noweb no-export
+(after! ox-latex
+  (add-to-list 'org-latex-classes
+               '("chameleon" "
+<<chameleon-template>>
+"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+#+end_src
+
+And some saner defaults for them
 
 #+begin_src emacs-lisp
 (after! ox-latex
   (setq org-latex-tables-booktabs t
+        org-latex-default-class "chameleon"
         org-latex-hyperref-template "\\colorlet{greenyblue}{blue!70!green}
 \\colorlet{blueygreen}{blue!40!green}
 \\providecolor{link}{named}{greenyblue}
@@ -1681,7 +1728,8 @@ Add some packages (also very likely to change)
         ("T1" "fontenc" t ("pdflatex"))
         ("" "fontspec" t)
         ("" "xcolor" nil)
-        ("" "hyperref" nil)))
+        ("" "hyperref" nil)
+        ("" "cleveref" nil)))
 #+end_src
 
 **** Pretty code blocks
