@@ -2038,6 +2038,7 @@ Packages to be unpinned or just completely disabled
 
 #+begin_src elisp
 (disable-packages! evil-escape)
+(unpin! evil-collection)
 (package! apheleia
  :recipe (:local-repo "~/build/elisp/apheleia"))
 (package! engrave-faces
