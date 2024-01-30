@@ -79,6 +79,7 @@ placed, otherwise they come first.")
         (corfu-insert)
       (funcall orig)))
 
+  (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible)
   (unless (display-graphic-p)
     (corfu-doc-terminal-mode)
     (corfu-terminal-mode)))
