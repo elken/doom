@@ -2,16 +2,17 @@
 ;;; completion/corfu/packages.el
 
 (package! corfu
+  :pin "24dccafeea114b1aec7118f2a8405b46aa0051e0"
   :recipe (:files (:defaults "extensions/*.el")))
 (when (modulep! +icons)
   (package! kind-icon))
 (when (modulep! +orderless)
-  (package! orderless))
+  (package! orderless :pin "b24748093b00b37c3a572c4909f61c08fa27504f"))
 (package! corfu-doc
   :recipe (:host github :repo "galeo/corfu-doc"))
 (package! cape)
- (package! cape-yasnippet
-   :recipe (:host github :repo "elken/cape-yasnippet"))
+(package! cape-yasnippet
+  :recipe (:host github :repo "elken/cape-yasnippet"))
 (package! cape-use-package
   :recipe (:host github :repo "elken/cape-use-package"))
 
