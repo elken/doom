@@ -54,7 +54,7 @@ placed, otherwise they come first.")
         (setq-local
          completion-at-point-functions
          (cl-substitute
-          (apply #'cape-super-capf (cl-substitute (car host) :completion (cl-pushnew :completion +corfu-global-capes)))
+          (apply #'cape-capf-super (cl-substitute (car host) :completion (cl-pushnew :completion +corfu-global-capes)))
           (car host)
           completion-at-point-functions)))))
 
