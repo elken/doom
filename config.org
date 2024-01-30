@@ -707,7 +707,7 @@ Configure the fonts across all used platforms (slightly different names).
 #+BEGIN_SRC emacs-lisp
 (setq  doom-font (font-spec :family "Iosevka Nerd Font" :size 16)
        doom-variable-pitch-font (font-spec :family "Montserrat" :size 16)
-       doom-unicode-font (font-spec :family "Iosevka Nerd Font" :size 16))
+       doom-unicode-font (font-spec :family "Symbols Nerd Font Mono" :size 16))
 #+END_SRC
 
 *** Ligatures
