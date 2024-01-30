@@ -689,17 +689,14 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
 
 #+begin_src emacs-lisp
 (after! doom-modeline
-  (setq all-the-icons-scale-factor 1.1
-        auto-revert-check-vc-info t
-        doom-modeline-major-mode-icon (display-graphic-p)
-        doom-modeline-major-mode-color-icon (display-graphic-p)
+  (setq auto-revert-check-vc-info t
+        doom-modeline-major-mode-icon t
         doom-modeline-buffer-file-name-style 'relative-to-project
-        doom-modeline-github t
-        doom-modeline-github-interval 60
+        doom-modeline-github nil
         doom-modeline-vcs-max-length 60)
   (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
   (doom-modeline-def-modeline 'main
-    '(bar modals workspace-name window-number persp-name buffer-position selection-info buffer-info matches remote-host debug vcs matches)
+    '(matches bar modals workspace-name window-number persp-name selection-info buffer-info remote-host debug vcs matches)
     '(github mu4e grip gnus checker misc-info repl lsp " ")))
 #+end_src
 
