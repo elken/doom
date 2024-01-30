@@ -1189,7 +1189,7 @@ Lisp programs can force the template by setting KEYS to a string."
       (org-mks org-capture-templates
                "Select a capture template\n━━━━━━━━━━━━━━━━━━━━━━━━━"
                "Template key: "
-               `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
+               `(("q" ,(concat (nerd-icons-octicon "nf-oct-stop" :face 'nerd-icons-red :v-adjust 0.01) "\tAbort")))))))
 (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier)
 
 (defun org-mks-pretty (table title &optional prompt specials)
@@ -1258,7 +1258,7 @@ is selected, only the bare key is returned."
                 (when specials
                   (insert "─────────────────────────\n")
                   (pcase-dolist (`(,key ,description) specials)
-                    (insert (format "%s   %s\n" (propertize key 'face '(bold all-the-icons-red)) description))
+                    (insert (format "%s   %s\n" (propertize key 'face '(bold nerd-icons-red)) description))
                     (push key allowed-keys)))
                 ;; Display UI and let user select an entry or
                 ;; a sub-level prefix.
@@ -1301,8 +1301,8 @@ Sprinkle in some =doct= utility functions
 (defun +doct-icon-declaration-to-icon (declaration)
   "Convert :icon declaration to icon"
   (let ((name (pop declaration))
-        (set  (intern (concat "all-the-icons-" (plist-get declaration :set))))
-        (face (intern (concat "all-the-icons-" (plist-get declaration :color))))
+        (set  (intern (concat "nerd-icons-" (plist-get declaration :set))))
+        (face (intern (concat "nerd-icons-" (plist-get declaration :color))))
         (v-adjust (or (plist-get declaration :v-adjust) 0.01)))
     (apply set `(,name :face ,face :v-adjust ,v-adjust))))
 
@@ -1337,14 +1337,14 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
 
   (setq org-capture-templates
         (doct `(("Home" :keys "h"
-                 :icon ("home" :set "octicon" :color "cyan")
+                 :icon ("nf-fa-home" :set "faicon" :color "cyan")
                  :file "Home.org"
                  :prepend t
                  :headline "Inbox"
                  :template ("* TODO %?"
                             "%i %a"))
                 ("Work" :keys "w"
-                 :icon ("business" :set "material" :color "yellow")
+                 :icon ("nf-fa-building" :set "faicon" :color "yellow")
                  :file "Work.org"
                  :prepend t
                  :headline "Inbox"
@@ -1353,12 +1353,12 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                             "DEADLINE: %^{Deadline:}t"
                             "%i %a"))
                 ("Note" :keys "n"
-                 :icon ("sticky-note" :set "faicon" :color "yellow")
+                 :icon ("nf-fa-sticky_note" :set "faicon" :color "yellow")
                  :file "Notes.org"
                  :template ("* %?"
                             "%i %a"))
                 ("Journal" :keys "j"
-                 :icon ("calendar" :set "faicon" :color "pink")
+                 :icon ("nf-fa-calendar" :set "faicon" :color "pink")
                  :type plain
                  :function (lambda ()
                              (org-journal-new-entry t)
@@ -1369,7 +1369,7 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                  :jump-to-captured t
                  :immediate-finish t)
                 ("Protocol" :keys "P"
-                 :icon ("link" :set "faicon" :color "blue")
+                 :icon ("nf-fa-link" :set "faicon" :color "blue")
                  :file "Notes.org"
                  :template ("* TODO %^{Title}"
                             "Source: %u"
@@ -1378,13 +1378,13 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                             "#+END_QUOTE"
                             "%?"))
                 ("Protocol link" :keys "L"
-                 :icon ("link" :set "faicon" :color "blue")
+                 :icon ("nf-fa-link" :set "faicon" :color "blue")
                  :file "Notes.org"
                  :template ("* TODO %?"
                             "[[%:link][%:description]]"
                             "Captured on: %U"))
                 ("Project" :keys "p"
-                 :icon ("repo" :set "octicon" :color "silver")
+                 :icon ("nf-oct-repo" :set "octicon" :color "silver")
                  :prepend t
                  :type entry
                  :headline "Inbox"
@@ -1394,11 +1394,11 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                  :file ""
                  :custom (:keyword "")
                  :children (("Task" :keys "t"
-                             :icon ("checklist" :set "octicon" :color "green")
+                             :icon ("nf-cod-checklist" :set "codicon" :color "green")
                              :keyword "TODO"
                              :file +org-capture-project-todo-file)
                             ("Note" :keys "n"
-                             :icon ("sticky-note" :set "faicon" :color "yellow")
+                             :icon ("nf-fa-sticky_note" :set "faicon" :color "yellow")
                              :keyword "%U"
                              :file +org-capture-project-notes-file)))))))
 #+end_src
