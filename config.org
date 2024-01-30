@@ -381,7 +381,7 @@ Useful function to retrieve passwords from auth-sources
 
 #+begin_src emacs-lisp
 (defun fetch-auth-source (&rest params)
-(require 'auth-source)
+  (require 'auth-source)
   (let ((match (car (apply #'auth-source-search params))))
     (if match
         (let ((secret (plist-get match :secret)))
