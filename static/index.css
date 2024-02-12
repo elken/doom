@@ -1,25 +1,19 @@
 :root {
-  --sidebar-width: 21em;
+  --sidebar-width: 25em;
   --body-width: 70vw;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
   scroll-behavior: smooth;
 }
 
 body {
   width: var(--body-width);
-  min-width: var(--body-width);
+  overflow: auto;
   padding-left: var(--sidebar-width);
   padding-right: 1em;
   margin: 0 auto;
   line-height: 1.6;
   font-size: 1rem;
-  line-height: 1.6;
 }
 
 .content {
@@ -33,14 +27,6 @@ body {
   width: var(--sidebar-width);
   overflow-x: auto;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  margin-left: 20px;
-}
-
-#table-of-contents li.active > a {
-  color: red;
-  font-weight: 500;
 }
 
 img {
@@ -48,4 +34,32 @@ img {
   max-width: 40vw;
   height: 100%;
   object-fit: cover;
+}
+
+nav h2 {
+  margin: 0;
+}
+
+nav ul {
+  list-style: none;
+  padding: 5px 10px;
+}
+
+nav a.active,
+nav li.active > a {
+  background: #3b4252;
+  padding: 5px;
+  box-shadow: 3px 3px 11px -3px rgba(61,69,85,0.75);
+}
+
+nav li {
+  margin-bottom: 10px;
+}
+
+nav li a {
+  text-decoration: none;
+}
+
+nav a:hover {
+  padding: 5px;
 }

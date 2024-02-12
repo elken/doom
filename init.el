@@ -21,8 +21,10 @@
 ;; Make line endings work
 (setq evil-respect-visual-line-mode t)
 
+(setq doom-localleader-key ",")
+
 ;; LSP prefers plists
-;; (setenv "LSP_USE_PLISTS" "1")
+(setenv "LSP_USE_PLISTS" "1")
 
 (setq process-connection-type nil)
 
@@ -44,16 +46,16 @@
        ;;     +icons)                     ; a search engine for love and life
 
        :ui
-       deft              ; notational velocity for Emacs
+       ;; deft              ; notational velocity for Emacs
        doom                      ; what makes DOOM look the way it does
        doom-dashboard            ; a nifty splash screen for Emacs
        doom-quit                 ; DOOM quit-message prompts when you quit Emacs
-       ;; (emoji +unicode)
+       (emoji +unicode)
        ;; exwm
        ;;fill-column     ; a `fill-column' indicator
        hl-todo            ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra
-       indent-guides     ; highlighted indent columns
+       ;; indent-guides     ; highlighted indent columns
        ligatures  ; ligatures and symbols to make your code pretty again
        ;; minimap           ; show a map of the code on the side
        modeline    ; snazzy, Atom-inspired modeline, plus API
@@ -63,13 +65,13 @@
        (popup +all
               +defaults) ; tame sudden yet inevitable temporary windows
        ;; tabs              ; a tab bar for Emacs
-       (treemacs +lsp)          ; a project drawer, like neotree but cooler
+       ;; (treemacs +lsp)          ; a project drawer, like neotree but cooler
        ;; unicode           ; extended unicode support for various languages
        (vc-gutter +pretty)         ; vcs diff in the fringe
        ;; vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        (window-select +numbers)         ; visually switch windows
        workspaces       ; tab emulation, persistence & separate workspaces
-       zen               ; distraction-free coding or writing
+       ;; zen               ; distraction-free coding or writing
 
        :editor
        (evil +everywhere)               ; come to the dark side, we have cookies
@@ -93,15 +95,16 @@
        vc                  ; version-control and Emacs, sitting in a tree
 
        :term
-       eshell            ; the elisp shell that works everywhere
+       ;; eshell            ; the elisp shell that works everywhere
        ;;shell             ; simple shell REPL for Emacs
        ;;term              ; basic terminal emulator for Emacs
        vterm                            ; the best terminal emulation in Emacs
 
        :checkers
        syntax       ; tasing you for every semicolon you forget
-       (:if (executable-find "aspell") spell +aspell) ; tasing you for misspelling mispelling
+       ;; (:if (executable-find "aspell") (spell +aspell)) ; tasing you for misspelling mispelling
        ;; grammar           ; tasing grammar mistake every you make
+       jinx
 
        :tools
        ;;ansible
@@ -134,15 +137,15 @@
        ;;agda              ; types of types of types of types...
        ;;cc                ; C/C++/Obj-C madness
        (clojure +lsp)                   ; java with a lisp
-       common-lisp       ; if you've seen one lisp, you've seen them all
+       ;; common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
-       (csharp +lsp
-               +sharper
-               +tree-sitter)            ; unity, .NET, and mono shenanigans
+       ;; (csharp +lsp
+       ;;         +sharper
+       ;;         +tree-sitter) ; unity, .NET, and mono shenanigans
        data                     ; config/data formats
-       (dart +lsp
-             +flutter)   ; paint ui and not much else
+       ;; (dart +lsp
+       ;;       +flutter) ; paint ui and not much else
        ;;(elixir +lsp
        ;;        +tree-sitter)            ; erlang done right
        ;;elm               ; care for a cup of TEA?
@@ -150,9 +153,9 @@
        ;;erlang            ; an elegant language for a more civilized age
        ;;ess               ; emacs speaks statistics
        ;;faust             ; dsp, but you get to keep your soul
-       (fsharp
-        +tree-sitter
-        +lsp)                           ; ML stands for Microsoft's Language
+       ;; (fsharp
+       ;;  +tree-sitter
+       ;;  +lsp) ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        (graphql +lsp)      ; Give it a REST
        ;;gdscript          ; the language you waited for
@@ -162,22 +165,21 @@
        ;;idris             ; a language you can depend on
        (json +lsp
              +tree-sitter)              ; At least it ain't XML
-       (java +lsp
-             +tree-sitter) ; the poster child for carpal tunnel syndrome
+       ;; (java +lsp
+       ;;       +tree-sitter) ; the poster child for carpal tunnel syndrome
        (javascript +lsp
                    +tree-sitter)    ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
-       (kotlin +lsp)            ; a better, slicker Java(Script)
+       ;; (kotlin +lsp)  ; a better, slicker Java(Script)
        ;;latex             ; writing papers in Emacs has never been so fun
        ;;lean
        ;;factor
        ;;ledger            ; an accounting system in Emacs
-       (lua +fennel
-            +lsp)               ; one-based indices? one-based indices
+       (lua +lsp)               ; one-based indices? one-based indices
        (markdown +grip)          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
-       nix                              ; I hereby declare "nix geht mehr!"
-       (ocaml +lsp)             ; an objective camel
+       ;; nix                              ; I hereby declare "nix geht mehr!"
+       ;; (ocaml +lsp) ; an objective camel
        (org +gnuplot
             +dragndrop
             +journal
@@ -187,13 +189,13 @@
             +present
             +pretty
             +roam2)    ; organize your plain life in plain text
-       (php +lsp)       ; perl's insecure younger brother
+       ;; (php +lsp) ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       (python +lsp
-               +pyright
-               +tree-sitter
-               +poetry)            ; beautiful is better than ugly
+       ;; (python +lsp
+       ;;         +pyright
+       ;;         +tree-sitter
+       ;;         +poetry) ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
@@ -202,10 +204,10 @@
        ;;(ruby +lsp
        ;;      +tree-sitter
        ;;      +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       (rust +lsp
-             +tree-sitter)          ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ;; (rust +lsp
+       ;;       +tree-sitter) ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
-       scheme ; a fully conniving family of lisps
+       ;; scheme ; a fully conniving family of lisps
        (sh +lsp)     ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity          ; do you need a blockchain? No.

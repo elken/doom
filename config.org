@@ -6,10 +6,6 @@
 #+caption: Banner
 #+latex_class: chameleon
 #+html_content_class: chameleon
-#+html_head: <script src='static/index.js'></script>
-#+html_head: <link rel='stylesheet' type='text/css' href='static/index.css' />
-#+html_head: <link rel='shortcut icon' type='image/png' href='https://raw.githubusercontent.com/eccentric-j/doom-icon/master/cute-doom/src/doom.iconset/icon_32x32.png'>
-
 [[file:images/banner.png]]
 
 (icon courtesy of https://github.com/eccentric-j/doom-icon)
@@ -18,20 +14,26 @@ Below is my [[https://github.com/hlissner/doom-emacs][doom-emacs]] config. Most 
 from stackoverflow, modernemacs, [[https://github.com/daviwil][David Wilson]] and [[https://github.com/tecosaur][Tecosaur]]. Everything else will
 be commented to the best of /my/ ability.
 
+Anything that's missing from here might also be located in [[file:archive.org][the archive]], so it's
+worth skimming from there too.
+
 Most of this cobbled mess is now mine, and if you do intend to use any of it it
 would be nice if you mentioned me when doing so. It's just polite :)
 
+Depends on Emacs 29 because of some super cool stuff, so if you're not using it
+_please_ don't open any issues about missing variables.
+
+#+name: file-name
+#+begin_src emacs-lisp :tangle no
+(buffer-file-name)
+#+end_src
+
 * Table of Contents :TOC_5_gh:noexport:
-- [[#setup][Setup]]
-  - [[#workflow][Workflow]]
-  - [[#exwm-setup][EXWM Setup]]
-    - [[#modulesuiexwm][modules/ui/exwm]]
-    - [[#session][Session]]
-    - [[#startsh--start-debugsh][start.sh / start-debug.sh]]
 - [[#faq][FAQ]]
 - [[#globals][Globals]]
   - [[#constants-and-variables][Constants and Variables]]
     - [[#lexical-binding][Lexical binding]]
+    - [[#frame-title-format][Frame title format]]
     - [[#default-projectile-path][Default projectile path]]
     - [[#lookup-provider-urls][Lookup provider URLs]]
     - [[#subword-mode][Subword-mode]]
@@ -39,6 +41,7 @@ would be nice if you mentioned me when doing so. It's just polite :)
     - [[#prevent-flickering][Prevent flickering]]
     - [[#clear-snippets-before-loading][Clear snippets before loading]]
     - [[#load-env-after-reload][Load env after reload]]
+    - [[#reload-config-without-sync][Reload config without sync]]
     - [[#bury-compile-buffer][Bury compile buffer]]
     - [[#evil][Evil]]
       - [[#splits][Splits]]
@@ -62,22 +65,27 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#fix-c-backspace][Fix =c-backspace=]]
       - [[#functions][Functions]]
       - [[#multi-vterm][Multi-vterm]]
+      - [[#ensure-the-shell-is-zsh][Ensure the shell is ZSH]]
+    - [[#default-modes][Default modes]]
+  - [[#convert-a-url-to-a-valid-package-recipe][Convert a URL to a valid package recipe]]
 - [[#keybindings][Keybindings]]
   - [[#save][Save]]
   - [[#search][Search]]
   - [[#dired][Dired]]
   - [[#journal][Journal]]
 - [[#graphical-setup][Graphical setup]]
+  - [[#pixel-precision-scrolling][Pixel-precision scrolling]]
   - [[#which-key][which-key]]
   - [[#marginalia][Marginalia]]
     - [[#files][Files]]
   - [[#info-pages][Info pages]]
   - [[#dashboard][Dashboard]]
-  - [[#tab-bar-mode][Tab-bar-mode]]
   - [[#modeline][Modeline]]
   - [[#fonts][Fonts]]
+    - [[#defaults][Defaults]]
     - [[#ligatures][Ligatures]]
   - [[#theme][Theme]]
+  - [[#banner][Banner]]
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
 - [[#org-mode][Org Mode]]
@@ -85,11 +93,9 @@ would be nice if you mentioned me when doing so. It's just polite :)
   - [[#hook-setup][Hook setup]]
   - [[#org-directory][org-directory]]
   - [[#font-setup][Font setup]]
-  - [[#heading-minimap][Heading minimap]]
   - [[#properties][Properties]]
     - [[#allow-property-inheritance][Allow property inheritance]]
   - [[#characters][Characters]]
-    - [[#org-bars][org-bars]]
     - [[#headline-bullets][Headline bullets]]
     - [[#item-bullets][Item bullets]]
     - [[#dropdown-icon][Dropdown icon]]
@@ -125,88 +131,45 @@ would be nice if you mentioned me when doing so. It's just polite :)
       - [[#ox-chameleon][ox-chameleon]]
       - [[#beamer][Beamer]]
     - [[#subsuperscript-characters][(sub|super)script characters]]
+    - [[#auto-export][Auto-export]]
+  - [[#org-protocol][org-protocol]]
 - [[#languages][Languages]]
-  - [[#dart][Dart]]
-  - [[#rust][Rust]]
-  - [[#c][C#]]
-  - [[#elisp][ELISP]]
+  - [[#clojure][Clojure]]
+    - [[#epithet][Epithet]]
+    - [[#portal][Portal]]
+  - [[#lua][Lua]]
   - [[#lspdap][LSP/DAP]]
     - [[#increase-variable-line-length][Increase variable line length]]
-    - [[#ignore-files-in-xref][Ignore files in xref]]
     - [[#improve-completions][Improve completions]]
-    - [[#ignore-directories][Ignore directories]]
-  - [[#php][PHP]]
-    - [[#web-mode-setup][Web-mode setup]]
-    - [[#intelephense][Intelephense]]
-    - [[#eglot][Eglot]]
 - [[#snippets][Snippets]]
-  - [[#cape][Cape]]
   - [[#snippet-definitions][Snippet definitions]]
     - [[#org-mode-1][Org-mode]]
       - [[#__][__]]
-    - [[#php-mode][PHP-Mode]]
-      - [[#function][function]]
-      - [[#php-1][php]]
-    - [[#kotlin-mode][kotlin-mode]]
-      - [[#__-1][__]]
     - [[#slack-message-compose-buffer-mode][slack-message-compose-buffer-mode]]
       - [[#standup][standup]]
-    - [[#php-laravel-mode][+php-laravel-mode]]
-      - [[#yas-parentsel][.yas-parents.el]]
-      - [[#__-2][__]]
-      - [[#migration][migration]]
-      - [[#scope][scope]]
 - [[#packages-1][Packages]]
   - [[#disabledunpin][Disabled/unpin]]
   - [[#embark-vc][embark-vc]]
-  - [[#laravel-mode][laravel-mode]]
   - [[#prescient][prescient]]
   - [[#rainbow-identifiers][Rainbow Identifiers]]
     - [[#fix-in-web-mode][Fix in web-mode]]
   - [[#cucumber][Cucumber]]
+  - [[#systemd][Systemd]]
   - [[#rpm-spec][RPM Spec]]
+  - [[#autothemer][Autothemer]]
+  - [[#bamboo][Bamboo]]
+  - [[#yadm][YADM]]
+    - [[#tramp-yadm][tramp-yadm]]
+  - [[#keychain][Keychain]]
+  - [[#asciidoc][Asciidoc]]
+  - [[#graphviz][Graphviz]]
+  - [[#exercism][Exercism]]
+  - [[#evil-cleverparens][evil-cleverparens]]
+  - [[#litable][litable]]
 - [[#spelling][Spelling]]
-- [[#slack][Slack]]
-- [[#reaper][Reaper]]
-- [[#graphviz][Graphviz]]
-- [[#jira][Jira]]
-  - [[#org-jira][org-jira]]
-  - [[#jira-workflow][jira-workflow]]
-- [[#translate][Translate]]
 - [[#local-settings][Local settings]]
   - [[#dotenv][dotenv]]
 
-* Setup
-** Workflow
-[[file:images/overview.png]]
-
-** EXWM Setup
-One of the many usecases for this config is =exwm= which is pulled from a number of files in the current environment. Loading =exwm= is a simple case of enabling the exwm module, although it's /wildly/ untested and is basically hardcoded to just work for me. Any input is welcome, although unlikely to make it into /this/ module (until I stop being lazy and attempt to make it better for upstream....)
-
-*** modules/ui/exwm
-The primary lisp file where the bulk of the configuration is held, with everything from my process manager to a now-playing segment. Below are some usage screenshots.
-Standard doom module layout, nothing fishy going on. For those unfamiliar,
-
- - =init.el= is loaded before anything else really, which is important to properly check if the flag exists to load the exwm code as early as possible
- - =config.el= is the main bread and butter, all the config lives here (surprisingly)
- - =doctor.el= is currently just used for detecting missing exe's, by plugging into =doom doctor=
- - =packages.el= is a list of extra packages to be installed by doom's package manager
-
-[[file:images/kill-process.png]]
-
-[[file:images/tray.png]]
-
-Transparency is handled both through [[*GUI/Frame][Doom]] and via [[file:exwm/picom.conf][picom]].
-
-*** Session
-For the sake of simplicity, I use a slightly modified version of [[https://github.com/WJCFerguson/exwm-gnome-flashback][GNOME Flashback]] to run the startup scripts. It also gives me ootb access to things like =pinentry=, the various password stores, =gnome-screensaver= lock screen and the useful screenshot tool.
-
-As such, everything is themed around [[https://nordtheme.com][Nord]].
-
-Over time and due to various issues, I have been migrating to a plain =exwm= session but I haven't yet settled on the best approach.
-
-*** start.sh / start-debug.sh
-The scripts responsible for starting up exwm in the right way, including env variables and picom.
 * FAQ
 None yet because luckily nobody else has seen this spaghetti junction
 
@@ -219,6 +182,19 @@ think of one? Would have thought of one.
 
 #+begin_src emacs-lisp
 ;;; -*- lexical-binding: t; -*-
+#+end_src
+
+*** Frame title format
+Making a /marginally/ more useful title format, since we often times might not necessarily running Emacs through the host.
+
+#+begin_src emacs-lisp
+(setq-default
+ frame-title-format
+ '(:eval (format "[%%b%s] - %s"
+           (if (buffer-modified-p)
+                      " •"
+             "")
+           system-name)))
 #+end_src
 
 *** Default projectile path
@@ -240,12 +216,13 @@ Majority of the default lookup providers are useless (to me) so let's trim the f
         ("Github"            "https://github.com/search?ref=simplesearch&q=%s")
         ("Youtube"           "https://youtube.com/results?aq=f&oq=&search_query=%s")
         ("MDN"               "https://developer.mozilla.org/en-US/search?q=%s")
-        ("Nixpkgs"           "https://search.nixos.org/packages?query=%s")))
+        ("Arch Wiki"         "https://wiki.archlinux.org/index.php?search=%s&title=Special%3ASearch&wprov=acrw1")
+        ("AUR"               "https://aur.archlinux.org/packages?O=0&K=%s")))
 #+end_src
 
 *** Subword-mode
-Subword mode is a good start because PHP uses a lot of CamelCase and it makes
-refactoring slightly easier
+Subword mode is a good start because some languages use a lot of CamelCase and
+it makes refactoring slightly easier
 
 #+begin_src emacs-lisp
 (global-subword-mode 1)
@@ -271,11 +248,11 @@ Some attempt to make them reproducible.
 
 #+begin_src emacs-lisp
 (add-hook! 'org-babel-pre-tangle-hook
-  (when (file-directory-p "snippets")
+  (when (file-directory-p (expand-file-name "snippets" doom-user-dir))
     (require 'async)
     (async-start
      (lambda ()
-       (delete-directory "snippets" t (not (null delete-by-moving-to-trash))))
+       (delete-directory (expand-file-name "snippets" doom-user-dir) t (not (null delete-by-moving-to-trash))))
      (lambda (result)
        (print! "Delete snippets dir got: " result)))))
 #+end_src
@@ -285,6 +262,28 @@ Most of the time, reloading breaks. So, let's not break.
 
 #+begin_src emacs-lisp
 (add-hook! 'doom-after-reload-hook (doom-load-envvars-file (expand-file-name "env" doom-local-dir) t))
+#+end_src
+
+*** Reload config without sync
+Seems there's a bug I'm too lazy to look into atm on this, so let's just define
+another reload command for me to use that doesn't depend on =doom sync=.
+
+#+begin_src emacs-lisp
+(defun doom/reload-without-sync ()
+  (interactive)
+  (mapc #'require (cdr doom-incremental-packages))
+  (doom-context-with '(reload modules)
+    (doom-run-hooks 'doom-before-reload-hook)
+    (doom-load (file-name-concat doom-user-dir doom-module-init-file) t)
+    (with-demoted-errors "PRIVATE CONFIG ERROR: %s"
+      (general-auto-unbind-keys)
+      (unwind-protect
+          (startup--load-user-init-file nil)
+        (general-auto-unbind-keys t)))
+    (doom-run-hooks 'doom-after-reload-hook)
+    (message "Config successfully reloaded!")))
+
+(define-key! help-map "rc" #'doom/reload-without-sync)
 #+end_src
 
 *** Bury compile buffer
@@ -498,6 +497,70 @@ Useful functions for the shell-side integration provided by vterm.
   :after vterm)
 #+end_src
 
+**** Ensure the shell is ZSH
+Noticed a few weird cases where =chsh= doesn't /quite/ apply, so let's force that to be the case instead.
+
+#+begin_src emacs-lisp
+(setq vterm-shell "/bin/zsh")
+#+end_src
+
+*** Default modes
+Ensuring that correct modes are loaded for given file extensions
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.jsonc\\'" . jsonc-mode))
+
+(after! nerd-icons
+  (setf (alist-get "yuck" nerd-icons-extension-icon-alist)
+        '(nerd-icons-fileicon "lisp" :face nerd-icons-orange))
+  (setf (alist-get 'yuck-mode nerd-icons-mode-icon-alist)
+        '(nerd-icons-fileicon "lisp" :face nerd-icons-orange))
+
+  (setf (alist-get "jsonc" nerd-icons-extension-icon-alist)
+        '(nerd-icons-fileicon "config-js" :v-adjust -0.05 :face nerd-icons-orange))
+  (setf (alist-get 'jsonc-mode nerd-icons-mode-icon-alist)
+        '(nerd-icons-fileicon "config-js" :v-adjust -0.05 :face nerd-icons-orange)))
+#+end_src
+
+** Convert a URL to a valid package recipe
+Useful when copying links to try new packages. Attempt to create one using
+=straight-hosts=, but fall back if one can't be found.
+
+#+begin_src emacs-lisp
+(defun lkn/url->package (string &optional arg)
+  "Interactively select a URL from the kill-ring and create a package! block."
+  (interactive (list (consult--read-from-kill-ring) current-prefix-arg))
+  (require 'consult)
+  (require 'straight)
+  (let ((url (thread-first
+               string
+               substring-no-properties
+               (substring 1 (length string))
+               string-trim
+               url-generic-parse-url)))
+    (if-let ((host
+              (cl-find-if (lambda (cell)
+                            (member (url-host url) cell))
+                          straight-hosts)))
+        (insert
+         (concat
+          "(package! "
+          (car (last (string-split (url-filename url) "/")))
+          "\n:recipe (:host "
+          (symbol-name (car host))
+          " :repo \""
+          (substring (url-filename url) 1)
+          "\"))"))
+      (insert
+       (concat
+        "(package! "
+        (car (last (string-split (url-filename url) "/")))
+        "\n:recipe (:host nil :repo \""
+        str
+        "\"))")))
+    (call-interactively #'indent-region)))
+#+end_src
+
 * Keybindings
 It's not a custom config without some fancy keybinds
 
@@ -536,6 +599,13 @@ convenience binding
 #+end_src
 
 * Graphical setup
+** Pixel-precision scrolling
+Emacs 29 has some new hotness, including a cool new scrolling thing.
+
+#+begin_src emacs-lisp
+(when (version< "29.0.50" emacs-version)
+  (pixel-scroll-precision-mode))
+#+end_src
 ** which-key
 Remove some of the useless =evil-= prefixes from which-key commands.
 
@@ -613,59 +683,6 @@ Inhibit the menu to improve things slightly
 (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-footer)
 #+end_src
 
-** Tab-bar-mode
-Acting as a global modeline (of sorts), this could end up being quite useful but
-for now this is just testing.
-
-#+begin_src emacs-lisp
-(defun reaper-get-running-timer-duration ()
-  "Return duration of current running timer."
-  (reaper-with-buffer
-   (when reaper-running-timer
-     (reaper--hours-to-time
-      (let ((entry (assoc reaper-running-timer reaper-timeentries)))
-        (cdr (assoc :hours entry)))))))
-
-(defun reaper-modeline-vanilla ()
-  "Return modeline string for vanilla emacs."
-  (when (and (string= "" reaper-api-key)
-             (string= "" reaper-account-id))
-    ;; TODO Make this a function
-    (dotenv-update-project-env doom-user-dir)
-    (customize-set-variable 'reaper-api-key (getenv "REAPER_API_KEY"))
-    (customize-set-variable 'reaper-account-id (getenv "REAPER_ACCOUNT_ID")))
-  (when-let ((note (reaper-get-running-timer-note))
-             (timer (reaper-get-running-timer-duration)))
-    (format " [ %s | %s] " (string-trim note) timer)))
-
-(defvar reaper-modeline--timer nil)
-(defun reaper-modeline-timer ()
-  "Start/stop the time for updating reaper doom-modeline segment."
-  (if (timerp reaper-modeline--timer)
-      (cancel-timer reaper-modeline--timer))
-    (setq reaper-modeline--timer
-          (run-with-timer
-           1
-           60
-           (lambda ()
-             (reaper-with-buffer
-              (setq reaper-timeentries nil)
-              (reaper-refresh-entries))))))
-
-(after! (reaper dotenv)
-  (unless (and (or (null reaper-api-key) (string= "" reaper-api-key))
-               (or (null reaper-account-id) (string= "" reaper-account-id)))
-    (reaper-modeline-timer)
-    (add-to-list 'global-mode-string '(:eval (reaper-modeline-vanilla)))))
-
-(customize-set-variable 'tab-bar-format '(tab-bar-format-global))
-(customize-set-variable 'tab-bar-mode t)
-(when tab-bar-mode
-  (setq display-time-format " [  %H:%M %d/%m/%y]"
-        display-time-default-load-average nil)
-  (display-time-mode 1))
-#+end_src
-
 ** Modeline
 Default modeline is a tad cluttered, and because I don't use exwm anymore the
 modeline from that module isn't in use. So, it's duplicated here and tweaked.
@@ -687,13 +704,13 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
 #+end_src
 
 ** Fonts
+*** Defaults
 Configure the fonts across all used platforms (slightly different names).
 
 #+BEGIN_SRC emacs-lisp
-(setq  doom-font (font-spec :family "Iosevka Nerd Font" :size 13)
-       doom-variable-pitch-font (font-spec :family "Overpass" :size 13)
-       doom-unicode-font (font-spec :family "Iosevka Nerd Font" :size 14)
-       doom-serif-font (font-spec :family "Overpass Mono" :weight 'light))
+(setq  doom-font (font-spec :family "Iosevka Nerd Font" :size 16)
+       doom-variable-pitch-font (font-spec :family "Montserrat" :size 16)
+       doom-unicode-font (font-spec :family "Iosevka Nerd Font" :size 16))
 #+END_SRC
 
 *** Ligatures
@@ -750,20 +767,18 @@ have sparked a discussion, maybe later)
   `(tree-sitter-hl-face:function.builtin :foreground ,(doom-color 'cyan))
   `(tree-sitter-hl-face:property :foreground ,(doom-color 'dark-blue))
   `(tree-sitter-hl-face:keyword :foreground ,(doom-color 'blue))
-  `(php-class :foreground ,(doom-color 'blue))
-  `(php-php-tag :foreground ,(doom-color 'blue))
-  `(php-constant :foreground ,(doom-color 'violet))
-  `(php-magical-constant :foreground ,(doom-color 'orange))
-  `(php-operator :foreground ,(doom-color 'blue))
-  `(php-doc-$this :foreground ,(doom-color 'cyan))
-  `(php-object-op :foreground ,(doom-color 'cyan))
-  `(php-string-op :foreground ,(doom-color 'blue))
-  `(php-static-method-call :foreground ,(doom-color 'magenta))
-  `(php-method-call :foreground ,(doom-color 'magenta))
-  `(php-function-name :foreground ,(doom-lighten 'magenta 0.3))
-  `(corfu-default :font "Iosevka Nerd Font Mono" :background "#272C36" :foreground "#ECEFF4"))
+  `(corfu-default :font "Iosevka Nerd Font Mono" :background ,(doom-color 'bg-alt) :foreground ,(doom-color 'fg))
+  `(adoc-title-0-face :foreground ,(doom-color 'blue) :height 1.2)
+  `(adoc-title-1-face :foreground ,(doom-color 'magenta) :height 1.1)
+  `(adoc-title-2-face :foreground ,(doom-color 'violet) :height 1.05)
+  `(adoc-title-3-face :foreground ,(doom-lighten (doom-color 'blue) 0.25) :height 1.0)
+  `(adoc-title-4-face :foreground ,(doom-lighten (doom-color 'magenta) 0.25) :height 1.1)
+  `(adoc-verbatim-face :background nil)
+  `(adoc-list-face :background nil)
+  `(adoc-internal-reference-face :foreground ,(face-attribute 'font-lock-comment-face :foreground)))
 #+end_src
 
+** Banner
 Change the default banner (need to add the ASCII banner at some point)
 
 #+BEGIN_SRC emacs-lisp
@@ -785,18 +800,19 @@ specific modes
 #+END_SRC
 
 ** GUI/Frame
-Maximise emacs on startup
+Maximise emacs on startup when not running under awesome
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(when (string= "" (shell-command-to-string "pgrep awesome"))
+  (add-to-list 'default-frame-alist '(fullscreen . maximized)))
 #+END_SRC
 
-Add some transparency
+Add some transparency when running under awesome
 
 #+begin_src emacs-lisp
-(after! exwm
-  (set-frame-parameter (selected-frame) 'alpha 90)
-  (add-to-list 'default-frame-alist '(alpha . 90)))
+(unless (string= "" (shell-command-to-string "pgrep awesome"))
+  (set-frame-parameter (selected-frame) 'alpha-background 90)
+  (add-to-list 'default-frame-alist '(alpha-background . 90)))
 #+end_src
 
 * Org Mode
@@ -835,11 +851,12 @@ for documentation and organisation.
 Let's set a sane default directory based on where I am
 
 #+begin_src emacs-lisp
-(setq org-directory "~/Nextcloud/org")
+(setq org-directory "~/Nextcloud/org"
+      org-agenda-files '("~/Nextcloud/org/Home.org" "~/Nextcloud/org/Work.org" "~/Nextcloud/org/Notes.org"))
 #+end_src
 
 ** Font setup
-Font setup to prettify the fonts. Uses Overpass in most places except where
+Font setup to prettify the fonts. Uses Montserrat in most places except where
 it makes sense to use the defined fixed width font.
 
 #+BEGIN_SRC emacs-lisp
@@ -853,7 +870,7 @@ it makes sense to use the defined fixed width font.
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Overpass" :weight 'regular :height (cdr face)))
+    (set-face-attribute (car face) nil :font "Montserrat" :weight 'regular :height (cdr face) :slant 'unspecified))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-tag nil :foreground nil :inherit '(shadow fixed-pitch) :weight 'bold)
@@ -865,28 +882,6 @@ it makes sense to use the defined fixed width font.
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+END_SRC
-
-** Heading minimap
-Outline structure of the org documents, apparently it has cool things for
-promoting from it.
-
-#+begin_src elisp
-(package! org-ol-tree
-  :recipe (:host github :repo "Townk/org-ol-tree"))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! org-ol-tree
-  :after org
-  :commands org-ol-tree
-  :config
-  (setq org-ol-tree-ui-window-position 'left))
-
-(map! :map org-mode-map
-      :after org
-      :localleader
-      :desc "Outline" "O" #'org-ol-tree)
-#+end_src
 
 ** Properties
 *** Allow property inheritance
@@ -900,25 +895,6 @@ This may be the solution to /so/ many weird issues with src blocks.
 Tried out org-modern recently, it is /very/ nice but also detracts away from some
 of the org markup and makes editing it too hard, so back to =(:lang org +pretty)=
 we go.
-
-*** org-bars
-Indent guides meets org-mode, these are /surprisingly/ nice.
-
-Though, they don't work with variable pitch fonts :(
-
-#+begin_src elisp
-(package! org-bars
-  :recipe (:host github :repo "tonyaldon/org-bars"))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! org-bars
-  :when (and (display-graphic-p)
-             nil)
-  :hook (org-mode . org-bars-mode)
-  :init
-  (setq org-bars-extra-pixels-height 10))
-#+end_src
 
 *** Headline bullets
 I don't feel the need for fancy characters to discern depth, I found this on
@@ -948,11 +924,35 @@ When a drawer is collapsed, show a nice dropdown arrow.
 Default keywords are /far/ too minimal. This will need further tweaking as I start
 using org mode for organisation more.
 
+Some tasks we want to file an action for, eg =DONE=, =KILL= and =WAIT= occur and we want to list a reason why. =org-todo-keywords= handles this natively by simply adding ~@/!~ after the shortcut key.
+
+The below is courtesy of [[https://git.sr.ht/~gagbo/doom-config/tree/eb615417ca0cc01df89bc9a9aea06e5c99f97540/item/config-org.el#L57-62][gagbo]].
+
 #+begin_src emacs-lisp
 (after! org
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "INPROG(i)" "PROJ(p)" "STORY(s)" "WAIT(w)" "HOLD(h)" "|" "DONE(d)" "KILL(k)")
-          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))))
+        '((sequence "TODO(t)" "INPROG(i)" "PROJ(p)" "STORY(s)" "WAIT(w@/!)" "|" "DONE(d@/!)" "KILL(k@/!)")
+          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)"))
+        ;; The triggers break down to the following rules:
+
+        ;; - Moving a task to =KILLED= adds a =killed= tag
+        ;; - Moving a task to =WAIT= adds a =waiting= tag
+        ;; - Moving a task to a done state removes =WAIT= and =HOLD= tags
+        ;; - Moving a task to =TODO= removes all tags
+        ;; - Moving a task to =NEXT= removes all tags
+        ;; - Moving a task to =DONE= removes all tags
+        org-todo-state-tags-triggers
+        '(("KILL" ("killed" . t))
+          ("HOLD" ("hold" . t))
+          ("WAIT" ("waiting" . t))
+          (done ("waiting") ("hold"))
+          ("TODO" ("waiting") ("cancelled") ("hold"))
+          ("NEXT" ("waiting") ("cancelled") ("hold"))
+          ("DONE" ("waiting") ("cancelled") ("hold")))
+
+        ;; This settings allows to fixup the state of a todo item without
+        ;; triggering notes or log.
+        org-treat-S-cursor-todo-selection-as-state-change nil))
 #+end_src
 
 ** Agenda/Log
@@ -1010,6 +1010,10 @@ proper value.
 
 ** Mixed pitch
 Enable =mixed-pitch-mode= to enable the more readable fonts where it makes sense.
+
+#+begin_src elisp
+(package! mixed-pitch)
+#+end_src
 
 #+begin_src emacs-lisp
 (setq +zen-mixed-pitch-modes '(org-mode LaTeX-mode markdown-mode gfm-mode Info-mode rst-mode adoc-mode))
@@ -1135,6 +1139,7 @@ Programmers are, by design, lazy
   :after org
   :init
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("els" . "src elisp"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
 #+end_src
 
@@ -1281,7 +1286,7 @@ is selected, only the bare key is returned."
 (advice-add 'org-mks :override #'org-mks-pretty)
 #+end_src
 
-The [[file:~/.emacs.doom/bin/org-capture][org-capture bin]] is rather nice, but I'd be nicer with a smaller frame, and
+The [[file:~/.config/emacs/bin/org-capture][doom org-capture bin]] is rather nice, but I'd be nicer with a smaller frame, and
 no modeline.
 
 #+begin_src emacs-lisp
@@ -1324,6 +1329,15 @@ Sprinkle in some =doct= utility functions
 And we can now add some templates! This isn't even remotely set in stone, I wouldn't even describe them as set in /jelly/ really.
 #+begin_src emacs-lisp
 (after! org-capture
+  (defun +org-capture/replace-brackets (link)
+    (mapconcat
+     (lambda (c)
+       (pcase (key-description (vector c))
+         ("[" "(")
+         ("]" ")")
+         (_ (key-description (vector c)))))
+     link))
+
   (setq org-capture-templates
         (doct `(("Home" :keys "h"
                  :icon ("home" :set "octicon" :color "cyan")
@@ -1344,7 +1358,7 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                 ("Note" :keys "n"
                  :icon ("sticky-note" :set "faicon" :color "yellow")
                  :file "Notes.org"
-                 :template ("* *?"
+                 :template ("* %?"
                             "%i %a"))
                 ("Journal" :keys "j"
                  :icon ("calendar" :set "faicon" :color "pink")
@@ -1357,6 +1371,21 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                  :template "** %(format-time-string org-journal-time-format)%^{Title}\n%i%?"
                  :jump-to-captured t
                  :immediate-finish t)
+                ("Protocol" :keys "P"
+                 :icon ("link" :set "faicon" :color "blue")
+                 :file "Notes.org"
+                 :template ("* TODO %^{Title}"
+                            "Source: %u"
+                            "#+BEGIN_QUOTE"
+                            "%i"
+                            "#+END_QUOTE"
+                            "%?"))
+                ("Protocol link" :keys "L"
+                 :icon ("link" :set "faicon" :color "blue")
+                 :file "Notes.org"
+                 :template ("* TODO %?"
+                            "[[%:link][%:description]]"
+                            "Captured on: %U"))
                 ("Project" :keys "p"
                  :icon ("repo" :set "octicon" :color "silver")
                  :prepend t
@@ -1374,9 +1403,7 @@ And we can now add some templates! This isn't even remotely set in stone, I woul
                             ("Note" :keys "n"
                              :icon ("sticky-note" :set "faicon" :color "yellow")
                              :keyword "%U"
-                             :file +org-capture-project-notes-file)))
-                ))))
-
+                             :file +org-capture-project-notes-file)))))))
 #+end_src
 
 ** Export
@@ -1621,59 +1648,12 @@ Tectonic is the hot new thing, which also means I can get rid of my tex installa
 (setq-default org-latex-pdf-process '("tectonic -Z shell-escape --outdir=%o %f"))
 #+end_src
 
-**** TODO Classes
-Simple base header shared by all defines classes
-
-#+name: base-template
-#+begin_src latex
-\\documentclass[10pt]{scrartcl}
-[PACKAGES]
-[DEFAULT-PACKAGES]
-[EXTRA]
-\\setmainfont[Ligatures=TeX]{Overpass}
-\\setmonofont[Ligatures=TeX]{Iosevka Nerd Font Mono}
-#+end_src
-
-#+name: chameleon-template
-#+begin_src latex :noweb yes
-% Using chameleon
-<<base-template>>
-#+end_src
-
-#+name: work-template
-#+begin_src latex :noweb yes
-% Using work
-<<base-template>>
-\\usepackage{fontawesome5}
-\\usepackage{tcolorbox}
-\\usepackage{fancyhdr}
-\\usepackage{lastpage}
-\\pagestyle{fancy}
-\\fancyhead{}
-\\fancyhead[RO, LE]{}
-#+end_src
-
-Now for some class setup (likely to change over time)
-
-#+begin_src emacs-lisp :noweb no-export
-(after! ox-latex
-  (add-to-list 'org-latex-classes
-               '("chameleon" "
-<<chameleon-template>>
-"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
-#+end_src
-
-And some saner default for them
+**** Classes
+Add some saner defaults for them
 
 #+begin_src emacs-lisp
 (after! ox-latex
-  (setq org-latex-default-class "chameleon"
-        org-latex-tables-booktabs t
+  (setq org-latex-tables-booktabs t
         org-latex-hyperref-template "\\colorlet{greenyblue}{blue!70!green}
 \\colorlet{blueygreen}{blue!40!green}
 \\providecolor{link}{named}{greenyblue}
@@ -1795,62 +1775,157 @@ Annoying having to gate these, so let's fix that
 (setq org-export-with-sub-superscripts '{})
 #+end_src
 
+*** Auto-export
+Defines a minor mode I can use to automatically export a PDF on save.
+
+#+begin_src emacs-lisp
+(defun +org-auto-export ()
+  (org-beamer-export-to-pdf t))
+
+(define-minor-mode org-auto-export-mode
+  "Toggle auto exporting the Org file."
+  :global nil
+  :lighter ""
+  (if org-auto-export-mode
+      ;; When the mode is enabled
+      (progn
+        (add-hook 'after-save-hook #'+org-auto-export :append :local))
+    ;; When the mode is disabled
+    (remove-hook 'after-save-hook #'+org-auto-export :local)))
+#+end_src
+
+** org-protocol
+Interact with org-mode from other applications, /including my web browser/. Being
+able to create things like tasks and other org items from anywhere sounds ideal.
+
+#+begin_src emacs-lisp
+(use-package! org-protocol
+  :defer t)
+#+end_src
+
+#+begin_src conf :tangle ~/.local/share/applications/org-protocol.desktop :mkdirp yes :noweb yes
+# DO NOT EDIT THIS
+# I have been generated from <<file-name()>>
+[Desktop Entry]
+Name=org-protocol
+Comment=Intercept calls from emacsclient to trigger custom actions
+Categories=Other;
+Keywords=org-protocol;
+Icon=emacs
+Type=Application
+Exec=emacsclient -- %u
+Terminal=false
+StartupWMClass=Emacs
+MimeType=x-scheme-handler/org-protocol;
+#+end_src
+
 * Languages
 Configuration for various programming languages.
 
-** Dart
-Simple hook/project mode to update translations on save.
+** Clojure
 
-#+begin_src emacs-lisp
-(after! lsp-dart
-  (customize-set-variable 'lsp-dart-dap-extension-version "3.46.1")
+*** Epithet
+Buffers are pretty great, but sometimes they can be named ... less usefully.
 
-  (defun lsp-dart--intl-update ()
-    "Update translations on save."
-    (when (and +dart-intl-mode
-               buffer-file-name
-               (string-search "lib/l10n" buffer-file-name))
-      (lsp-dart--run-command (lsp-dart-flutter-command) "pub run intl_utils:generate")))
-
-  (def-project-mode! +dart-intl-mode
-    :modes '(json-mode)
-    :files (and "pubspec.yaml" "lib/l10n")
-    :on-enter (add-hook 'after-save-hook #'lsp-dart--intl-update)
-    :on-exit (remove-hook 'after-save-hook #'lsp-dart--intl-update))
-
-  (setq lsp-dart-dap-flutter-hot-reload-on-save t))
+#+begin_src elisp
+(package! epithet
+  :recipe (:host github :repo "oantolin/epithet"))
 #+end_src
 
-** Rust
-Rust is the hot new thing, guess I better jump on the bandwagon if I want to stay cool.
-
 #+begin_src emacs-lisp
-(after! lsp-mode
-  (setq lsp-rust-analyzer-display-parameter-hints t
-        lsp-rust-analyzer-server-display-inlay-hints t))
+(use-package! epithet
+  :hook (clojure-mode . epithet-rename-buffer)
+  :init
+  ;; (setq-hook! 'clojure-mode-hook doom-modeline-buffer-file-name-style 'buffer-name)
+  (defun epithet-for-clojure ()
+    "Suggest a name for a `clojure-mode' buffer."
+    (when (and (require 'cider nil t)
+               (derived-mode-p 'clojure-mode))
+      (after! doom-modeline
+        (setq-local doom-modeline-buffer-file-name-style 'buffer-name))
+      (format
+       "%s <%s>"
+       (substring-no-properties (cider-current-ns))
+       (projectile-project-name))))
+
+  :config
+  (add-to-list 'epithet-suggesters #'epithet-for-clojure)
+  (after! doom-modeline
+    (advice-add #'epithet-rename-buffer :after #'doom-modeline-update-buffer-file-name)))
 #+end_src
 
-** C#
-Projectile doesn't recognise these projects properly, so we have to fix that
+*** Portal
+This portal thing looks pretty cool yanno.
 
 #+begin_src emacs-lisp
-(after! projectile
-  (defun projectile-dotnet-project-p ()
-    "Check if a project contains a *.sln file at the project root, or either
-a .csproj or .fsproj file at either the project root or within src/*/."
-    (or (projectile-verify-file-wildcard "?*.sln")
-        (projectile-verify-file-wildcard "?*.csproj")
-        (projectile-verify-file-wildcard "src/*/?*.csproj")
-        (projectile-verify-file-wildcard "?*.fsproj")
-        (projectile-verify-file-wildcard "src/*/?*.fsproj"))))
+(defvar lkn/clj-portal-viewers '(":portal.viewer/inspector"
+                                 ":portal.viewer/pprint"
+                                 ":portal.viewer/table"
+                                 ":portal.viewer/tree"
+                                 ":portal.viewer/hiccup"))
+
+(defun lkn/clj-start-of-sexp ()
+  (save-excursion
+    (paredit-backward-up)
+    (point)))
+
+(defun lkn/clj-end-of-sexp ()
+  (save-excursion
+    (paredit-forward-up)
+    (point)))
+
+(defun lkn/portal-open ()
+  (interactive)
+  (cider-nrepl-sync-request:eval
+   "(do (ns dev) (def portal ((requiring-resolve 'portal.api/open) {:launcher :emacs})) (add-tap (requiring-resolve 'portal.api/submit)))"))
+
+(defun lkn/portal-clear ()
+  (interactive)
+  (cider-nrepl-sync-request:eval "(portal.api/clear)"))
+
+(defun lkn/portal-close ()
+  (interactive)
+  (cider-nrepl-sync-request:eval "portal.api/close"))
+
+(defun lkn/portal-tap-contained (&optional viewer)
+  (interactive (list (when (consp current-prefix-arg)
+                       (completing-read "Default Viewer: " lkn/clj-portal-viewers))))
+  (let ((beg (lkn/clj-start-of-sexp))
+        (end (lkn/clj-end-of-sexp)))
+    (cider-interactive-eval
+   (format "(tap> ^{:portal.viewer/default %s} %s)" (or viewer (car lkn/clj-portal-viewers)) (buffer-substring-no-properties beg end)))))
+
+(defun lkn/portal-tap-last (&optional viewer)
+  (interactive (list (when (consp current-prefix-arg)
+                       (completing-read "Default Viewer: " lkn/clj-portal-viewers))))
+  (cider-interactive-eval
+   (format "(tap> ^{:portal.viewer/default %s} %s)" (or viewer (car lkn/clj-portal-viewers)) (cider-last-sexp))))
+
+(map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+      :localleader
+      (:prefix ("p p" . "Portal")
+        :desc "Open Portal"
+        "o" #'lkn/portal-open
+        :desc "Clear layers"
+        "c" #'lkn/portal-clear
+        :desc "Close current session"
+        "q" #'lkn/portal-close
+        :desc "Send sexp around point"
+        "s" #'lkn/portal-tap-contained
+        :desc "Send sexp next to point"
+        "S" #'lkn/portal-tap-last))
 #+end_src
 
-** ELISP
-/Finally/ get the completion in elisp working (not sure why it's been so bad for so long...)
+** Lua
+First things first; we need a project mode for my awesomewm config.
 
 #+begin_src emacs-lisp
-(set-company-backend! 'emacs-lisp-mode
-  'company-capf 'company-yasnippet)
+(def-project-mode! +awesome-config-mode
+  :modes '(lua-mode)
+  :files ("rc.lua")
+  :when (string-prefix-p (expand-file-name "awesome" (xdg-config-home)) default-directory))
+
+(add-hook '+awesome-config-mode-hook #'rainbow-mode)
 #+end_src
 
 ** LSP/DAP
@@ -1859,32 +1934,6 @@ By default this is /way/ too short.
 
 #+begin_src emacs-lisp
 (setq dap-ui-variable-length 200)
-#+end_src
-
-*** Ignore files in xref
-PHP is a dumb language (don't get me started...), as such we need extra files to
-get decent completion & documentation. 0% of the time will we want to use them
-as references, so we won't.
-
-#+begin_src emacs-lisp
-(defvar xref-ignored-files '("_ide_helper_models.php" "_ide_helper.php")
-  "List of files to be ignored by `xref'.")
-
-(defun xref-ignored-file-p (item)
-  "Return t if `item' should be ignored."
-  (seq-some
-   (lambda (cand)
-     (string-suffix-p cand (oref (xref-item-location item) file))) xref-ignored-files))
-
-(defadvice! +lsp--ignored-locations-to-xref-items-a (items)
-  "Remove ignored files from list of xref-items."
-  :filter-return #'lsp--locations-to-xref-items
-  (cl-remove-if #'xref-ignored-file-p items))
-
-(defadvice! +lsp-ui-peek--ignored-locations-a (items)
-  "Remove ignored files from list of xref-items."
-  :filter-return #'lsp-ui-peek--get-references
-  (cl-remove-if #'xref-ignored-file-p items))
 #+end_src
 
 *** Improve completions
@@ -1896,95 +1945,14 @@ The default completions are quite bad
         '(:separate company-capf company-yasnippet company-dabbrev)))
 #+end_src
 
-*** Ignore directories
-Add some extra ignored directories for =+lsp=.
-
-#+begin_src emacs-lisp
-(after! lsp-mode
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\vendor"))
-#+end_src
-
-And some more for projectile
-
-#+begin_src emacs-lisp
-(after! projectile
-  (add-to-list 'projectile-globally-ignored-directories "vendor"))
-#+end_src
-
-** PHP
-*** Web-mode setup
-#+begin_src emacs-lisp
-(after! web-mode
-  (pushnew! web-mode-engines-alist '(("blade"  . "\\.blade\\."))))
-#+end_src
-
-*** Intelephense
-Because I'm a massive sellout who likes features
-
-#+begin_src emacs-lisp
-(after! eglot
-  (setq lsp-intelephense-licence-key (or (ignore-errors (fetch-auth-source :user "intelephense") nil))))
-#+end_src
-
-*** Eglot
-Trying out this eglot thing for a bit, let's see how it goes.
-
-Make sure it's loaded in php-mode
-
-#+begin_src emacs-lisp
-(after! eglot
-  (add-hook 'php-mode-hook 'eglot-ensure)
-  (add-hook 'dart-mode-hook 'eglot-ensure))
-#+end_src
-
-Set some config needed for the server
-
-#+begin_src emacs-lisp
-(when (modulep! :tools lsp +eglot)
-  (defvar php-intelephense-storage-path (expand-file-name "lsp-intelephense" doom-etc-dir))
-  (defvar php-intelephense-command (expand-file-name "lsp/npm/intelephense/bin/intelephense" doom-etc-dir)))
-#+end_src
-
-And set the server to be loaded
-
-#+begin_src emacs-lisp
-(after! eglot
-  (defclass eglot-php (eglot-lsp-server) () :documentation "PHP's Intelephense")
-  (cl-defmethod eglot-initialization-options ((server eglot-php))
-    "Passes through required intelephense options"
-    `(:storagePath ,php-intelephense-storage-path
-      :licenceKey ,lsp-intelephense-licence-key
-      :clearCache t))
-  (add-to-list 'eglot-server-programs `((php-mode phps-mode) . (eglot-php . (,php-intelephense-command "--stdio")))))
-#+end_src
-
 * Snippets
 I constantly find myself complaining I don't have snippets setup, and yet I
 always forget to set snippets up. [[https://www.youtube.com/watch?v=sc5iTNVEOAg][My own worst enemy]]? Probably. But who's
 keeping score...
 
-** Cape
-Capes are kinda cool
-#+begin_src elisp
-(package! cape-yasnippet
-  :recipe (:local-repo "~/build/elisp/cape-yasnippet"
-           :build (:not compile)))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! cape-yasnippet
-  :after cape
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-yasnippet)
-  (after! lsp-mode
-    (add-hook 'lsp-managed-mode-hook #'cape-yasnippet--lsp))
-  (after! eglot
-    (add-hook 'eglot-managed-mode-hook #'cape-yasnippet--eglot)))
-#+end_src
-
 ** Snippet definitions
 :PROPERTIES:
-:header-args:snippet: :mkdirp yes :tangle (expand-file-name (downcase (elt (org-get-outline-path t) (- (length (org-get-outline-path t)) 1))) (expand-file-name (downcase (elt (org-get-outline-path t) 1)) "snippets"))
+:header-args:snippet: :mkdirp yes :tangle (expand-file-name (downcase (car (last (org-get-outline-path t)))) (expand-file-name (downcase (car (last (butlast (org-get-outline-path t))))) "snippets"))
 :END:
 
 A collection of snippets tangled using clever magic.
@@ -1995,53 +1963,12 @@ A collection of snippets tangled using clever magic.
 # -*- mode: snippet -*-
 # name: Org template
 # --
-#+title: ${1:`(s-titleized-words (replace-regexp-in-string "^[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9]-" "" (file-name-base (or buffer-file-name "new buffer"))))`}
-#+author: ${2:`(user-full-name)`}
-#+date: ${3:`(format-time-string "%Y-%m-%d")`}
-#+latex_class: chameleon
+,#+title: ${1:`(s-titleized-words (replace-regexp-in-string "^[0-9]\\{4\\}-[0-9][0-9]-[0-9][0-9]-" "" (file-name-base (or buffer-file-name "new buffer"))))`}
+,#+author: ${2:`(user-full-name)`}
+,#+date: \today
+,#+latex_class: chameleon
 
 $0
-#+end_src
-
-*** PHP-Mode
-**** function
-#+begin_src snippet
-# -*- mode: snippet -*-
-# name: function
-# key: fu
-# uuid: fu
-# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
-# --
-${1:$$(yas-auto-next (yas-completing-read "Visibility (public): " '("public" "private" "protected") nil nil nil nil "public"))} function ${2:name}($3)
-{
-    $0
-}
-#+end_src
-
-**** php
-#+begin_src snippet
-# -*- mode: snippet -*-
-# name: <?php
-# key: php
-# uuid: php
-# --
-<?php
-$0
-#+end_src
-
-*** kotlin-mode
-**** __
-
-#+begin_src snippet
-# -*- mode: snippet -*-
-# name: Kotlin template
-# --
-package `(mapconcat 'identity (cdr (member "kotlin" (split-string default-directory "/" t))) ".")`
-
-class `(s-join "" (mapcar 's-titleize (s-split-words (file-name-base buffer-file-name))))`
-{
-    $0
-}
 #+end_src
 
 *** slack-message-compose-buffer-mode
@@ -2058,81 +1985,6 @@ $1: $2
 *Blocked*: $4
 #+end_src
 
-*** +php-laravel-mode
-**** .yas-parents.el
-#+begin_src emacs-lisp
-
-(eval-when-compile (require 'subr-x))
-
-(defun string-split-words (string)
-  (split-string
-   (let ((case-fold-search nil))
-     (replace-regexp-in-string
-      "\\([[:lower:]]\\)\\([[:upper:]]\\)" "\\1 \\2"
-      (replace-regexp-in-string "\\([[:upper:]]\\)\\([[:upper:]][0-9[:lower:]]\\)" "\\1 \\2" string)))
-   "[^[:word:]0-9]+"
-   t))
-
-(defun +php-laravel-mode--get-namespace ()
-    "Get a formatted namespace for the current PHP file"
-    (substring
-        (replace-regexp-in-string "/" (regexp-quote "\\")
-            (thread-first
-                buffer-file-name
-                (file-relative-name (doom-project-root))
-                file-name-directory
-                capitalize))
-        0
-        -1))
-
-(defun +php-laravel-mode--get-class-name ()
-    "Get a formatted class name for the current PHP file"
-    (string-join (mapcar 'capitalize (string-split-words (file-name-base buffer-file-name)))))
-#+end_src
-**** __
-
-#+begin_src snippet
-# -*- mode: snippet -*-
-# name: PHP template
-# --
-<?php
-
-namespace `(+php-laravel-mode--get-namespace)`;
-
-class `(+php-laravel-mode--get-class-name)`
-{
-    $0
-}
-#+end_src
-
-**** migration
-#+begin_src snippet
-# -*- mode: snippet -*-
-# name: Laravel Migration method
-# key: mig
-# uuid: mig
-# --
-Schema::table('$1', function (Blueprint $table) {
-    `%`$0
-});
-#+end_src
-
-**** scope
-#+begin_src snippet
-# -*- mode: snippet -*-
-# name: Sentry scope
-# key: scope
-# uuid: scope
-# --
-withScope(function (Scope $scope) use ($1) {
-    $scope->setContext('$2', [
-        $3
-    ]);
-
-    `%`$0
-});
-#+end_src
-
 * Packages
 Place to put packages that don't have a guaranteed home yet.
 
@@ -2141,14 +1993,14 @@ Packages to be unpinned or just completely disabled
 
 #+begin_src elisp
 (disable-packages! evil-escape)
-(unpin! vterm)
-(unpin! lsp-mode)
-(unpin! lsp-dart)
-(when (modulep! :tools lsp +eglot)
-  (unpin! eglot))
-(unpin! forge)
-(when (modulep! :completion corfu)
-  (unpin! evil-collection))
+(package! apheleia
+ :recipe (:local-repo "~/build/elisp/apheleia"))
+(package! engrave-faces
+  :recipe (:host github :repo "elken/engrave-faces"))
+(package! ox-chameleon
+  :recipe (:host github :repo "elken/ox-chameleon"))
+(package! forge
+  :recipe (:host github :repo "elken/forge" :branch "feat/forge-max-topics"))
 #+end_src
 
 ** embark-vc
@@ -2161,25 +2013,6 @@ Embark additions to improve various vc operations
 #+begin_src emacs-lisp
 (use-package! embark-vc
   :after embark)
-#+end_src
-
-** laravel-mode
-Not yet fit for human consumption, but fit for mine because I'm +sub+ super-human
-
-#+begin_src elisp
-(package! laravel-mode
-  :recipe (:local-repo "~/build/elisp/laravel-mode"
-           :build (:not compile)))
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! laravel-tinker
-  :after php-mode
-  :init
-  (set-popup-rule! "^\\tinker:" :vslot -5 :size 0.35 :select t :modeline nil :ttl nil)
-  (map! :localleader
-         :map php-mode-map
-         :desc "Toggle a project-local Tinker REPL" "o t" #'laravel-tinker-toggle))
 #+end_src
 
 ** prescient
@@ -2234,6 +2067,18 @@ Needed for feature test files
   :mode "\\.feature$")
 #+end_src
 
+** Systemd
+Starting to actually write more of these now, so this is an easy sell
+
+#+begin_src elisp
+(package! systemd)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! systemd
+  :mode "\\.service$")
+#+end_src
+
 ** RPM Spec
 Needed for rpm files to not be treated poorly (there, there)
 
@@ -2247,77 +2092,82 @@ Needed for rpm files to not be treated poorly (there, there)
   :mode "\\.spec\\(\\.in\\)?$")
 #+end_src
 
-* Spelling
-
-#+begin_src emacs-lisp
-(setq ispell-program-name "aspell"
-      ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
-      ispell-dictionary "en"
-      ispell-personal-dictionary "~/Nextcloud/dict")
-
-(after! cape
-  (setq cape-dict-file (if (file-exists-p ispell-personal-dictionary) ispell-personal-dictionary cape-dict-file)))
-#+end_src
-
-* Slack
-Includes a couple of niceties locally, these /may/ end up in a module one day.
+** Autothemer
+Needed for a very WIP theme, otherwise not needed.
 
 #+begin_src elisp
-(package! slack)
+(package! autothemer)
+#+end_src
+
+** Bamboo
+Setup for my package for integrating with Bamboo HR
+
+#+begin_src elisp
+(package! bhr
+  :recipe (:host github :repo "elken/bhr.el"))
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! slack
-  :commands (slack-start)
-  :custom
-  (slack-buffer-emojify t)
-  (slack-prefer-current-team t)
-  (slack-enable-global-mode-string t)
-  (slack-modeline-count-only-subscribed-channel nil)
+(use-package! bhr
+  :commands (bhr-view-timesheet bhr-submit-multiple))
+#+end_src
+
+** YADM
+[[https://yadm.io][yadm]] is my preferred dotfile manager of choice, but by default because of the nature of how the repo is handled; it's quite a pain to manage from Emacs.
+
+*** tramp-yadm
+tramp-yadm to the rescue! This lets me use magit & projectile as expected on the repo; allowing me to manage dotfile changes with the superior git client.
+
+#+begin_src elisp
+(package! tramp-yadm
+  :recipe (:host github :repo "seanfarley/tramp-yadm"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! tramp-yadm
+  :defer t
   :init
-  (require 'auth-source)
-  (require 'slack-util)
-
-  (defun +slack/register-team (&rest plist)
-    "Given an email, get the `:token' and `:cookie' for the given EMAIL."
-    (let ((token (auth-source-pick-first-password
-                  :host (plist-get plist :host)
-                  :user (plist-get plist :email)))
-          (cookie (auth-source-pick-first-password
-                   :host (plist-get plist :host)
-                   :user (format "%s^cookie" (plist-get plist :email)))))
-      (apply 'slack-register-team (slack-merge-plist `(:token ,token :cookie ,cookie) plist))))
-
-  (defun +slack/post-standup-message ()
-    "Create a standup message to send to a room."
+  (defun yadm-status ()
+    "Invoke magit on the yadm repo"
     (interactive)
-    (let* ((team (slack-team-select))
-           (channel (slack-room-select
-                     (cl-loop for team in (list team)
-                              for channels = (append (slack-team-channels team) (slack-team-ims team))
-                              nconc channels)
-                     team))
-           (buf (slack-create-room-message-compose-buffer channel team)))
+    (magit-status "/yadm::~")
+    (setq-local magit-git-executable (executable-find "yadm"))
+    (setq-local magit-remote-git-executable (executable-find "yadm")))
 
-      (slack-buffer-display buf)
-      (yas-expand-snippet (yas-lookup-snippet "Standup template" 'slack-message-compose-buffer-mode)))))
+  (after! magit
+    (tramp-yadm-register)
+    (map! :leader :desc "Open yadm status" "g p" #'yadm-status)))
 #+end_src
 
-* Reaper
-Emacs client for Harvest, the time tracker we use at =$DAYJOB=. Over time, this
-will likely become more config than just a dump of macros.
+** Keychain
+[[http://www.funtoo.org/wiki/Keychain][Keychain]] is /amazing/. It wraps ssh-agent and gpg-agent so I never have to.
 
-#+begin_src elisp
-(package! reaper)
-#+end_src
+The /problem/ is Emacs doesn't always detect it nicely ... until now!
 
 #+begin_src emacs-lisp
-(use-package! reaper
-   :init
-   (map! :leader :n :desc "Track time" "t t" #'reaper))
+(defun +keychain-startup-hook ()
+    "Load keychain env after emacs"
+    (let* ((ssh (shell-command-to-string "keychain -q --noask --agents ssh --eval"))
+           (gpg (shell-command-to-string "keychain -q --noask --agents gpg --eval")))
+      (list (and ssh
+                 (string-match "SSH_AUTH_SOCK[=\s]\\([^\s;\n]*\\)" ssh)
+                 (setenv       "SSH_AUTH_SOCK" (match-string 1 ssh)))
+            (and ssh
+                 (string-match "SSH_AGENT_PID[=\s]\\([0-9]*\\)?" ssh)
+                 (setenv       "SSH_AGENT_PID" (match-string 1 ssh)))
+            (and gpg
+                 (string-match "GPG_AGENT_INFO[=\s]\\([^\s;\n]*\\)" gpg)
+                 (setenv       "GPG_AGENT_INFO" (match-string 1 gpg))))))
+
+(add-hook 'after-init-hook #'+keychain-startup-hook)
 #+end_src
 
-* Graphviz
+** Asciidoc
+#+begin_src elisp
+(package! adoc-mode)
+#+end_src
+
+** Graphviz
 Some config to help with graphviz
 
 #+begin_src elisp
@@ -2331,70 +2181,73 @@ Some config to help with graphviz
     (require 'company-graphviz-dot)))
 #+end_src
 
-* Jira
-Config related to setting up Jira.
+** Exercism
+Exercism is a useful site for learning a programming language by performing
+various exercises. You can opt to use either an in-browser editor or your own
+via a local CLI.
 
-** org-jira
-Used for accessing Jira tasks through org-mode. Jira's interface is /quite/ a mess
-so I'd rather not use it as much.
-
-You know what we love? =org-mode=.
+Which do you think I want?
 
 #+begin_src elisp
-(package! org-jira)
+(package! exercism-modern
+  :recipe (:files (:defaults "icons")
+           :host github :repo "elken/exercism-modern"))
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package! org-jira
-  :commands (org-jira-get-issues org-jira-get-issues-from-custom-jql)
+(use-package! exercism-modern
+  :commands (exercism-modern-jump exercism-modern-view-tracks))
+#+end_src
+
+** evil-cleverparens
+Trying to find a decent structural editor I like...
+
+#+begin_src elisp
+(package! evil-cleverparens
+  :recipe (:host github :repo "tomdl89/evil-cleverparens" :branch "fix/delete-escaped-parens"))
+
+(package! paredit)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! paredit
+  :hook (emacs-lisp-mode . paredit-mode)
+  :hook (clojure-mode . paredit-mode))
+
+(use-package! evil-cleverparens
+  :when (modulep! :editor evil +everywhere)
+  :hook (paredit-mode . evil-cleverparens-mode))
+#+end_src
+
+** litable
+This is literally the coolest package ever...
+
+#+begin_src elisp
+(package! litable
+  :recipe (:host github :repo "Fuco1/litable"))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! litable
+  :custom
+  (litable-list-file (expand-file-name "litable-lists.el" doom-cache-dir))
   :init
-  (let ((dir (expand-file-name ".org-jira"
-                               (or (getenv "XDG_CONFIG_HOME")
-                                   (getenv "HOME")))))
-    (unless (file-directory-p dir)
-      (make-directory dir))
-    (setq org-jira-working-dir dir)))
+  (map! :localleader
+        :map emacs-lisp-mode-map
+        (:prefix ("t" . "toggle")
+          "l" #'litable-mode)))
 #+end_src
 
-** jira-workflow
-Custom package I've written to handle some of my jira workflow usage to get over
-some of the gripes I have. Still some features left to work on (eg automatic
-ticket movement) but for the most part it does a decent job
-
-#+begin_src elisp
-(package! jira-workflow
-  :recipe (:host github :repo "elken/jira-workflow"))
-#+end_src
+* Spelling
 
 #+begin_src emacs-lisp
-(use-package! jira-workflow
-  :after dotenv
-  :commands (jira-workflow-start-ticket)
-  :init
-  (map!
-   :desc "Start working on a ticket"
-   :leader "g c B"
-   #'jira-workflow-start-ticket))
-#+end_src
+(setq ispell-program-name "aspell"
+      ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB")
+      ispell-dictionary "en"
+      ispell-personal-dictionary "~/Nextcloud/dict")
 
-* Translate
-I do a decent amount of copy/paste translating stuff for work, so let's make this /easier/.
-
-#+begin_src elisp
-(package! google-translate)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package! google-translate
-  :config
-  (defun google-translate--search-tkk ()
-    "Search TKK."
-    (list 430675 2721866130))
-  (setf (alist-get "Kinyarwanda" google-translate-supported-languages-alist) "rw")
-  (setq google-translate-output-destination 'kill-ring)
-  (setq google-translate-translation-directions-alist
-        '(("en" . "fr")
-          ("en" . "rw"))))
+(after! cape
+  (setq cape-dict-file (if (file-exists-p ispell-personal-dictionary) ispell-personal-dictionary cape-dict-file)))
 #+end_src
 
 * Local settings
@@ -2419,10 +2272,7 @@ Better handle setting of environment variables needed for various tools
     (add-hook! 'doom-init-ui-hook
       (defun +dotenv-startup-hook ()
         "Load .env after starting emacs"
-        (dotenv-update-project-env doom-user-dir)
-        (customize-set-variable 'jiralib-url (getenv "JIRALIB_URL"))
-        (customize-set-variable 'jira-workflow-harvest-service-icon-url (getenv "JIRA_WORKFLOW_SERVICE_ICON_URL"))
-        (customize-set-variable 'jira-workflow-harvest-service-name (replace-regexp-in-string "http[s]://" "" jiralib-url)))))
+        (dotenv-update-project-env doom-user-dir))))
   :config
   (add-hook! 'projectile-after-switch-project-hook
     (defun +dotenv-projectile-hook ()

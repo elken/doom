@@ -1,0 +1,51 @@
+name: "Publish"
+on:
+  push:
+    branches: master
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04 # change to -latest when possible
+    container:
+      image: ghcr.io/elken/doom:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get Doom's version
+        id: doom-version
+        run: |
+          git config --global --add safe.directory /__w/doom/doom
+          echo "doom_hash=$(git log -1 | head -1 | awk '"'"'{print substr($2,1,8)}'"'"')" >> $GITHUB_ENV
+
+      - name: Cache Doom's Install
+        id: doomcache
+        uses: actions/cache@v2
+        with:
+          path: /root/.config/emacs
+          key: ${{ runner.os }}-doom@${{ env.doom_hash }}
+
+      - name: Export config
+        env:
+          DOOMDIR: /__w/doom/doom
+        run: |
+          /root/.config/emacs/bin/doom sync -u
+          /root/.config/emacs/bin/doom publish
+
+      - name: 🚀 Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.6
+        with:
+          branch: gh-pages
+          folder: out
