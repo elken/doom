@@ -1,0 +1,6 @@
+#+title: Readme
+#+author: Ellis Kenyő
+#+date: \today
+#+latex_class: chameleon
+
+A simple module to customize tab-bar-mode. Currently just shows workspaces from [[file:~/.config/doom/modules/ui/perspective/][perspectives]].
