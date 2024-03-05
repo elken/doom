@@ -1,0 +1,10 @@
+#+title: Readme
+#+author: Ellis Kenyő
+#+date: \today
+#+latex_class: chameleon
+
+Simple setup for [[https://github.com/nex3/perspective-el][perspective.el]] copied from my private vanilla config. Seems to
+be much more stable and buggy than persp-mode without any of the custom advice,
+so I'm sticking with it for now.
+
+If [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=65719][this patch]] ever gets merged, that'll also give this a big win.
