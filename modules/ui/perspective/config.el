@@ -4,11 +4,17 @@
   :init (persp-mode)
   :hook (kill-emacs . persp-state-save)
   :custom
+  (persp-sort 'created)
   (persp-suppress-no-prefix-key-warning t)
   (persp-show-modestring nil)
   (persp-state-default-file (expand-file-name "perspectives" doom-cache-dir))
   :config
   (defun +doom-dashboard--persp-detect-project-h ())
+
+  (when (modulep! :completion vertico)
+    (after! consult
+      (consult-customize consult--source-buffer :hidden t :default nil)
+      (add-to-list 'consult-buffer-sources persp-consult-source)))
 
   (defun persp-generate-id ()
     (format "#%d"
@@ -16,6 +22,24 @@
                      when (string-match-p "^#[0-9]+$" name)
                      maximize (string-to-number (substring name 1)) into max
                      finally return (if max (1+ max) 1))))
+
+  (defun persp-names (&optional asc)
+    "Return a list of the names of all perspectives on the `selected frame'.
+
+Optionall sort ASCending."
+    (let ((persps (hash-table-values (perspectives-hash))))
+      (cond ((eq persp-sort 'name)
+             (sort (mapcar 'persp-name persps) (if asc #'string> #'string<)))
+            ((eq persp-sort 'access)
+             (mapcar 'persp-name
+                     (sort persps (lambda (a b)
+                                    (time-less-p (persp-last-switch-time (if asc b a))
+                                                 (persp-last-switch-time (if asc a b)))))))
+            ((eq persp-sort 'created)
+             (mapcar 'persp-name
+                     (sort persps (lambda (a b)
+                                    (time-less-p (persp-created-time (if asc b a))
+                                                 (persp-created-time (if asc a b))))))))))
 
   (map!
    :leader
