@@ -89,6 +89,7 @@ _please_ don't open any issues about missing variables.
   - [[#line-numbers][Line Numbers]]
   - [[#guiframe][GUI/Frame]]
 - [[#org-mode][Org Mode]]
+  - [[#complete-ids-when-inserting-links][Complete IDs when inserting links]]
   - [[#fill-column][fill-column]]
   - [[#hook-setup][Hook setup]]
   - [[#org-directory][org-directory]]
@@ -813,6 +814,18 @@ Add some transparency when running under awesome
 #+end_src
 
 * Org Mode
+** Complete IDs when inserting links
+This /definitely/ feels like something that should be on ootb, but hey ho.
+
+#+begin_src emacs-lisp
+(defun org-id-complete-link (&optional arg)
+  "Create an id: link using completion"
+  (concat "id:" (org-id-get-with-outline-path-completion)))
+
+(after! org
+  (org-link-set-parameters "id" :complete 'org-id-complete-link))
+#+end_src
+
 ** fill-column
 Keep the content centered on the page when writing org documents
 
