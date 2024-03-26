@@ -698,7 +698,7 @@ modeline from that module isn't in use. So, it's duplicated here and tweaked.
   (remove-hook 'doom-modeline-mode-hook #'size-indication-mode)
   (doom-modeline-def-modeline 'main
     '(matches bar modals workspace-name window-number persp-name selection-info buffer-info remote-host debug vcs matches)
-    '(github mu4e grip gnus checker misc-info repl lsp " ")))
+    '(github mu4e grip gnus check misc-info repl lsp " ")))
 #+end_src
 
 ** Fonts
