@@ -62,17 +62,17 @@
        ;;nav-flash         ; blink cursor line after big motions
        ;;neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
-       perspective
+       ;; perspective
        (popup +all
               +defaults) ; tame sudden yet inevitable temporary windows
        ;; tabs              ; a tab bar for Emacs
-       tab-bar
+       ;; tab-bar
        ;; (treemacs +lsp)          ; a project drawer, like neotree but cooler
        ;; unicode           ; extended unicode support for various languages
        (vc-gutter +pretty)         ; vcs diff in the fringe
        ;; vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        (window-select +numbers)         ; visually switch windows
-       ;;workspaces       ; tab emulation, persistence & separate workspaces
+       workspaces       ; tab emulation, persistence & separate workspaces
        ;; zen               ; distraction-free coding or writing
 
        :editor
@@ -147,8 +147,8 @@
        data                     ; config/data formats
        ;; (dart +lsp
        ;;       +flutter) ; paint ui and not much else
-       ;;(elixir +lsp
-       ;;        +tree-sitter)            ; erlang done right
+       (elixir +lsp
+               +tree-sitter)            ; erlang done right
        ;;elm               ; care for a cup of TEA?
        (emacs-lisp +tree-sitter)                       ; drown in parentheses
        ;;erlang            ; an elegant language for a more civilized age
