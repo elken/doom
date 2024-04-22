@@ -557,7 +557,7 @@ Useful when copying links to try new packages. Attempt to create one using
         "(package! "
         (car (last (string-split (url-filename url) "/")))
         "\n:recipe (:host nil :repo \""
-        str
+        string
         "\"))")))
     (call-interactively #'indent-region)))
 #+end_src
