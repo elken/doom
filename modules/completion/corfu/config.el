@@ -87,8 +87,12 @@ placed, otherwise they come first.")
 
 (use-package! orderless
   :when (modulep! +orderless)
+  :hook (lsp-completion-mode . +corfu-lsp-mode-setup)
   :init
-  (setq completion-styles '(orderless partial-completion)
+  (defun +corfu-lsp-mode-setup ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(orderless)))
+  (setq completion-styles '(orderless partial-completion flex)
         completion-category-overrides '((file (styles . (partial-completion))))))
 
 
