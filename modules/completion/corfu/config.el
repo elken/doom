@@ -208,3 +208,8 @@ placed, otherwise they come first.")
   :init (setq evil-collection-corfu-key-themes '(default magic-return))
   :config
   (evil-collection-corfu-setup))
+
+
+(use-package! corfu-prescient
+  :after corfu
+  :hook (corfu-mode . corfu-prescient-mode))

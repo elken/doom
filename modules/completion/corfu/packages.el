@@ -15,6 +15,7 @@
   :recipe (:host github :repo "elken/yasnippet-capf"))
 (package! package-capf
   :recipe (:host github :repo "elken/package-capf"))
+(package! corfu-prescient)
 
 (when (modulep! :os tty)
   (package! popon
