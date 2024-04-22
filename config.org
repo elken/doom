@@ -2103,8 +2103,6 @@ Packages to be unpinned or just completely disabled
   :recipe (:host github :repo "elken/engrave-faces"))
 (package! ox-chameleon
   :recipe (:host github :repo "elken/ox-chameleon"))
-(package! forge
-  :recipe (:host github :repo "elken/forge" :branch "feat/forge-max-topics"))
 #+end_src
 
 ** embark-vc
