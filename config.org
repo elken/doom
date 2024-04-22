@@ -139,6 +139,11 @@ _please_ don't open any issues about missing variables.
     - [[#epithet][Epithet]]
     - [[#portal][Portal]]
   - [[#lua][Lua]]
+  - [[#ruby][Ruby]]
+    - [[#enable-rbenv][Enable rbenv]]
+    - [[#force-disable-rvm][Force disable rvm]]
+    - [[#disable-other-language-servers][Disable other language servers]]
+    - [[#enable-rainbow-parens][Enable rainbow-parens]]
   - [[#lspdap][LSP/DAP]]
     - [[#increase-variable-line-length][Increase variable line length]]
     - [[#improve-completions][Improve completions]]
@@ -1984,6 +1989,46 @@ First things first; we need a project mode for my awesomewm config.
   :when (string-prefix-p (expand-file-name "awesome" (xdg-config-home)) default-directory))
 
 (add-hook '+awesome-config-mode-hook #'rainbow-mode)
+#+end_src
+
+** Ruby
+New year new me. This year, it's Ruby.
+
+*** Enable rbenv
+I don't yet see a case for /not/ having this on all the time, so for now we just
+always have this on.
+
+Easier to manage things with rbenv.
+
+#+begin_src emacs-lisp
+(global-rbenv-mode)
+#+end_src
+
+*** Force disable rvm
+Seems that even just having some remnant of rvm around is enough to trigger it,
+and that breaks a lot.
+
+So, I'd rather just have it always be off.
+
+#+begin_src emacs-lisp
+(setq rspec-use-rvm nil)
+#+end_src
+
+*** Disable other language servers
+Not yet sure which of these is best, so for now until I get a compelling reason
+I'd rather stick with solargraph.
+
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (add-to-list 'lsp-disabled-clients 'rubocop-ls)
+  (add-to-list 'lsp-disabled-clients 'typeprof-ls))
+#+end_src
+
+*** Enable rainbow-parens
+Another language that's missing this...
+
+#+begin_src emacs-lisp
+(add-hook 'ruby-mode-hook #'rainbow-delimiters-mode)
 #+end_src
 
 ** LSP/DAP
