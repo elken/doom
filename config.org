@@ -147,6 +147,8 @@ _please_ don't open any issues about missing variables.
   - [[#lspdap][LSP/DAP]]
     - [[#increase-variable-line-length][Increase variable line length]]
     - [[#improve-completions][Improve completions]]
+- [[#completion][Completion]]
+  - [[#projectile-completion-fn][Projectile completion fn]]
 - [[#snippets][Snippets]]
   - [[#snippet-definitions][Snippet definitions]]
     - [[#org-mode-1][Org-mode]]
@@ -2047,6 +2049,33 @@ The default completions are quite bad
 (after! lsp-mode
   (setq +lsp-company-backends
         '(:separate company-capf company-yasnippet company-dabbrev)))
+#+end_src
+
+* Completion
+Completion is handled by the amazing VERTICO stack, most of which we can just rely on stock Doom setup.
+
+There are however a few minor changes we want...
+
+** Projectile completion fn
+In order to get a slightly nicer UI, we can set this manually rather than relying on the default =completing-read=.
+
+#+begin_src emacs-lisp
+(autoload #'consult--read "consult")
+
+;;;###autoload
+(defun +vertico/projectile-completion-fn (prompt choices)
+  "Given a PROMPT and a list of CHOICES, filter a list of files for
+`projectile-find-file'."
+  (interactive)
+  (consult--read
+   choices
+   :prompt prompt
+   :sort nil
+   :add-history (thing-at-point 'filename)
+   :category 'file
+   :history '(:input +vertico/find-file-in--history)))
+
+(setq projectile-completion-system '+vertico/projectile-completion-fn)
 #+end_src
 
 * Snippets
