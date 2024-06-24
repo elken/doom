@@ -174,6 +174,7 @@ _please_ don't open any issues about missing variables.
   - [[#exercism][Exercism]]
   - [[#evil-cleverparens][evil-cleverparens]]
   - [[#litable][litable]]
+  - [[#magit-file-icons][magit-file-icons]]
 - [[#spelling][Spelling]]
 - [[#local-settings][Local settings]]
   - [[#dotenv][dotenv]]
@@ -2368,6 +2369,20 @@ This is literally the coolest package ever...
         :map emacs-lisp-mode-map
         (:prefix ("t" . "toggle")
           "l" #'litable-mode)))
+#+end_src
+
+** magit-file-icons
+A simple package to add file icons in magit views.
+
+#+begin_src elisp
+(package! magit-file-icons)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! magit-file-icons
+  :after magit
+  :init
+  (magit-file-icons-mode 1))
 #+end_src
 
 * Spelling
