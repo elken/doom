@@ -2021,6 +2021,7 @@ I'd rather stick with solargraph.
 #+begin_src emacs-lisp
 (after! lsp-mode
   (add-to-list 'lsp-disabled-clients 'rubocop-ls)
+  (add-to-list 'lsp-disabled-clients 'solargraph)
   (add-to-list 'lsp-disabled-clients 'typeprof-ls))
 #+end_src
 
