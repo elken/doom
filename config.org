@@ -2168,7 +2168,7 @@ Place to put packages that don't have a guaranteed home yet.
 Packages to be unpinned or just completely disabled
 
 #+begin_src elisp
-(disable-packages! evil-escape)
+(disable-packages! evil-escape org-yt)
 (unpin! evil-collection)
 (package! apheleia
  :recipe (:local-repo "~/build/elisp/apheleia"))
