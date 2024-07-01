@@ -2098,7 +2098,8 @@ In order to get a slightly nicer UI, we can set this manually rather than relyin
 (defun +literate-jump-heading ()
   "Jump to a heading in the literate org file."
   (interactive)
-  (let* ((buffer (or (find-buffer-visiting +literate-config-file)
+  (let* ((+literate-config-file (file-name-concat doom-user-dir "config.org"))
+         (buffer (or (find-buffer-visiting +literate-config-file)
                      (find-file-noselect +literate-config-file t))))
     (with-current-buffer buffer
       (let* ((imenu-auto-rescan t)
