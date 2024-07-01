@@ -2417,7 +2417,7 @@ This is literally the coolest package ever...
 A simple package to add file icons in magit views.
 
 #+begin_src elisp
-(package! magit-file-icons)
+(package! magit-file-icons :pin "0006e243b0e7aa005f6e8900b4b2e3a92c2d0532")
 #+end_src
 
 #+begin_src emacs-lisp
